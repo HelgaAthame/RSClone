@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+
+      /* Language and Environment */
+      "target": "ESNext",
+      "lib": [
+          "ESNext"
+      ],
+
+      /* Modules */
+      "module": "ESNext",
+      "moduleResolution": "NodeNext",
+      "resolveJsonModule": true,
+      "sourceMap": true,
+      "outDir": "./build",
+      "noEmit": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+
+      /* Type Checking */
+      "strict": true,
+      "noImplicitAny": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "skipLibCheck": true,
+  },
+}
