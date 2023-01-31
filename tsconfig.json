@@ -4,7 +4,8 @@
       /* Language and Environment */
       "target": "ESNext",
       "lib": [
-          "ESNext"
+          "ESNext",
+          "DOM"
       ],
 
       /* Modules */
