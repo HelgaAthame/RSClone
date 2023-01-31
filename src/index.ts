@@ -1,4 +1,4 @@
-import { app } from './firebase-config';
+import { app } from './firebase-config.js';
 
 import { initializeApp } from 'firebase/app';
 import {
@@ -118,9 +118,11 @@ signInWithPopup(auth, provider)
   });
 
   const myTestDiv = document.querySelector('.my-test-div') as HTMLElement;
-  myTestDiv?.addEventListener('click', async () => {
-    await createUserWithEmailAndPassword(auth, email, password);
-    alert('kuku');
+  if (myTestDiv === null) throw new Error('There is no element');
+  myTestDiv.addEventListener('click', () => {
+    alert('1');
+    signInWithPopup(auth, provider);
+    alert('2');
   });
 
   export { createUserWithEmailAndPassword };
