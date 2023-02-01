@@ -9,3 +9,5 @@ class App {
     this.model = model;
   }
 }
+
+const app = new App(new MenuView(), new Model());
