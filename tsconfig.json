@@ -1,29 +1,28 @@
 {
   "compilerOptions": {
+    /* Language and Environment */
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
 
-      /* Language and Environment */
-      "target": "ESNext",
-      "lib": [
-          "ESNext",
-          "DOM"
-      ],
+    /* Modules */
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "outDir": "./build",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
 
-      /* Modules */
-      "module": "ESNext",
-      "moduleResolution": "NodeNext",
-      "resolveJsonModule": true,
-      "sourceMap": true,
-      "outDir": "./build",
-      "noEmit": true,
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
 
-      /* Type Checking */
-      "strict": true,
-      "noImplicitAny": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noImplicitReturns": true,
-      "skipLibCheck": true,
-  },
+    /* Phaser types */
+    "typeRoots": ["./node_modules/phaser/types"]
+  }
 }
