@@ -225,5 +225,8 @@ function update() {
 
 function dropBomb() {
   const bomb = bombs.create(500, 500, "bomb");
-  bomb.setScale((1 / 555) * fieldSquareLength, (1 / 569) * fieldSquareLength);
+  bomb.setScale(
+    (1 / 555 / 1.5) * fieldSquareLength,
+    (1 / 569 / 1.5) * fieldSquareLength
+  );
 }
