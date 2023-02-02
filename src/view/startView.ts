@@ -1,5 +1,6 @@
 import GithubLogo from '../assets/logos/github.png';
 import RsschoolLogo from '../assets/logos/logo-rs.svg'
+import selectorChecker from '../utils/selectorChecker.js';
 import './startView.scss';
 
 export class StartView {
@@ -35,6 +36,9 @@ export class StartView {
   }
 
   addListeners () {
-
+    const start = selectorChecker(document, '.start');
+    start.addEventListener('click', () => {
+      // some callback to render main game screen
+    })
   }
 }
