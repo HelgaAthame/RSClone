@@ -4,13 +4,51 @@
   justify-items: space-between;
 }
 
+@mixin flexCenter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flexBetween {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin ancor {
+  color: $text-color;
+  text-decoration: none;
+  &:hover {
+    color: white;
+    cursor: pointer;
+    text-shadow: 0 0 10px white;
+  }
+  &:active {
+    color: $ancor-color;
+    cursor: pointer;
+    text-shadow: 0 0 10px $ancor-color;
+  }
+  &:disabled {
+    color: $disabled-color;
+    cursor: initial;
+  }
+}
+
+$basic-padding: 1rem;
+$text-color: #ddd;
+$ancor-color: palevioletred;
+$disabled-color: #444;
+
 body {
   background-color: black;
   font-family: Mayhem;
   color: #ddd;
   .main {
     @include flexCol;
-    height: 100vh;
+    height: 95vh;
     .logo {
       flex-grow: 1;
       background-image: url('./../assets/bomberman-logo.png');
@@ -18,7 +56,47 @@ body {
       background-position: center;
     }
     .nav {
-      flex-grow: 1;
+      @include flexCenter;
+      article {
+        padding: $basic-padding;
+        @include ancor;
+      }
+    }
+    .settings {
+      @include flexCenter;
+      @include ancor;
+    }
+    .footer {
+      @include flexBetween;
+      .github {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: 33vw;
+        .github__logo {
+          img {
+            width: 3rem;
+          }
+        }
+        div, a {
+          @include ancor;
+          padding: $basic-padding;
+        }
+      }
+      .year {
+        width: 33vw;
+        justify-self: center;
+        @include flexCenter;
+      }
+      .rs {
+        padding: $basic-padding;
+        display: flex;
+        justify-content: flex-end;
+        width: 33vw;
+        img {
+          width: 4rem;
+        }
+      }
     }
   }
 }
