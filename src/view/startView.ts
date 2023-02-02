@@ -1,5 +1,5 @@
 import GithubLogo from '../assets/logos/github.png';
-import RsschoolLogo from '../assets/logos/logo-rs.svg'
+import RsschoolLogo from '../assets/logos/logo-rs';
 import selectorChecker from '../utils/selectorChecker.js';
 import './startView.scss';
 
@@ -33,6 +33,7 @@ export class StartView {
     `;
     this.addListeners();
     document.body.append(main);
+    this.addListeners();
   }
 
   addListeners () {
