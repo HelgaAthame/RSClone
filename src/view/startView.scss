@@ -1,0 +1,60 @@
+@mixin flexCol {
+  display:flex;
+  flex-direction: column;
+  justify-items: space-between;
+}
+
+body {
+  background-color: black;
+  font-family: Mayhem;
+  color: #ddd;
+  .main {
+    @include flexCol;
+    height: 100vh;
+    .logo {
+      flex-grow: 1;
+      background-image: url('./../assets/bomberman-logo.png');
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .nav {
+      flex-grow: 1;
+    }
+  }
+}
+
+
+@font-face {
+  font-family: Mayhem;
+  src: url('./../assets/fonts/retro-land-mayhem.ttf');
+}
+
+@font-face {
+  font-family: Baloo;
+  src: url('./../assets/fonts/BalooPaaji2-Regular.ttf');
+}
+
+@font-face {
+  font-family: Monaco;
+  src: url('./../assets/fonts/monaco.ttf');
+}
+
+@font-face {
+  font-family: Pacifico;
+  src: url('./../assets/fonts/Pacifico.ttf');
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url('./../assets/fonts/Roboto-Regular.ttf');
+}
+
+@font-face {
+  font-family: SnakeBold;
+  src: url('./../assets/fonts/snakebold.ttf');
+}
+
+@font-face {
+  font-family: SnakeThin;
+  src: url('./../assets/fonts/snakethin.ttf');
+}
