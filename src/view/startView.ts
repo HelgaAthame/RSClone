@@ -31,8 +31,8 @@ export class StartView {
         </section>
       </footer>
     `;
-    this.addListeners();
     document.body.append(main);
+    this.addListeners();
   }
 
   addListeners () {
