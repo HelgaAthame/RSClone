@@ -3,6 +3,10 @@ import Phaser from "phaser";
 const width = window.innerWidth;
 const height = window.innerHeight;
 
+const fieldSquareLength = height / 11;
+const fieldStartX = width / 2 - height / 2;
+const fieldEndX = fieldStartX + height;
+
 const config = {
   type: Phaser.AUTO,
   width: width,
@@ -20,7 +24,7 @@ const config = {
   },
 };
 
-let char, grass, enemy, bomb, explosion, cursors;
+let char, grass, stones, enemy, bombs, explosion, cursors;
 
 const game = new Phaser.Game(config);
 
@@ -31,6 +35,7 @@ function preload() {
   });
 
   this.load.image("grass", "./src/assets/grass.png");
+  this.load.image("stone", "./src/assets/stone.jpg");
 
   this.load.image("explosion", "./src/assets/explosion__sprite.jfif");
   this.load.image("bomb", "./src/assets/bomb.png");
@@ -40,27 +45,55 @@ function preload() {
 }
 
 function create() {
-  const fieldSquareLength = height / 11;
-  const fieldStartX = width / 2 - height / 2;
-  const fieldEndX = fieldStartX + height;
+  stones = this.physics.add.staticGroup();
+  grass = this.physics.add.staticGroup();
 
-  for (let i = fieldStartX; i < fieldEndX; i += fieldSquareLength) {
-    for (let j = 0; j < height; j += fieldSquareLength) {
-      console.log(j);
-      this.physics.add
-        .image(
-          fieldStartX + i * fieldSquareLength,
-          j * fieldSquareLength,
-          "grass"
-        )
-        .setScale(1 / 11);
+  /* Draw field */
+  /* BIG WIDTH ONLY!!! */
+  for (
+    let i = 0;
+    i < fieldEndX - fieldStartX + fieldSquareLength;
+    i += fieldSquareLength
+  ) {
+    for (let j = 0; j < height + fieldSquareLength; j += fieldSquareLength) {
+      if (
+        i === 0 ||
+        Math.floor(i) === Math.floor(fieldEndX - fieldStartX) ||
+        j === 0 ||
+        Math.floor(j) === Math.floor(height - fieldSquareLength)
+      ) {
+        stones
+          .create(
+            fieldStartX + i + fieldSquareLength / 2,
+            j + fieldSquareLength / 2,
+            "stone"
+          )
+          .setScale((1 / 1200) * fieldSquareLength)
+          .refreshBody();
+      } else {
+        grass
+          .create(
+            fieldStartX + i + fieldSquareLength / 2,
+            j + fieldSquareLength / 2,
+            "grass"
+          )
+          .setScale((1 / 512) * fieldSquareLength)
+          .refreshBody();
+      }
     }
   }
 
-  this.physics.add.image(width / 2, height / 2, "grass").setScale(1 / 11);
-
   char = this.physics.add.sprite(width / 2, height / 2 - 32, "char");
 
+  this.physics.add.collider(char, stones);
+
+  bombs = this.physics.add.group();
+  this.physics.add.collider(char, bombs);
+  this.physics.add.collider(stones, bombs);
+
+  /* Draw Char */
+
+  /* MOVE ANIMATIONS */
   this.anims.create({
     key: "up",
     frames: this.anims.generateFrameNumbers("char", {
@@ -103,28 +136,74 @@ function create() {
     frameRate: 20,
   });
 
-  cursors = this.input.keyboard.createCursorKeys();
+  /* BOMB ANIMATIONS */
 
-  /*   this.add.image(width / 2, height / 2, "sky");
-
-  const particles = this.add.particles("red");
-
-  const emitter = particles.createEmitter({
-    speed: 100,
-    scale: { start: 1, end: 0 },
-    blendMode: "ADD",
+  this.anims.create({
+    key: "bombUp",
+    frames: this.anims.generateFrameNumbers("char", {
+      frames: [35, 36, 37, 38, 39, 38, 37, 36],
+    }),
+    frameRate: 10,
+    repeat: -1,
   });
 
-  const logo = this.physics.add.image(400, 100, "logo");
+  this.anims.create({
+    key: "bombRight",
+    frames: this.anims.generateFrameNumbers("char", {
+      frames: [20, 21, 22, 23, 24, 23, 22, 21],
+    }),
+    frameRate: 10,
+    repeat: -1,
+  });
 
-  logo.setVelocity(100, 200);
-  logo.setBounce(1, 1);
-  logo.setCollideWorldBounds(true);
+  this.anims.create({
+    key: "bombDown",
+    frames: this.anims.generateFrameNumbers("char", {
+      frames: [25, 26, 27, 28, 29, 28, 27, 26],
+    }),
+    frameRate: 10,
+    repeat: -1,
+  });
 
-  emitter.startFollow(logo); */
+  this.anims.create({
+    key: "bombLeft",
+    frames: this.anims.generateFrameNumbers("char", {
+      frames: [30, 31, 32, 33, 34, 33, 32, 31],
+    }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  this.anims.create({
+    key: "turn",
+    frames: [{ key: "char", frame: 7 }],
+  });
+
+  cursors = this.input.keyboard.createCursorKeys();
 }
 
 function update() {
+  /* Char controls */
+  if (cursors.space.isDown) {
+    const currentCharDirection = char.anims.currentAnim.key;
+
+    switch (currentCharDirection) {
+      case "up":
+        char.anims.play("bombUp", true);
+        break;
+      case "right":
+        char.anims.play("bombRight", true);
+        break;
+      case "down":
+        char.anims.play("bombDown", true);
+        break;
+      case "left":
+        char.anims.play("bombLeft", true);
+        break;
+    }
+
+    dropBomb();
+  }
   if (cursors.up.isDown) {
     char.setVelocityY(-160);
     char.anims.play("up", true);
@@ -140,6 +219,11 @@ function update() {
   } else {
     char.setVelocityX(0);
     char.setVelocityY(0);
-    char.anims.play("turn");
+    char.anims.stop();
   }
+}
+
+function dropBomb() {
+  const bomb = bombs.create(500, 500, "bomb");
+  bomb.setScale((1 / 555) * fieldSquareLength, (1 / 569) * fieldSquareLength);
 }
