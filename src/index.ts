@@ -1,13 +1,15 @@
-import { MenuView } from "./view/menuView.js";
 import { Model } from "./model/index.js";
+import { View, view } from "./view/index.js";
 
 class App {
-  view: MenuView;
+  view: View;
   model: Model;
-  constructor(view: MenuView, model: Model) {
+  constructor(view: View, model: Model) {
     this.view = view;
     this.model = model;
   }
 }
+const app = new App(view, new Model());
 
-const app = new App(new MenuView(), new Model());
+//рендер главного экрана
+app.view.start.renderUI();
