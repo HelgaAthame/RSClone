@@ -3,9 +3,9 @@ import Phaser from "phaser";
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const fieldSquareLength = height / 11;
+const ceilsNum = 11;
+const fieldSquareLength = Math.floor(height / ceilsNum);
 const fieldStartX = width / 2 - height / 2;
-const fieldEndX = fieldStartX + height;
 
 const config = {
   type: Phaser.AUTO,
@@ -26,6 +26,8 @@ const config = {
 
 let char, grass, stones, enemy, bombs, explosion, cursors;
 
+let bombActive = false;
+
 const game = new Phaser.Game(config);
 
 function preload() {
@@ -40,17 +42,31 @@ function preload() {
   this.load.image("explosion", "./src/assets/explosion__sprite.jfif");
   this.load.image("bomb", "./src/assets/bomb.png");
   this.load.image("enemy", "./src/assets/enemy.png");
-  /*   this.load.image("logo", "assets/sprites/phaser3-logo.png");
-  this.load.image("red", "assets/particles/red.png"); */
 }
 
 function create() {
   stones = this.physics.add.staticGroup();
-  grass = this.physics.add.staticGroup();
+  const grass = this.add.group({
+    key: "grass",
+    repeat: ceilsNum ** 2 - 1,
+    setScale: {
+      x: (1 / 512) * fieldSquareLength,
+      y: (1 / 512) * fieldSquareLength,
+    },
+  });
 
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
-  for (
+  Phaser.Actions.GridAlign(grass.getChildren(), {
+    width: ceilsNum,
+    height: ceilsNum,
+    cellWidth: fieldSquareLength + 2,
+    cellHeight: fieldSquareLength + 2,
+    x: -2 * fieldSquareLength + fieldStartX,
+    y: -2 * fieldSquareLength,
+  });
+
+  /*   for (
     let i = 0;
     i < fieldEndX - fieldStartX + fieldSquareLength;
     i += fieldSquareLength
@@ -81,7 +97,7 @@ function create() {
           .refreshBody();
       }
     }
-  }
+  } */
 
   char = this.physics.add.sprite(width / 2, height / 2 - 32, "char");
 
@@ -185,24 +201,7 @@ function create() {
 function update() {
   /* Char controls */
   if (cursors.space.isDown) {
-    const currentCharDirection = char.anims.currentAnim.key;
-
-    switch (currentCharDirection) {
-      case "up":
-        char.anims.play("bombUp", true);
-        break;
-      case "right":
-        char.anims.play("bombRight", true);
-        break;
-      case "down":
-        char.anims.play("bombDown", true);
-        break;
-      case "left":
-        char.anims.play("bombLeft", true);
-        break;
-    }
-
-    dropBomb();
+    dropBomb(this);
   }
   if (cursors.up.isDown) {
     char.setVelocityY(-160);
@@ -223,10 +222,43 @@ function update() {
   }
 }
 
-function dropBomb() {
-  const bomb = bombs.create(500, 500, "bomb");
-  bomb.setScale(
-    (1 / 555 / 1.5) * fieldSquareLength,
-    (1 / 569 / 1.5) * fieldSquareLength
-  );
+function dropBomb(ctx) {
+  const charX = char.body.center.x;
+  const charY = char.body.center.y;
+
+  if (!bombActive) {
+    bombActive = true;
+    const bomb = bombs.create(charX, charY, "bomb");
+
+    const bombScaleX = (1 / 555) * fieldSquareLength;
+    const bombScaleY = (1 / 569) * fieldSquareLength;
+    bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
+    setTimeout(() => (bombActive = false), 1000);
+
+    ctx.tweens.add({
+      targets: bomb,
+      scaleX: bombScaleX / 1.5,
+      scaleY: bombScaleY / 1.5,
+      yoyo: true,
+      repeat: -1,
+      duration: 300,
+      ease: "Sine.easeInOut",
+    });
+
+    const currentCharDirection = char.anims.currentAnim.key;
+    switch (currentCharDirection) {
+      case "up":
+        char.anims.play("bombUp", true);
+        break;
+      case "right":
+        char.anims.play("bombRight", true);
+        break;
+      case "down":
+        char.anims.play("bombDown", true);
+        break;
+      case "left":
+        char.anims.play("bombLeft", true);
+        break;
+    }
+  }
 }
