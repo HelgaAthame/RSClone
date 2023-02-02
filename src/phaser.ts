@@ -45,8 +45,9 @@ function preload() {
 }
 
 function create() {
-  stones = this.physics.add.staticGroup();
-  const grass = this.add.group({
+  /* Draw field */
+  /* BIG WIDTH ONLY!!! */
+  grass = this.physics.add.staticGroup({
     key: "grass",
     repeat: ceilsNum ** 2 - 1,
     setScale: {
@@ -54,50 +55,33 @@ function create() {
       y: (1 / 512) * fieldSquareLength,
     },
   });
-
-  /* Draw field */
-  /* BIG WIDTH ONLY!!! */
   Phaser.Actions.GridAlign(grass.getChildren(), {
     width: ceilsNum,
     height: ceilsNum,
-    cellWidth: fieldSquareLength + 2,
-    cellHeight: fieldSquareLength + 2,
+    cellWidth: fieldSquareLength,
+    cellHeight: fieldSquareLength,
     x: -2 * fieldSquareLength + fieldStartX,
     y: -2 * fieldSquareLength,
   });
+  grass.refresh();
 
-  /*   for (
-    let i = 0;
-    i < fieldEndX - fieldStartX + fieldSquareLength;
-    i += fieldSquareLength
-  ) {
-    for (let j = 0; j < height + fieldSquareLength; j += fieldSquareLength) {
-      if (
-        i === 0 ||
-        Math.floor(i) === Math.floor(fieldEndX - fieldStartX) ||
-        j === 0 ||
-        Math.floor(j) === Math.floor(height - fieldSquareLength)
-      ) {
-        stones
-          .create(
-            fieldStartX + i + fieldSquareLength / 2,
-            j + fieldSquareLength / 2,
-            "stone"
-          )
-          .setScale((1 / 1200) * fieldSquareLength)
-          .refreshBody();
-      } else {
-        grass
-          .create(
-            fieldStartX + i + fieldSquareLength / 2,
-            j + fieldSquareLength / 2,
-            "grass"
-          )
-          .setScale((1 / 512) * fieldSquareLength)
-          .refreshBody();
-      }
-    }
-  } */
+  stones = this.physics.add.staticGroup({
+    key: "stone",
+    repeat: ceilsNum,
+    setScale: {
+      x: (1 / 1200) * fieldSquareLength,
+      y: (1 / 1200) * fieldSquareLength,
+    },
+  });
+  Phaser.Actions.GridAlign(stones.getChildren(), {
+    width: ceilsNum,
+    height: ceilsNum,
+    cellWidth: fieldSquareLength,
+    cellHeight: fieldSquareLength,
+    x: -6.045 * fieldSquareLength + fieldStartX,
+    y: -6.045 * fieldSquareLength,
+  });
+  stones.refresh();
 
   char = this.physics.add.sprite(width / 2, height / 2 - 32, "char");
 
@@ -228,7 +212,7 @@ function dropBomb(ctx) {
 
   if (!bombActive) {
     bombActive = true;
-    const bomb = bombs.create(charX, charY, "bomb");
+    const bomb = bombs.create(charX, charY, "bomb").setImmovable();
 
     const bombScaleX = (1 / 555) * fieldSquareLength;
     const bombScaleY = (1 / 569) * fieldSquareLength;
