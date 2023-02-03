@@ -3,8 +3,12 @@ import Phaser from "phaser";
 const width = window.innerWidth;
 const height = window.innerHeight;
 const ceilsNum = 11;
-const fieldSquareLength = Math.floor(height / ceilsNum);
+const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
+
+const fieldMatrix = Array(ceilsNum + 1)
+  .fill(0)
+  .map(() => Array(ceilsNum + 1).fill(0));
 
 const config = {
   type: Phaser.AUTO,
@@ -17,6 +21,7 @@ const config = {
     },
   },
   scene: {
+    char: "",
     preload: preload,
     create: create,
     update: update,
@@ -32,7 +37,7 @@ const game = new Phaser.Game(config);
 function preload() {
   this.load.spritesheet("char", "./src/assets/char__sprite.png", {
     frameWidth: 64,
-    frameHeight: 100,
+    frameHeight: 99,
   });
   this.load.spritesheet("explosion", "./src/assets/explosion_sprite.png", {
     frameWidth: 64,
@@ -48,39 +53,47 @@ function preload() {
 function create() {
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
-  grass = this.physics.add.staticGroup({
-    key: "grass",
-    repeat: ceilsNum ** 2 - 1,
-    setScale: {
-      x: (1 / 512) * fieldSquareLength,
-      y: (1 / 512) * fieldSquareLength,
-    },
-  });
-  Phaser.Actions.GridAlign(grass.getChildren(), {
-    width: ceilsNum,
-    height: ceilsNum,
-    cellWidth: fieldSquareLength,
-    cellHeight: fieldSquareLength,
-    x: -2 * fieldSquareLength + fieldStartX,
-    y: -2 * fieldSquareLength,
-  });
-  grass.refresh();
 
-  stones = this.physics.add.staticGroup({
-    key: "stone",
-    repeat: ceilsNum * 4 - 2,
-    setScale: {
-      x: (1 / 1200) * fieldSquareLength,
-      y: (1 / 1200) * fieldSquareLength,
-    },
-  });
+  stones = this.physics.add.staticGroup();
+  const stoneImgSize = 1200;
+  grass = this.physics.add.staticGroup();
+  const grassImgSize = 512;
+
+  for (let i = 0; i <= ceilsNum; i++) {
+    for (let j = 0; j <= ceilsNum; j++) {
+      fieldMatrix[i][j] = {
+        x: j * fieldSquareLength + fieldSquareLength / 2,
+        y: fieldStartX + i * fieldSquareLength + fieldSquareLength / 2,
+      };
+      if (i === 0 || i === ceilsNum || j === 0 || j === ceilsNum - 1) {
+        fieldMatrix[i][j].material = "stone";
+        stones
+          .create(
+            fieldStartX + i * fieldSquareLength + fieldSquareLength / 2,
+            j * fieldSquareLength + fieldSquareLength / 2,
+            "stone"
+          )
+          .setScale((1 / stoneImgSize) * fieldSquareLength)
+          .refreshBody();
+      } else {
+        fieldMatrix[i][j].material = "grass";
+        grass
+          .create(
+            fieldStartX + i * fieldSquareLength + fieldSquareLength / 2,
+            j * fieldSquareLength + fieldSquareLength / 2,
+            "grass"
+          )
+          .setScale((1 / grassImgSize) * fieldSquareLength)
+          .refreshBody();
+      }
+    }
+  }
 
   char = this.physics.add.sprite(width / 2, height / 2 - 32, "char");
 
   this.physics.add.collider(char, stones);
 
   bombs = this.physics.add.group();
-
   this.physics.add.collider(char, bombs);
   this.physics.add.collider(stones, bombs);
 
@@ -139,47 +152,11 @@ function create() {
     frameRate: 20,
   });
 
-  /* BOMB ANIMATIONS */
-
   this.anims.create({
-    key: "bombUp",
-    frames: this.anims.generateFrameNumbers("char", {
-      frames: [35, 36, 37, 38, 39, 38, 37, 36],
-    }),
+    key: "placeBomb",
+    frames: [{ key: "char", frame: 27 }],
     frameRate: 10,
     repeat: -1,
-  });
-
-  this.anims.create({
-    key: "bombRight",
-    frames: this.anims.generateFrameNumbers("char", {
-      frames: [20, 21, 22, 23, 24, 23, 22, 21],
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "bombDown",
-    frames: this.anims.generateFrameNumbers("char", {
-      frames: [25, 26, 27, 28, 29, 28, 27, 26],
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "bombLeft",
-    frames: this.anims.generateFrameNumbers("char", {
-      frames: [30, 31, 32, 33, 34, 33, 32, 31],
-    }),
-    frameRate: 10,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "turn",
-    frames: [{ key: "char", frame: 7 }],
   });
 
   cursors = this.input.keyboard.createCursorKeys();
@@ -204,12 +181,11 @@ function update() {
   };
 
   const dropBomb = () => {
-    const charX = char.body.center.x;
-    const charY = char.body.center.y;
-
     if (!bombActive) {
+      const [bombX, bombY] = findClosestSquare();
+
       bombActive = true;
-      const bomb = bombs.create(charX, charY, "bomb").setImmovable();
+      const bomb = bombs.create(bombX, bombY, "bomb").setImmovable();
       const bombScaleX = (1 / 555) * fieldSquareLength;
       const bombScaleY = (1 / 569) * fieldSquareLength;
       bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
@@ -226,29 +202,10 @@ function update() {
       });
 
       setTimeout(() => {
-        explodeBomb(bomb, charX, charY);
+        explodeBomb(bomb, bombX, bombY);
       }, 1000);
 
-      if (char.anims?.currentAnim) {
-        const currentCharDirection = char.anims.currentAnim.key;
-        switch (currentCharDirection) {
-          case "up":
-            char.anims.play("bombUp", true);
-            break;
-          case "right":
-            char.anims.play("bombRight", true);
-            break;
-          case "down":
-            char.anims.play("bombDown", true);
-            break;
-          case "left":
-            char.anims.play("bombLeft", true);
-            break;
-          default:
-            char.anims.play("bombUp", true);
-            break;
-        }
-      }
+      char.anims.play("placeBomb", true);
     }
   };
 
@@ -272,9 +229,25 @@ function update() {
     char.setVelocityX(-160);
     char.setVelocityY(0);
     char.anims.play("left", true);
-  } else {
+  } else if (!cursors.space.isDown) {
     char.setVelocityX(0);
     char.setVelocityY(0);
-    char.anims.stop();
+    char.anims.play("turn", true);
   }
+}
+
+function findClosestSquare() {
+  const charX = char.body.center.x;
+  const charY = char.body.center.y;
+  const flatFieldMatrix = fieldMatrix.flat();
+  const charToSquareDist = flatFieldMatrix.map((square) =>
+    Math.sqrt((charX - square.x) ** 2 + (charY - square.y) ** 2)
+  );
+
+  const minDistSquare = Math.min(...charToSquareDist);
+  const minDistSquareIndex = charToSquareDist.indexOf(minDistSquare);
+  const closestSquare = flatFieldMatrix[minDistSquareIndex];
+  console.log(minDistSquare, minDistSquareIndex);
+
+  return [closestSquare.x, closestSquare.y];
 }
