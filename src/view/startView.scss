@@ -49,6 +49,22 @@ body {
   .main {
     @include flexCol;
     height: 95vh;
+
+    .begin {
+      @include flexCenter;
+      padding-top: 15vw;
+      padding-right: 10vw;
+      font-size: 2rem;
+      height: 95vh;
+      background-image: url('../assets/bomb.png');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 50vw;
+      .begin__text {
+        @include ancor;
+      }
+    }
+
     .logo {
       flex-grow: 1;
       background-image: url('./../assets/bomberman-logo.png');

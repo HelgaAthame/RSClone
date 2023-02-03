@@ -8,9 +8,12 @@ export class StartView {
     const main = document.createElement('main');
     main.classList.add('main');
     main.innerHTML = `
-      <section class="begin"></section>
+      <section class="begin">
+        <article class="begin__text">start</article>
+      </section>
     `;
     document.body.append(main);
+    this.addAudio();
   }
 
   renderStartScreen () {
@@ -39,7 +42,6 @@ export class StartView {
       </section>
     </footer>
   `;
-    this.addAudio();
     this.addListeners();
   }
 
@@ -62,12 +64,11 @@ export class StartView {
     bgAudio.loop = true;
     document.body.append(bgAudio);
 
-    document.body.addEventListener('load', function() {
+    const beginText = selectorChecker(document, '.begin__text');
+    beginText.addEventListener('click', () => {
       loaded = true;
       bgAudio.play();
+      this.renderStartScreen();
     }, false);
-
-    /*const click = new Event('click');
-    bgAudio.dispatchEvent(click);*/
   }
 }
