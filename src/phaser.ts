@@ -164,12 +164,43 @@ function create() {
 
 function update() {
   const explodeBomb = (bomb, x: number, y: number) => {
+    const flatFieldMatrix = fieldMatrix.flat();
+    console.log(
+      flatFieldMatrix.find((square) => square.x === x && square.y === y)
+    );
     bomb.destroy();
     drawExplosion(x, y);
-    drawExplosion(x + fieldSquareLength, y);
-    drawExplosion(x - fieldSquareLength, y);
-    drawExplosion(x, y + fieldSquareLength);
-    drawExplosion(x, y - fieldSquareLength);
+
+    if (
+      flatFieldMatrix.find(
+        (square) => square.x === x + fieldSquareLength && square.y === y
+      ).material !== "stone"
+    ) {
+      drawExplosion(x + fieldSquareLength, y);
+    }
+
+    if (
+      flatFieldMatrix.find(
+        (square) => square.x === x - fieldSquareLength && square.y === y
+      ).material !== "stone"
+    ) {
+      drawExplosion(x - fieldSquareLength, y);
+    }
+    if (
+      flatFieldMatrix.find(
+        (square) => square.x === x && square.y === y + fieldSquareLength
+      ).material !== "stone"
+    ) {
+      drawExplosion(x, y + fieldSquareLength);
+    }
+
+    if (
+      flatFieldMatrix.find(
+        (square) => square.x === x && square.y === y - fieldSquareLength
+      ).material !== "stone"
+    ) {
+      drawExplosion(x, y - fieldSquareLength);
+    }
   };
 
   const drawExplosion = (x: number, y: number) => {
@@ -247,7 +278,6 @@ function findClosestSquare() {
   const minDistSquare = Math.min(...charToSquareDist);
   const minDistSquareIndex = charToSquareDist.indexOf(minDistSquare);
   const closestSquare = flatFieldMatrix[minDistSquareIndex];
-  console.log(minDistSquare, minDistSquareIndex);
-
+  console.log(fieldMatrix);
   return [closestSquare.x, closestSquare.y];
 }
