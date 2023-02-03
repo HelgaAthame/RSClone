@@ -22,7 +22,7 @@ const config = {
 
 let char, grass, enemy, bomb, explosion, cursors;
 
-const game = new Phaser.Game(config);
+export const game = new Phaser.Game(config);
 
 function preload() {
   this.load.spritesheet("char", "./src/assets/char__sprite.png", {
