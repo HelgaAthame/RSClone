@@ -1,7 +1,8 @@
 import GithubLogo from '../assets/logos/github.png';
-import RsschoolLogo from '../assets/logos/logo-rs';
+import RsschoolLogo from '../assets/logos/logo-rs.svg';
 import selectorChecker from '../utils/selectorChecker.js';
 import './startView.scss';
+import { game } from '../phaser.js';
 
 export class StartView {
   renderUI() {
@@ -31,15 +32,16 @@ export class StartView {
         </section>
       </footer>
     `;
-    this.addListeners();
     document.body.append(main);
     this.addListeners();
   }
 
   addListeners () {
     const start = selectorChecker(document, '.start');
-    start.addEventListener('click', () => {
-      // some callback to render main game screen
+    start.addEventListener('click', async () => {
+
+      const phaser = await import('../phaser.js');
+      const game = phaser.game;// some callback to render main game screen
     })
   }
 }
