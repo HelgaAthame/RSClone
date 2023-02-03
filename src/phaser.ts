@@ -67,21 +67,12 @@ function create() {
 
   stones = this.physics.add.staticGroup({
     key: "stone",
-    repeat: ceilsNum,
+    repeat: ceilsNum * 4 - 2,
     setScale: {
       x: (1 / 1200) * fieldSquareLength,
       y: (1 / 1200) * fieldSquareLength,
     },
   });
-  Phaser.Actions.GridAlign(stones.getChildren(), {
-    width: ceilsNum,
-    height: ceilsNum,
-    cellWidth: fieldSquareLength,
-    cellHeight: fieldSquareLength,
-    x: -6.045 * fieldSquareLength + fieldStartX,
-    y: -6.045 * fieldSquareLength,
-  });
-  stones.refresh();
 
   char = this.physics.add.sprite(width / 2, height / 2 - 32, "char");
 
