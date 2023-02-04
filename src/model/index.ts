@@ -16,14 +16,14 @@ export class Model {
     this._isMuted = false;
     this._volume = 0.5;
     this._buttons = {
-      arrowUp: 'arrowUp',
-      arrowDown: 'arrowDown',
-      arrowLeft: 'arrowLeft',
-      arrowRight: 'arrowRight',
+      arrowUp: 'ArrowUp',
+      arrowDown: 'ArrowDown',
+      arrowLeft: 'ArrowLeft',
+      arrowRight: 'ArrowRight',
       buttonA: 'X',
       buttonB: 'Z',
-      select: 'shift',
-      start: 'enter'
+      select: 'RightShift',
+      start: 'Enter'
     }
   }
   _buttons: Buttons;
@@ -68,7 +68,7 @@ export class Model {
   }
   get buttons () {
     //todo получить информацию из БД
-    return this.buttons;
+    return this._buttons;
   }
 }
 

@@ -22,21 +22,21 @@ export class StartView {
     main.innerHTML = `
     <section class="logo"></section>
     <nav class="nav">
-      <article class="start">start</article>
-      <article class="continue">continue</article>
+      <article class="start article">start</article>
+      <article class="continue article">continue</article>
+      <article class="settings article">settings</article>
     </nav>
-    <section class="settings">settings</section>
     <footer class="footer">
       <section class="github">
         <div class="github__logo">
           <img class="github__img" src="${GithubLogo}" alt="Github logo"/>
         </div>
-        <a href="https://github.com/killthecreator">Gleb</a>
-        <a href="https://github.com/HelgaAthame">Olga</a>
-        <a href="https://github.com/alexmegadrive">Alex</a>
+        <a href="https://github.com/killthecreator" class="footer-link">Gleb</a>
+        <a href="https://github.com/HelgaAthame" class="footer-link">Olga</a>
+        <a href="https://github.com/alexmegadrive" class="footer-link">Alex</a>
       </section>
       <section class="year">2023</section>
-      <section class="rs">
+      <section class="rs footer-link">
         <a href="https://rs.school/js/">
           <img class="rs-school__img" src="${RsschoolLogo}" alt="RS School JS Front-end course"/>
         </a>
@@ -49,6 +49,7 @@ export class StartView {
   addListeners () {
     this.addStartListener();
     this.addSettingsListener();
+    this.moveMenu();
   }
 
   addStartListener () {
@@ -69,6 +70,48 @@ export class StartView {
     })
   }
 
+  moveMenu () {
+    let i = 0; //number of the first element in nav menu to be selected
+    let k = 2; //number of the first element in footer links to be selected
+    const navs: NodeListOf<HTMLDivElement> = document.querySelectorAll('.article');
+    const footerlinks: NodeListOf<HTMLDivElement> = document.querySelectorAll('.footer-link');
+    console.log(footerlinks);
+    document.addEventListener('keyup', (e) => {
+
+      function clearStyles () {
+        navs.forEach(article => {
+          article.classList.remove('active');
+        });
+        footerlinks.forEach(link => {
+          link.classList.remove('active');
+        });
+      }
+
+      if (e.code === 'ArrowUp') {
+        clearStyles ();
+        if ( i > 0 ) i--;
+        navs[i].classList.add('active');
+      }
+      if (e.code === 'ArrowDown') {
+        clearStyles ();
+        if ( i < navs.length -1 ) i++;
+        navs[i].classList.add('active');
+      }
+      if (e.code === 'ArrowLeft') {
+        clearStyles ();
+        alert(`k = ${k}`);
+        if ( k > 0 ) k--;
+        footerlinks[k].classList.add('active');
+      }
+      if (e.code === 'ArrowRight') {
+        clearStyles ();
+        alert(`k = ${k}`);
+        if ( k < footerlinks.length - 1 ) k++;
+        footerlinks[k].classList.add('active');
+      }
+    })
+  }
+
   addAudio () {
     let loaded = false;
     const bgAudio = new Audio('../src/assets/sounds/title-screen.mp3');
@@ -78,10 +121,18 @@ export class StartView {
     document.body.append(bgAudio);
 
     const beginText = selectorChecker(document, '.begin__text');
-    beginText.addEventListener('click', () => {
+    document.addEventListener('keyup', (e) => {
+      beginText.classList.add('active');
+      if (beginText.classList.contains('active') && e.code === 'Enter') {
+        loaded = true;
+        bgAudio.play();
+        this.renderStartScreen();
+      }
+    })
+    /*beginText.addEventListener('click', () => {
       loaded = true;
       bgAudio.play();
       this.renderStartScreen();
-    }, false);
+    }, false);*/
   }
 }

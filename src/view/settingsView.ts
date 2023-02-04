@@ -13,42 +13,42 @@ export class SettingsView {
         <div class="setting__table">
           <div class="setting__button">
             <div class="sign arrow-up">🠕</div>
-            <div class="key">🠕</div>
+            <div class="key">${model.buttons.arrowUp}</div>
           </div>
           <div class="setting__button">
             <div class="sign arrow-up">🠗</div>
-            <div class="key">🠗</div>
+            <div class="key">${model.buttons.arrowDown}</div>
           </div>
           <div class="setting__button">
             <div class="sign">🠔</div>
-            <div class="key">🠔</div>
+            <div class="key">${model.buttons.arrowLeft}</div>
           </div>
           <div class="setting__button">
             <div class="sign">🠖</div>
-            <div class="key">🠖</div>
+            <div class="key">${model.buttons.arrowRight}</div>
           </div>
           <div class="setting__button">
             <div class="sign">A</div>
-            <div class="key">X</div>
+            <div class="key">${model.buttons.buttonA}</div>
           </div>
           <div class="setting__button">
             <div class="sign">B</div>
-            <div class="key">Z</div>
+            <div class="key">${model.buttons.buttonB}</div>
           </div>
           <div class="setting__button">
             <div class="sign">select</div>
-            <div class="key">shift</div>
+            <div class="key">${model.buttons.select}</div>
           </div>
           <div class="setting__button">
             <div class="sign">start</div>
-            <div class="key">enter</div>
+            <div class="key">${model.buttons.start}</div>
           </div>
         </div>
         <div class="setting__sound">
           <div class="setting__sound-wrapper">
             <input class="setting__sound-input" value="0.5" type="range" min="0" max="1" step="0.01"/>
           </div>
-          <div class="setting__sound-mute">🔇</div>
+          <div class="setting__sound-mute">${model.volume === 0 ? '🔈' : '🔇'}</div>
         </div>
       </section>
       <section class="setting__save">
@@ -63,7 +63,7 @@ export class SettingsView {
 
   configSoundLevel() {
     const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
-
+    inputRange.value = model.volume.toString();
     inputRange.addEventListener('input', () => {
       model.volume = Number(inputRange.value);
     })
@@ -118,6 +118,7 @@ export class SettingsView {
         select: keys[6].innerHTML,
         start: keys[7].innerHTML
       }
+      console.log(model.buttons);
       view.start.renderStartScreen();
     })
   }
