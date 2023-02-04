@@ -118,7 +118,6 @@ export class SettingsView {
         select: keys[6].innerHTML,
         start: keys[7].innerHTML
       }
-      console.log(model.buttons);
       view.start.renderStartScreen();
     })
   }
