@@ -276,7 +276,7 @@ function update() {
           sqaureToCheck.material = "grass";
           woodSquare.destroy();
           break;
-        case "char":
+        /*         case "char":
           char.setTint(0xff0000);
           this.add.tween({
             targets: char,
@@ -289,7 +289,7 @@ function update() {
             },
           });
           gameOver = true;
-          break;
+          break; */
         case "enemy":
           const enemyToDestroy = enemy.children.entries.find(
             (enemy) =>
@@ -307,6 +307,8 @@ function update() {
               getEnd: () => 0,
             },
           });
+          enemyToDestroy.destroy();
+          sqaureToCheck.material = "grass";
           break;
       }
     };
@@ -425,6 +427,7 @@ function update() {
       enemy.setVelocityY(randomMove1);
       enemy.setVelocityX(randomMove2);
     }
+    console.log(fieldMatrix);
   };
   enemy.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
