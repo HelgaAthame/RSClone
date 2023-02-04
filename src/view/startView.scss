@@ -52,14 +52,15 @@ body {
 
     .begin {
       @include flexCenter;
-      padding-top: 15vw;
-      padding-right: 10vw;
+      margin: 10vw;
+      padding-top: 12vh;
+      padding-right: 7vw;
       font-size: 2rem;
       height: 95vh;
       background-image: url('../assets/bomb.png');
       background-position: center;
       background-repeat: no-repeat;
-      background-size: 50vw;
+      background-size: contain;
       .begin__text {
         @include ancor;
       }
