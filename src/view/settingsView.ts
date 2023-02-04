@@ -43,7 +43,7 @@ export class SettingsView {
         </div>
         <div class="setting__sound">
           <div class="setting__sound-wrapper">
-            <input class="setting__sound-input" type="range"/>
+            <input class="setting__sound-input" value="0.5" type="range" min="0" max="1" step="0.01"/>
           </div>
           <div class="setting__sound-mute">🔇</div>
         </div>
@@ -52,5 +52,15 @@ export class SettingsView {
         <button class="setting__save-button">SAVE</button>
       </section>
     `;
+    this.configSoundLevel();
+  }
+
+  static configSoundLevel() {
+    const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
+    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+
+    inputRange.addEventListener('input', () => {
+      bgAudio.volume = Number(inputRange.value);
+    })
   }
 }
