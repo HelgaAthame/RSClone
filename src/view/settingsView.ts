@@ -1,4 +1,5 @@
-import { Model, model } from '../model/index.js';
+import { model } from '../model/index.js';
+import { view } from './index.js';
 import selectorChecker from '../utils/selectorChecker.js';
 import './settingsView.scss';
 
@@ -57,11 +58,11 @@ export class SettingsView {
     this.configSoundLevel();
     this.configSoundMute();
     this.editSettings();
+    this.saveButtonConfig();
   }
 
   configSoundLevel() {
     const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
-    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
 
     inputRange.addEventListener('input', () => {
       model.volume = Number(inputRange.value);
@@ -103,4 +104,21 @@ export class SettingsView {
     })
   }
 
+  saveButtonConfig() {
+    const saveButton = selectorChecker(document, '.setting__save-button');
+    const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
+    saveButton.addEventListener('click', () => {
+      model.buttons = {
+        arrowUp: keys[0].innerHTML,
+        arrowDown: keys[1].innerHTML,
+        arrowLeft: keys[2].innerHTML,
+        arrowRight: keys[3].innerHTML,
+        buttonA: keys[4].innerHTML,
+        buttonB: keys[5].innerHTML,
+        select: keys[6].innerHTML,
+        start: keys[7].innerHTML
+      }
+      view.start.renderStartScreen();
+    })
+  }
 }

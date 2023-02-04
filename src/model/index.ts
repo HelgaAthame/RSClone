@@ -1,10 +1,32 @@
 import selectorChecker from "../utils/selectorChecker.js";
 
+type Buttons = {
+  arrowUp: String
+  arrowDown: String
+  arrowLeft: String
+  arrowRight: String
+  buttonA: String
+  buttonB: String
+  select: String
+  start: String
+}
+
 export class Model {
   constructor () {
     this._isMuted = false;
     this._volume = 0.5;
+    this._buttons = {
+      arrowUp: 'arrowUp',
+      arrowDown: 'arrowDown',
+      arrowLeft: 'arrowLeft',
+      arrowRight: 'arrowRight',
+      buttonA: 'X',
+      buttonB: 'Z',
+      select: 'shift',
+      start: 'enter'
+    }
   }
+  _buttons: Buttons;
   _isMuted: Boolean;
   _volume: Number;
 
@@ -38,6 +60,15 @@ export class Model {
   get volume () {
     //TODO взять из БД
     return this._volume;
+  }
+
+  set buttons (val: Buttons) {
+    this._buttons = val;
+    //TODO сохранять в БД
+  }
+  get buttons () {
+    //todo получить информацию из БД
+    return this.buttons;
   }
 }
 
