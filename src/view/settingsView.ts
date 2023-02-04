@@ -9,11 +9,11 @@ export class SettingsView {
       <section class="setting__wrapper">
         <div class="setting__table">
           <div class="setting__button">
-            <div class="sign">🠕</div>
+            <div class="sign arrow-up">🠕</div>
             <div class="key">🠕</div>
           </div>
           <div class="setting__button">
-            <div class="sign">🠗</div>
+            <div class="sign arrow-up">🠗</div>
             <div class="key">🠗</div>
           </div>
           <div class="setting__button">
@@ -53,6 +53,7 @@ export class SettingsView {
       </section>
     `;
     this.configSoundLevel();
+    this.editSettings();
   }
 
   static configSoundLevel() {
@@ -61,6 +62,23 @@ export class SettingsView {
 
     inputRange.addEventListener('input', () => {
       bgAudio.volume = Number(inputRange.value);
+    })
+  }
+
+  static editSettings () {
+    const settingSigns = document.querySelectorAll('.sign');
+    const keys = document.querySelectorAll('.key');
+    settingSigns.forEach((sign: Element, i: number) => {
+      sign.addEventListener('click', () => {
+        settingSigns.forEach(sign => {
+          sign.classList.remove('active');
+        });
+        sign.classList.add('active');
+        keys.forEach(key => {
+          key.classList.remove('blink');
+        })
+        keys[i].classList.add('blink');
+      });
     })
   }
 }

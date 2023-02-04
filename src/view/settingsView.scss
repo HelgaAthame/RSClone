@@ -81,6 +81,25 @@ body {
             margin: $small-padding;
             flex-grow: 1;
           }
+          .active {
+            color: $ancor-color;
+            text-shadow: 0 0 10px $ancor-color;
+          }
+          .blink {
+            transition: 0.1s;
+            -webkit-animation: blink 1s linear infinite;
+            animation: blink 1s linear infinite;
+          }
+          @-webkit-keyframes blink {
+            50% { color: rgb(34, 34, 34); }
+            51% { color: rgba(34, 34, 34, 0); }
+            100% { color: rgba(34, 34, 34, 0); }
+          }
+          @keyframes blink {
+            50% { color: rgb(34, 34, 34); }
+            51% { color: rgba(34, 34, 34, 0); }
+            100% { color: rgba(34, 34, 34, 0); }
+          }
         }
       }
       .setting__sound {
