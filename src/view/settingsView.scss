@@ -1,0 +1,105 @@
+@mixin flexCenter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin ancor {
+  color: $text-color;
+  text-decoration: none;
+  &:hover {
+    color: white;
+    cursor: pointer;
+    text-shadow: 0 0 10px white;
+  }
+  &:active {
+    color: $ancor-color;
+    cursor: pointer;
+    text-shadow: 0 0 10px $ancor-color;
+  }
+  &:disabled {
+    color: $disabled-color;
+    cursor: initial;
+  }
+}
+
+$basic-padding: 1rem;
+$small-padding: 0.25rem 1rem;
+$text-color: #ddd;
+$ancor-color: palevioletred;
+$disabled-color: #444;
+$grad: linear-gradient(#e66465, #9198e5);
+$grad-active: linear-gradient(#c44243, #7076c3);
+$button-color: #222;
+
+@mixin button {
+  font-family: Mayhem;
+  font-size: 2rem;
+  margin: $basic-padding;
+  border-width: 5px;
+  border-color: $button-color;
+  color: $button-color;
+  border-style: solid;
+  background-image: $grad;
+  width: 12rem;
+  height: 5rem;
+  transition: 0.2s;
+  &:hover {
+    color: $disabled-color;
+    border-color: $disabled-color;
+    background-image: none;
+    background-color: white;
+  }
+  &:active {
+    color: $button-color;
+    border-color: $button-color;
+    background-image: $grad-active;
+  }
+}
+
+body {
+  .main {
+    height: 95vh;
+    justify-content: center;
+    .setting__title {
+      font-size: 3rem;
+      text-align: center;
+      padding: $basic-padding;
+    }
+    .setting__wrapper {
+      @include flexCenter;
+      .setting__table {
+        .setting__button {
+          @include flexCenter;
+          .sign {
+            padding: $small-padding;
+            flex-grow: 1;
+            @include ancor;
+          }
+          .key {
+            margin: $small-padding;
+            flex-grow: 1;
+          }
+        }
+      }
+      .setting__sound {
+        .setting__sound-wrapper {
+
+        }
+        .setting__sound-input {
+
+        }
+      }
+      .setting__sound-mute {
+
+      }
+    }
+    .setting__save {
+      @include flexCenter;
+      .setting__save-button {
+        @include button;
+      }
+    }
+  }
+}
