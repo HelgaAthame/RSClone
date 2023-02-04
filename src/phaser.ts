@@ -10,6 +10,9 @@ const fieldImgSize = 512;
 
 const charStartX = fieldStartX + 1.5 * fieldSquareLength;
 const charStartY = height - 1.5 * fieldSquareLength;
+const charSpeed = 160;
+
+const enemySpeed = 80;
 
 const fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
@@ -44,7 +47,7 @@ let char: Phaser.Physics.Matter.Sprite,
 
 let gameOver = false;
 let bombActive = false;
-let curLvlEnemies = 5;
+let curLvlEnemies = 3;
 
 export const game = new Phaser.Game(config);
 
@@ -366,19 +369,19 @@ function update() {
     newCharSquare.material = "char";
 
     if (cursors.up.isDown) {
-      char.setVelocityY(-160);
+      char.setVelocityY(-charSpeed);
       char.setVelocityX(0);
       char.anims.play("up", true);
     } else if (cursors.right.isDown) {
-      char.setVelocityX(160);
+      char.setVelocityX(charSpeed);
       char.setVelocityY(0);
       char.anims.play("right", true);
     } else if (cursors.down.isDown) {
-      char.setVelocityY(160);
+      char.setVelocityY(charSpeed);
       char.setVelocityX(0);
       char.anims.play("down", true);
     } else if (cursors.left.isDown) {
-      char.setVelocityX(-160);
+      char.setVelocityX(-charSpeed);
       char.setVelocityY(0);
       char.anims.play("left", true);
     } else if (!cursors.space.isDown) {
@@ -390,8 +393,12 @@ function update() {
   charMovement();
 
   const enemyMovement = (enemy: Phaser.Physics.Matter.Sprite): void => {
-    const randomMove1 = [-80, 80][Math.floor(Math.random() * 2)];
-    const randomMove2 = [-80, 80][Math.floor(Math.random() * 2)];
+    const randomMove1 = [-enemySpeed, enemySpeed][
+      Math.floor(Math.random() * 2)
+    ];
+    const randomMove2 = [-enemySpeed, enemySpeed][
+      Math.floor(Math.random() * 2)
+    ];
 
     const [closestX, closestY] = findClosestSquare(enemy);
     const flatFieldMatrix = fieldMatrix.flat();
