@@ -1,7 +1,7 @@
 import GithubLogo from '../assets/logos/github.png';
 import RsschoolLogo from '../assets/logos/logo-rs.svg';
 import selectorChecker from '../utils/selectorChecker.js';
-import { SettingsView } from './settingsView.js';
+import { view } from './index.js';
 import './startView.scss';
 
 export class StartView {
@@ -65,7 +65,7 @@ export class StartView {
   addSettingsListener () {
     const settings = selectorChecker(document, '.settings');
     settings.addEventListener('click', async () => {
-      SettingsView.renderUI();
+      view.settings.renderUI();
     })
   }
 
@@ -74,6 +74,7 @@ export class StartView {
     const bgAudio = new Audio('../src/assets/sounds/title-screen.mp3');
     bgAudio.classList.add('bgAudio');
     bgAudio.loop = true;
+    bgAudio.volume = 0.5;
     document.body.append(bgAudio);
 
     const beginText = selectorChecker(document, '.begin__text');

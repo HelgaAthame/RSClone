@@ -1,8 +1,10 @@
+import { Model, model } from '../model/index.js';
 import selectorChecker from '../utils/selectorChecker.js';
 import './settingsView.scss';
 
 export class SettingsView {
-  static renderUI() {
+
+  renderUI() {
     const main = selectorChecker(document, 'main');
     main.innerHTML = `
       <section class="setting__title">settings</section>
@@ -53,19 +55,28 @@ export class SettingsView {
       </section>
     `;
     this.configSoundLevel();
+    this.configSoundMute();
     this.editSettings();
   }
 
-  static configSoundLevel() {
+  configSoundLevel() {
     const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
     const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
 
     inputRange.addEventListener('input', () => {
-      bgAudio.volume = Number(inputRange.value);
+      model.volume = Number(inputRange.value);
     })
   }
 
-  static editSettings () {
+  configSoundMute () {
+    const muteButton = selectorChecker(document, '.setting__sound-mute');
+
+    muteButton.addEventListener('click', () => {
+      model.isMuted = !model.isMuted;
+    })
+  }
+
+  editSettings () {
     const settingSigns = document.querySelectorAll('.sign');
     const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
 
