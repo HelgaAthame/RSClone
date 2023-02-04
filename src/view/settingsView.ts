@@ -57,8 +57,9 @@ export class SettingsView {
     `;
     this.configSoundLevel();
     this.configSoundMute();
-    this.editSettings();
-    this.saveButtonConfig();
+    //this.editSettings();
+    //this.saveButtonConfig();
+    this.moveMenu();
   }
 
   configSoundLevel() {
@@ -77,7 +78,7 @@ export class SettingsView {
     })
   }
 
-  editSettings () {
+  /*editSettings () {
     const settingSigns = document.querySelectorAll('.sign');
     const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
 
@@ -85,10 +86,10 @@ export class SettingsView {
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       const val = e.code.startsWith('Key') ? e.code.slice(3) : e.code;
-      ourTarget.textContent = val;
+      if (ourTarget) ourTarget.textContent = val;
     });
 
-    settingSigns.forEach((sign: Element, i: number) => {
+    /*settingSigns.forEach((sign: Element, i: number) => {
 
       sign.addEventListener('click', () => {
         settingSigns.forEach(sign => {
@@ -102,9 +103,9 @@ export class SettingsView {
         ourTarget = keys[i];
       });
     })
-  }
+  }*/
 
-  saveButtonConfig() {
+  /*saveButtonConfig() {
     const saveButton = selectorChecker(document, '.setting__save-button');
     const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
     saveButton.addEventListener('click', () => {
@@ -119,6 +120,66 @@ export class SettingsView {
         start: keys[7].innerHTML
       }
       view.start.renderStartScreen();
+    })
+  }*/
+
+  moveMenu () {
+    let i = 0; //number of the first element in nav menu to be selected
+    const signs: NodeListOf<HTMLDivElement> = document.querySelectorAll('.sign');
+    const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
+    const saveButton = selectorChecker(document, '.setting__save-button');
+
+    let ourTarget: HTMLDivElement;
+
+    document.addEventListener('keyup', async function f (e) {
+
+      function clearStyles () {
+        signs.forEach(article => {
+          article.classList.remove('active');
+        });
+        keys.forEach(link => {
+          link.classList.remove('blink');
+        });
+        saveButton.classList.remove('active');
+      }
+
+      switch (e.code) {
+        case 'ArrowUp':
+          clearStyles ();
+          if ( i > 0 ) i--;
+          signs[i].classList.add('active');
+          keys[i].classList.add('blink');
+          break;
+        case 'ArrowDown':
+          clearStyles ();
+          if ( i < signs.length ) i++;
+          if (i < signs.length) {
+            signs[i].classList.add('active');
+            keys[i].classList.add('blink');
+            ourTarget = keys[i];
+          } else {
+            saveButton.classList.add('active');
+          }
+          break;
+        case 'Enter':
+          if (saveButton.classList.contains('active')) {
+            model.buttons = {
+              arrowUp: keys[0].innerHTML,
+              arrowDown: keys[1].innerHTML,
+              arrowLeft: keys[2].innerHTML,
+              arrowRight: keys[3].innerHTML,
+              buttonA: keys[4].innerHTML,
+              buttonB: keys[5].innerHTML,
+              select: keys[6].innerHTML,
+              start: keys[7].innerHTML
+            }
+            document.removeEventListener('keyup', f);
+            view.start.renderStartScreen();
+          }
+        default:
+          const val = e.code.startsWith('Key') ? e.code.slice(3) : e.code;
+          if (ourTarget) ourTarget.textContent = val;
+      }
     })
   }
 }

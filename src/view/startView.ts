@@ -77,7 +77,7 @@ export class StartView {
     const navs: NodeListOf<HTMLDivElement> = document.querySelectorAll('.article');
     const footerlinks: NodeListOf<HTMLDivElement> = document.querySelectorAll('.footer-link');
 
-    document.addEventListener('keyup', async (e) => {
+    document.addEventListener('keyup', async function foo (e) {
 
       function clearStyles () {
         navs.forEach(article => {
@@ -135,6 +135,7 @@ export class StartView {
               selected.click();
               break;
            }
+          document.removeEventListener('keyup', foo);
           break;
 
       }
@@ -150,13 +151,14 @@ export class StartView {
     document.body.append(bgAudio);
 
     const beginText = selectorChecker(document, '.begin__text');
+
     document.addEventListener('keyup', (e) => {
       beginText.classList.add('active');
       if (loaded === false && e.code === 'Enter') {
         beginText.classList.remove('active');
-        alert(beginText.classList.contains('active'));
         loaded = true;
         bgAudio.play();
+
         this.renderStartScreen();
       }
     })
