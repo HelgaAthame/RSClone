@@ -45,7 +45,7 @@ export class SettingsView {
           <div class="setting__sound-wrapper">
             <input class="setting__sound-input" type="range"/>
           </div>
-          <div class="setting__sound-mute"></div>
+          <div class="setting__sound-mute">🔇</div>
         </div>
       </section>
       <section class="setting__save">

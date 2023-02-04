@@ -85,14 +85,35 @@ body {
       }
       .setting__sound {
         .setting__sound-wrapper {
-
-        }
-        .setting__sound-input {
-
+          .setting__sound-input {
+            transform: rotate(90deg);
+            width: 12rem;
+            margin: 6rem -4rem 0 -4rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: 5px;
+            background-color: $text-color;
+            &:hover {
+              cursor:pointer;
+            }
+            &::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              border-radius: 0;
+              border: 5px solid $button-color;
+              background-image: $grad;
+              width: 1.5rem;
+              height: 3rem;
+            }
+          }
         }
       }
       .setting__sound-mute {
-
+        margin: 6rem 0 0 0.5rem;
+        font-size: 2rem;
+        &:hover {
+          cursor:pointer;
+        }
       }
     }
     .setting__save {
