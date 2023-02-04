@@ -313,7 +313,7 @@ function update() {
         if (!enemyToDestroy) throw Error("The enemy was not found");
         enemyToDestroy.setTint(0xff0000);
         this.add.tween({
-          targets: char,
+          targets: enemyToDestroy,
           ease: "Sine.easeInOut",
           duration: 200,
           delay: 0,
@@ -323,7 +323,6 @@ function update() {
           },
         });
         setTimeout(() => enemyToDestroy.destroy(), 200);
-        gameOver = true;
       }
     };
 
