@@ -110,7 +110,9 @@ function create() {
     }
   }
 
-  char = this.physics.add.sprite(charStartX, charStartY, "char").setScale(0.78);
+  char = this.physics.add
+    .sprite(charStartX, charStartY, "char")
+    .setScale(0.85, 0.78);
 
   this.physics.add.collider(char, stones);
   this.physics.add.collider(char, wood);
