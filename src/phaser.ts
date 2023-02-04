@@ -34,7 +34,7 @@ const config = {
 };
 
 let char: Phaser.Physics.Matter.Sprite,
-  enemy: Phaser.GameObjects.Group,
+  enemies: Phaser.GameObjects.Group,
   grass: Phaser.Physics.Arcade.StaticGroup,
   stone: Phaser.Physics.Arcade.StaticGroup,
   wood: Phaser.Physics.Arcade.StaticGroup,
@@ -44,7 +44,7 @@ let char: Phaser.Physics.Matter.Sprite,
 
 let gameOver = false;
 let bombActive = false;
-let curLvlEnemies = 3;
+let curLvlEnemies = 5;
 
 export const game = new Phaser.Game(config);
 
@@ -72,7 +72,7 @@ function create() {
   stone = this.physics.add.staticGroup();
   grass = this.physics.add.staticGroup();
   wood = this.physics.add.staticGroup();
-  enemy = this.physics.add.group();
+  enemies = this.physics.add.group();
   bombs = this.physics.add.group();
   let enemyCounter = 0;
 
@@ -148,11 +148,10 @@ function create() {
       (randomX === ceilsNum - 2 && randomY === 2)
     )
       continue;
-    console.log(randomX, randomY);
-    fieldMatrix[randomX][randomY].material = "enemy";
-
+    fieldMatrix[randomX][randomY].material = `enemy_${enemyCounter}`;
     enemyCounter++;
-    enemy
+
+    enemies
       .create(
         fieldMatrix[randomX][randomY].x,
         fieldMatrix[randomX][randomY].y,
@@ -164,13 +163,13 @@ function create() {
 
   this.physics.add.collider(char, stone);
   this.physics.add.collider(char, wood);
-  this.physics.add.collider(char, enemy);
+  this.physics.add.collider(char, enemies);
   this.physics.add.collider(char, bombs);
 
-  this.physics.add.collider(enemy, enemy);
-  this.physics.add.collider(enemy, wood);
-  this.physics.add.collider(enemy, stone);
-  this.physics.add.collider(enemy, bombs);
+  this.physics.add.collider(enemies, enemies);
+  this.physics.add.collider(enemies, wood);
+  this.physics.add.collider(enemies, stone);
+  this.physics.add.collider(enemies, bombs);
 
   /*Draw explosion */
 
@@ -258,58 +257,46 @@ function update() {
           Math.floor(square.x) === Math.floor(x) &&
           Math.floor(square.y) === Math.floor(y)
       );
+      const enemiesAlive = flatFieldMatrix.filter((square) =>
+        square.material?.startsWith("enemy")
+      );
 
       if (!sqaureToCheck) throw Error("Square to check was not found");
       if (sqaureToCheck.material === "stone") return;
 
       drawExplosion(x, y);
 
-      switch (sqaureToCheck.material) {
-        case "wood":
-          const woodSquare = wood.children.entries.find((woodSquare) => {
-            return (
-              sqaureToCheck.x === woodSquare.x &&
-              sqaureToCheck.y === woodSquare.y
-            );
-          });
-          if (!woodSquare) throw Error("Wood square was not found");
-          sqaureToCheck.material = "grass";
-          woodSquare.destroy();
-          break;
-        /*         case "char":
-          char.setTint(0xff0000);
-          this.add.tween({
-            targets: char,
-            ease: "Sine.easeInOut",
-            duration: 500,
-            delay: 0,
-            alpha: {
-              getStart: () => 1,
-              getEnd: () => 0,
-            },
-          });
-          gameOver = true;
-          break; */
-        case "enemy":
-          const enemyToDestroy = enemy.children.entries.find(
-            (enemy) =>
-              enemy.x === sqaureToCheck.x && enemy.y === sqaureToCheck.y
+      if (sqaureToCheck.material === "wood") {
+        const woodSquare = wood.children.entries.find((woodSquare) => {
+          return (
+            sqaureToCheck.x === woodSquare.x && sqaureToCheck.y === woodSquare.y
           );
-          if (!enemyToDestroy) throw Error("The enemy was not found");
-          enemyToDestroy.setTint(0xff0000);
-          this.add.tween({
-            targets: enemyToDestroy,
-            ease: "Sine.easeInOut",
-            duration: 500,
-            delay: 0,
-            alpha: {
-              getStart: () => 1,
-              getEnd: () => 0,
-            },
-          });
-          enemyToDestroy.destroy();
-          sqaureToCheck.material = "grass";
-          break;
+        });
+        if (!woodSquare) throw Error("Wood square was not found");
+        sqaureToCheck.material = "grass";
+        woodSquare.destroy();
+      } /* else if (sqaureToCheck.material === "char") {
+        char.setTint(0xff0000);
+        this.add.tween({
+          targets: char,
+          ease: "Sine.easeInOut",
+          duration: 500,
+          delay: 0,
+          alpha: {
+            getStart: () => 1,
+            getEnd: () => 0,
+          },
+        });
+        gameOver = true;
+      } */ else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
+        const enemyToDestroy = enemies.children.entries.find((enemy) => {
+          const [closestX, closestY] = findClosestSquare(enemy);
+          return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
+        });
+        if (!enemyToDestroy) throw Error("The enemy was not found");
+
+        enemyToDestroy.destroy();
+        sqaureToCheck.material = "grass";
       }
     };
 
@@ -403,11 +390,10 @@ function update() {
   charMovement();
 
   const enemyMovement = (enemy: Phaser.Physics.Matter.Sprite): void => {
-    const randomMove1 = [-160, 160][Math.floor(Math.random() * 2)];
-    const randomMove2 = [-160, 160][Math.floor(Math.random() * 2)];
+    const randomMove1 = [-80, 80][Math.floor(Math.random() * 2)];
+    const randomMove2 = [-80, 80][Math.floor(Math.random() * 2)];
 
     const [closestX, closestY] = findClosestSquare(enemy);
-
     const flatFieldMatrix = fieldMatrix.flat();
 
     const newEnemySquare = flatFieldMatrix.find(
@@ -416,8 +402,10 @@ function update() {
         Math.floor(square.y) === Math.floor(closestY)
     );
 
+    const curEnemyID = enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
-    newEnemySquare.material = "enemy";
+    newEnemySquare.material = `enemy_${curEnemyID}`;
+
     if (
       enemy.body.position.x !== enemy.body.prev.x &&
       enemy.body.position.y !== enemy.body.prev.y
@@ -427,9 +415,8 @@ function update() {
       enemy.setVelocityY(randomMove1);
       enemy.setVelocityX(randomMove2);
     }
-    console.log(fieldMatrix);
   };
-  enemy.children.entries.forEach((enemy) => enemyMovement(enemy));
+  enemies.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
 
 function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
