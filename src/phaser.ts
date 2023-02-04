@@ -141,7 +141,14 @@ function create() {
     const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
     const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
 
-    if (fieldMatrix[randomX][randomY].material !== "grass") continue;
+    if (
+      fieldMatrix[randomX][randomY].material !== "grass" ||
+      (randomX === ceilsNum - 2 && randomY === 1) ||
+      (randomX === ceilsNum - 3 && randomY === 1) ||
+      (randomX === ceilsNum - 2 && randomY === 2)
+    )
+      continue;
+    console.log(randomX, randomY);
     fieldMatrix[randomX][randomY].material = "enemy";
 
     enemyCounter++;
@@ -419,7 +426,7 @@ function update() {
       enemy.setVelocityX(randomMove2);
     }
   };
-  enemy.children.entries.forEach((enemy) => enemyMovement(enemy));
+  //enemy.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
 
 function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
