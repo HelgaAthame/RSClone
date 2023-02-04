@@ -426,7 +426,7 @@ function update() {
       enemy.setVelocityX(randomMove2);
     }
   };
-  //enemy.children.entries.forEach((enemy) => enemyMovement(enemy));
+  enemy.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
 
 function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
