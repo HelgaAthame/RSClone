@@ -82,7 +82,6 @@ function create() {
         fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
       const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
       const randomWoodSquare = Math.round(Math.random());
-      const randomEnemy = Math.round(Math.random());
 
       const emptyStartLocations =
         (i === ceilsNum - 1 && j === 2) ||
@@ -130,14 +129,6 @@ function create() {
           .refreshBody();
         continue;
       }
-      if (randomEnemy && !emptyStartLocations && enemyCounter < curLvlEnemies) {
-        fieldMatrix[i - 1][j - 1].material = "enemy";
-        enemyCounter++;
-        enemy
-          .create(curSquareXCenter, curSquareYCenter, "enemy")
-          .setScale(0.22)
-          .refreshBody();
-      }
     }
   }
 
@@ -145,6 +136,24 @@ function create() {
     .sprite(charStartX, charStartY, "char")
     .setScale(0.85, 0.77)
     .refreshBody();
+
+  while (enemyCounter < curLvlEnemies) {
+    const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+    const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+
+    if (fieldMatrix[randomX][randomY].material !== "grass") continue;
+    fieldMatrix[randomX][randomY].material = "enemy";
+
+    enemyCounter++;
+    enemy
+      .create(
+        fieldMatrix[randomX][randomY].x,
+        fieldMatrix[randomX][randomY].y,
+        "enemy"
+      )
+      .setScale(0.22)
+      .refreshBody();
+  }
 
   this.physics.add.collider(char, stone);
   this.physics.add.collider(char, wood);
