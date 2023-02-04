@@ -1,5 +1,10 @@
+import selectorChecker from "../utils/selectorChecker.js";
+
 export class SettingsView {
-  renderUI() {
-    // TO-DO
+  static renderUI() {
+    const main = selectorChecker(document, 'main');
+    main.innerHTML = `
+
+    `;
   }
 }
