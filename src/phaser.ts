@@ -5,10 +5,14 @@ const height = window.innerHeight;
 const ceilsNum = 11;
 const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
+const fieldImgSize = 512;
 
-const fieldMatrix = Array(ceilsNum + 1)
+const charStartX = fieldStartX + 1.5 * fieldSquareLength;
+const charStartY = height - 1.5 * fieldSquareLength - 32;
+
+const fieldMatrix = Array(ceilsNum)
   .fill(0)
-  .map(() => Array(ceilsNum + 1).fill(0));
+  .map(() => Array(ceilsNum).fill(0));
 
 const config = {
   type: Phaser.AUTO,
@@ -28,7 +32,7 @@ const config = {
   },
 };
 
-let char, grass, stones, enemy, bombs, explosion, cursors;
+let char, grass, stones, wood, enemy, bombs, explosion, cursors;
 
 let bombActive = false;
 
@@ -44,8 +48,9 @@ function preload() {
     frameHeight: 64,
   });
 
-  this.load.image("grass", "./src/assets/grass.png");
-  this.load.image("stone", "./src/assets/stone.jpg");
+  this.load.image("grass", "./src/assets/grass.webp");
+  this.load.image("stone", "./src/assets/stone.webp");
+  this.load.image("wood", "./src/assets/wood.webp");
   this.load.image("bomb", "./src/assets/bomb.png");
   this.load.image("enemy", "./src/assets/enemy.png");
 }
@@ -55,43 +60,60 @@ function create() {
   /* BIG WIDTH ONLY!!! */
 
   stones = this.physics.add.staticGroup();
-  const stoneImgSize = 1200;
   grass = this.physics.add.staticGroup();
-  const grassImgSize = 512;
+  wood = this.physics.add.staticGroup();
 
-  for (let i = 0; i <= ceilsNum; i++) {
-    for (let j = 0; j <= ceilsNum; j++) {
-      fieldMatrix[i][j] = {
-        x: j * fieldSquareLength + fieldSquareLength / 2,
-        y: fieldStartX + i * fieldSquareLength + fieldSquareLength / 2,
+  for (let i = 1; i <= ceilsNum; i++) {
+    for (let j = 1; j <= ceilsNum; j++) {
+      const curSquareXCenter =
+        fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
+      const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
+      const randomWoodSquare = !Math.round(Math.random());
+
+      const emptyStartLocations =
+        (i === ceilsNum - 1 && j === 2) ||
+        (i === ceilsNum - 2 && j === 2) ||
+        (i === ceilsNum - 1 && j === 3);
+
+      fieldMatrix[i - 1][j - 1] = {
+        x: curSquareXCenter,
+        y: curSquareYCenter,
       };
-      if (i === 0 || i === ceilsNum || j === 0 || j === ceilsNum - 1) {
-        fieldMatrix[i][j].material = "stone";
-        stones
-          .create(
-            fieldStartX + i * fieldSquareLength + fieldSquareLength / 2,
-            j * fieldSquareLength + fieldSquareLength / 2,
-            "stone"
-          )
-          .setScale((1 / stoneImgSize) * fieldSquareLength)
+
+      fieldMatrix[i - 1][j - 1].material = "grass";
+      grass
+        .create(curSquareXCenter, curSquareYCenter, "grass")
+        .setScale((1 / fieldImgSize) * fieldSquareLength)
+        .refreshBody();
+
+      if (randomWoodSquare && !emptyStartLocations) {
+        fieldMatrix[i - 1][j - 1].material = "wood";
+        wood
+          .create(curSquareXCenter, curSquareYCenter, "wood")
+          .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
-      } else {
-        fieldMatrix[i][j].material = "grass";
-        grass
-          .create(
-            fieldStartX + i * fieldSquareLength + fieldSquareLength / 2,
-            j * fieldSquareLength + fieldSquareLength / 2,
-            "grass"
-          )
-          .setScale((1 / grassImgSize) * fieldSquareLength)
+      }
+      if (i === 1 || i === ceilsNum || j === 1 || j === ceilsNum) {
+        fieldMatrix[i - 1][j - 1].material = "stone";
+        stones
+          .create(curSquareXCenter, curSquareYCenter, "stone")
+          .setScale((1 / fieldImgSize) * fieldSquareLength)
+          .refreshBody();
+      }
+      if (i % 3 === 0 && j % 3 === 0) {
+        fieldMatrix[i - 1][j - 1].material = "stone";
+        stones
+          .create(curSquareXCenter, curSquareYCenter, "stone")
+          .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
       }
     }
   }
 
-  char = this.physics.add.sprite(width / 2, height / 2 - 32, "char");
+  char = this.physics.add.sprite(charStartX, charStartY, "char").setScale(0.78);
 
   this.physics.add.collider(char, stones);
+  this.physics.add.collider(char, wood);
 
   bombs = this.physics.add.group();
   this.physics.add.collider(char, bombs);
@@ -164,43 +186,48 @@ function create() {
 
 function update() {
   const explodeBomb = (bomb, x: number, y: number) => {
-    const flatFieldMatrix = fieldMatrix.flat();
-    console.log(
-      flatFieldMatrix.find((square) => square.x === x && square.y === y)
-    );
+    const nextX = x + fieldSquareLength;
+    const prevX = x - fieldSquareLength;
+    const nextY = y + fieldSquareLength;
+    const prevY = y - fieldSquareLength;
+
     bomb.destroy();
-    drawExplosion(x, y);
+    const checkSquare = (x: number, y: number) => {
+      const flatFieldMatrix = fieldMatrix.flat();
+      const sqaureToCheck = flatFieldMatrix.find(
+        (square) =>
+          Math.floor(square.x) === Math.floor(x) &&
+          Math.floor(square.y) === Math.floor(y)
+      );
 
-    if (
-      flatFieldMatrix.find(
-        (square) => square.x === x + fieldSquareLength && square.y === y
-      ).material !== "stone"
-    ) {
-      drawExplosion(x + fieldSquareLength, y);
-    }
+      if (sqaureToCheck.material === "stone") return;
 
-    if (
-      flatFieldMatrix.find(
-        (square) => square.x === x - fieldSquareLength && square.y === y
-      ).material !== "stone"
-    ) {
-      drawExplosion(x - fieldSquareLength, y);
-    }
-    if (
-      flatFieldMatrix.find(
-        (square) => square.x === x && square.y === y + fieldSquareLength
-      ).material !== "stone"
-    ) {
-      drawExplosion(x, y + fieldSquareLength);
-    }
+      drawExplosion(x, y);
 
-    if (
-      flatFieldMatrix.find(
-        (square) => square.x === x && square.y === y - fieldSquareLength
-      ).material !== "stone"
-    ) {
-      drawExplosion(x, y - fieldSquareLength);
-    }
+      switch (sqaureToCheck.material) {
+        case "wood":
+          const woodSquare = wood.children.entries.find((woodSquare) => {
+            return (
+              sqaureToCheck.x === woodSquare.x &&
+              sqaureToCheck.y === woodSquare.y
+            );
+          });
+          sqaureToCheck.material = "grass";
+          woodSquare.destroy();
+
+          break;
+
+        case "grass":
+          drawExplosion(x, y);
+          break;
+      }
+    };
+
+    checkSquare(x, y);
+    checkSquare(nextX, y);
+    checkSquare(prevX, y);
+    checkSquare(x, nextY);
+    checkSquare(x, prevY);
   };
 
   const drawExplosion = (x: number, y: number) => {
@@ -278,6 +305,5 @@ function findClosestSquare() {
   const minDistSquare = Math.min(...charToSquareDist);
   const minDistSquareIndex = charToSquareDist.indexOf(minDistSquare);
   const closestSquare = flatFieldMatrix[minDistSquareIndex];
-  console.log(fieldMatrix);
   return [closestSquare.x, closestSquare.y];
 }
