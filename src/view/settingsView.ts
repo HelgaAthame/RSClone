@@ -67,8 +67,17 @@ export class SettingsView {
 
   static editSettings () {
     const settingSigns = document.querySelectorAll('.sign');
-    const keys = document.querySelectorAll('.key');
+    const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
+
+    let ourTarget: HTMLDivElement;
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      const val = e.code.startsWith('Key') ? e.code.slice(3) : e.code;
+      ourTarget.textContent = val;
+    });
+
     settingSigns.forEach((sign: Element, i: number) => {
+
       sign.addEventListener('click', () => {
         settingSigns.forEach(sign => {
           sign.classList.remove('active');
@@ -78,7 +87,9 @@ export class SettingsView {
           key.classList.remove('blink');
         })
         keys[i].classList.add('blink');
+        ourTarget = keys[i];
       });
     })
   }
+
 }
