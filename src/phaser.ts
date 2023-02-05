@@ -254,213 +254,83 @@ function create() {
 }
 
 function update() {
-  const restartGame = () => {
-    this.scene.restart();
-    setTimeout(() => {
-      gameOver = false;
-    }, 500);
-  };
-
   if (gameOver && cursors.space.isDown) {
-    restartGame();
+    restartGame.apply(this);
   }
   if (gameOver) return;
 
-  const explodeBomb = (
-    bomb: Phaser.GameObjects.Image,
-    x: number,
-    y: number
-  ) => {
-    const nextX = x + fieldSquareLength;
-    const prevX = x - fieldSquareLength;
-    const nextY = y + fieldSquareLength;
-    const prevY = y - fieldSquareLength;
-
-    bomb.destroy();
-
-    const checkSquare = (x: number, y: number) => {
-      const flatFieldMatrix = fieldMatrix.flat();
-      const sqaureToCheck = flatFieldMatrix.find(
-        (square) =>
-          Math.floor(square.x) === Math.floor(x) &&
-          Math.floor(square.y) === Math.floor(y)
-      );
-      const enemiesAlive = flatFieldMatrix.filter((square) =>
-        square.object?.startsWith("enemy")
-      );
-
-      if (!sqaureToCheck) throw Error("Square to check was not found");
-      if (sqaureToCheck.object === "stone") return;
-
-      drawExplosion(x, y);
-
-      if (sqaureToCheck.object === "wood") {
-        const woodSquare = wood.children.entries.find((woodSquare) => {
-          return (
-            sqaureToCheck.x === woodSquare.x && sqaureToCheck.y === woodSquare.y
-          );
-        });
-        if (!woodSquare) throw Error("Wood square was not found");
-        sqaureToCheck.object = "grass";
-        woodSquare.destroy();
-      } else if (sqaureToCheck.object === "char") {
-        char.setTint(0xff0000);
-        this.add.tween({
-          targets: char,
-          ease: "Sine.easeInOut",
-          duration: 200,
-          delay: 0,
-          alpha: {
-            getStart: () => 1,
-            getEnd: () => 0,
-          },
-        });
-        setTimeout(() => char.destroy(), 200);
-        gameOver = true;
-        drawGameOver.apply(this);
-      } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
-        const enemyToDestroy = enemies.children.entries.find((enemy) => {
-          const [closestX, closestY] = findClosestSquare(enemy);
-          return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
-        });
-        if (enemyToDestroy) {
-          enemyToDestroy.setTint(0xff0000);
-          this.add.tween({
-            targets: enemyToDestroy,
-            ease: "Sine.easeInOut",
-            duration: 200,
-            delay: 0,
-            alpha: {
-              getStart: () => 1,
-              getEnd: () => 0,
-            },
-          });
-          setTimeout(() => enemyToDestroy.destroy(), 200);
-        }
-      }
-    };
-
-    checkSquare(x, y);
-    checkSquare(nextX, y);
-    checkSquare(prevX, y);
-    checkSquare(x, nextY);
-    checkSquare(x, prevY);
-  };
-
-  const drawExplosion = (x: number, y: number) => {
-    explosion = this.physics.add.sprite(x, y, "explosion");
-    const explosionAnim = explosion.anims.play("bombExplosion", false);
-    explosionAnim.once("animationcomplete", () => {
-      explosionAnim.destroy();
-    });
-  };
-
-  const dropBomb = () => {
-    if (!bombActive) {
-      const [bombX, bombY] = findClosestSquare(char);
-
-      bombActive = true;
-      const bomb = bombs.create(bombX, bombY, "bomb").setImmovable();
-      const bombScaleX = (1 / 555) * fieldSquareLength;
-      const bombScaleY = (1 / 569) * fieldSquareLength;
-      bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
-      setTimeout(() => (bombActive = false), 1000);
-
-      this.tweens.add({
-        targets: bomb,
-        scaleX: bombScaleX / 1.5,
-        scaleY: bombScaleY / 1.5,
-        yoyo: true,
-        repeat: -1,
-        duration: 300,
-        ease: "Sine.easeInOut",
-      });
-
-      setTimeout(() => {
-        explodeBomb(bomb, bombX, bombY);
-      }, 1000);
-
-      char.anims.play("placeBomb", true);
-    }
-  };
-
-  /* Char controls */
   if (cursors.space.isDown && !gameOver) {
-    dropBomb();
+    dropBomb.apply(this);
   }
 
-  const charMovement = (): void => {
-    const [closestX, closestY] = findClosestSquare(char);
-    const flatFieldMatrix = fieldMatrix.flat();
-    const curCharSquare = flatFieldMatrix.find(
-      (square) => square.object === "char"
-    );
-    if (!curCharSquare) throw Error("Current characher square was not found");
-    curCharSquare.object = "grass";
-    const newCharSquare = flatFieldMatrix.find(
-      (square) =>
-        Math.floor(square.x) === Math.floor(closestX) &&
-        Math.floor(square.y) === Math.floor(closestY)
-    );
-    if (!newCharSquare) throw Error("New characher square was not found");
-    newCharSquare.object = "char";
-
-    if (cursors.up.isDown) {
-      char.setVelocityY(-charSpeed);
-      char.setVelocityX(0);
-      char.anims.play("up", true);
-    } else if (cursors.right.isDown) {
-      char.setVelocityX(charSpeed);
-      char.setVelocityY(0);
-      char.anims.play("right", true);
-    } else if (cursors.down.isDown) {
-      char.setVelocityY(charSpeed);
-      char.setVelocityX(0);
-      char.anims.play("down", true);
-    } else if (cursors.left.isDown) {
-      char.setVelocityX(-charSpeed);
-      char.setVelocityY(0);
-      char.anims.play("left", true);
-    } else if (!cursors.space.isDown) {
-      char.setVelocityX(0);
-      char.setVelocityY(0);
-      char.anims.play("turn", true);
-    }
-  };
   charMovement();
-
-  const enemyMovement = (enemy: Phaser.Physics.Matter.Sprite): void => {
-    const randomMove1 = [-enemySpeed, enemySpeed][
-      Math.floor(Math.random() * 2)
-    ];
-    const randomMove2 = [-enemySpeed, enemySpeed][
-      Math.floor(Math.random() * 2)
-    ];
-
-    const [closestX, closestY] = findClosestSquare(enemy);
-    const flatFieldMatrix = fieldMatrix.flat();
-
-    const newEnemySquare = flatFieldMatrix.find(
-      (square) =>
-        Math.floor(square.x) === Math.floor(closestX) &&
-        Math.floor(square.y) === Math.floor(closestY)
-    );
-
-    const curEnemyID = enemies.children.entries.indexOf(enemy);
-    if (!newEnemySquare) throw Error("New enemy square was not found");
-    newEnemySquare.object = `enemy_${curEnemyID}`;
-
-    if (
-      enemy.body.position.x !== enemy.body.prev.x &&
-      enemy.body.position.y !== enemy.body.prev.y
-    ) {
-      return;
-    } else {
-      enemy.setVelocityY(randomMove1);
-      enemy.setVelocityX(randomMove2);
-    }
-  };
   enemies.children.entries.forEach((enemy) => enemyMovement(enemy));
+}
+
+function charMovement(): void {
+  const [closestX, closestY] = findClosestSquare(char);
+  const flatFieldMatrix = fieldMatrix.flat();
+  const curCharSquare = flatFieldMatrix.find(
+    (square) => square.object === "char"
+  );
+  if (!curCharSquare) throw Error("Current characher square was not found");
+  curCharSquare.object = "grass";
+  const newCharSquare = flatFieldMatrix.find(
+    (square) =>
+      Math.floor(square.x) === Math.floor(closestX) &&
+      Math.floor(square.y) === Math.floor(closestY)
+  );
+  if (!newCharSquare) throw Error("New characher square was not found");
+  newCharSquare.object = "char";
+
+  if (cursors.up.isDown) {
+    char.setVelocityY(-charSpeed);
+    char.setVelocityX(0);
+    char.anims.play("up", true);
+  } else if (cursors.right.isDown) {
+    char.setVelocityX(charSpeed);
+    char.setVelocityY(0);
+    char.anims.play("right", true);
+  } else if (cursors.down.isDown) {
+    char.setVelocityY(charSpeed);
+    char.setVelocityX(0);
+    char.anims.play("down", true);
+  } else if (cursors.left.isDown) {
+    char.setVelocityX(-charSpeed);
+    char.setVelocityY(0);
+    char.anims.play("left", true);
+  } else if (!cursors.space.isDown) {
+    char.setVelocityX(0);
+    char.setVelocityY(0);
+    char.anims.play("turn", true);
+  }
+}
+function enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
+  const randomMove1 = [-enemySpeed, enemySpeed][Math.floor(Math.random() * 2)];
+  const randomMove2 = [-enemySpeed, enemySpeed][Math.floor(Math.random() * 2)];
+
+  const [closestX, closestY] = findClosestSquare(enemy);
+  const flatFieldMatrix = fieldMatrix.flat();
+
+  const newEnemySquare = flatFieldMatrix.find(
+    (square) =>
+      Math.floor(square.x) === Math.floor(closestX) &&
+      Math.floor(square.y) === Math.floor(closestY)
+  );
+
+  const curEnemyID = enemies.children.entries.indexOf(enemy);
+  if (!newEnemySquare) throw Error("New enemy square was not found");
+  newEnemySquare.object = `enemy_${curEnemyID}`;
+
+  if (
+    enemy.body.position.x !== enemy.body.prev.x &&
+    enemy.body.position.y !== enemy.body.prev.y
+  ) {
+    return;
+  } else {
+    enemy.setVelocityY(randomMove1);
+    enemy.setVelocityX(randomMove2);
+  }
 }
 
 function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
@@ -490,4 +360,125 @@ function drawGameOver() {
     })
     .setOrigin(0.5)
     .setDepth(1);
+}
+
+function restartGame() {
+  this.scene.restart();
+  setTimeout(() => {
+    gameOver = false;
+  }, 500);
+}
+
+function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
+  const nextX = x + fieldSquareLength;
+  const prevX = x - fieldSquareLength;
+  const nextY = y + fieldSquareLength;
+  const prevY = y - fieldSquareLength;
+
+  bomb.destroy();
+
+  const checkSquare = (x: number, y: number) => {
+    const flatFieldMatrix = fieldMatrix.flat();
+    const sqaureToCheck = flatFieldMatrix.find(
+      (square) =>
+        Math.floor(square.x) === Math.floor(x) &&
+        Math.floor(square.y) === Math.floor(y)
+    );
+    const enemiesAlive = flatFieldMatrix.filter((square) =>
+      square.object?.startsWith("enemy")
+    );
+
+    if (!sqaureToCheck) throw Error("Square to check was not found");
+    if (sqaureToCheck.object === "stone") return;
+
+    drawExplosion.apply(this, [x, y]);
+
+    if (sqaureToCheck.object === "wood") {
+      const woodSquare = wood.children.entries.find((woodSquare) => {
+        return (
+          sqaureToCheck.x === woodSquare.x && sqaureToCheck.y === woodSquare.y
+        );
+      });
+      if (!woodSquare) throw Error("Wood square was not found");
+      sqaureToCheck.object = "grass";
+      woodSquare.destroy();
+    } else if (sqaureToCheck.object === "char") {
+      char.setTint(0xff0000);
+      this.add.tween({
+        targets: char,
+        ease: "Sine.easeInOut",
+        duration: 200,
+        delay: 0,
+        alpha: {
+          getStart: () => 1,
+          getEnd: () => 0,
+        },
+      });
+      setTimeout(() => char.destroy(), 200);
+      gameOver = true;
+      drawGameOver.apply(this);
+    } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
+      const enemyToDestroy = enemies.children.entries.find((enemy) => {
+        const [closestX, closestY] = findClosestSquare(enemy);
+        return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
+      });
+      if (enemyToDestroy) {
+        enemyToDestroy.setTint(0xff0000);
+        this.add.tween({
+          targets: enemyToDestroy,
+          ease: "Sine.easeInOut",
+          duration: 200,
+          delay: 0,
+          alpha: {
+            getStart: () => 1,
+            getEnd: () => 0,
+          },
+        });
+        setTimeout(() => enemyToDestroy.destroy(), 200);
+      }
+    }
+  };
+
+  checkSquare(x, y);
+  checkSquare(nextX, y);
+  checkSquare(prevX, y);
+  checkSquare(x, nextY);
+  checkSquare(x, prevY);
+}
+
+function drawExplosion(x: number, y: number) {
+  explosion = this.physics.add.sprite(x, y, "explosion");
+  const explosionAnim = explosion.anims.play("bombExplosion", false);
+  explosionAnim.once("animationcomplete", () => {
+    explosionAnim.destroy();
+  });
+}
+
+function dropBomb() {
+  if (!bombActive) {
+    const [bombX, bombY] = findClosestSquare(char);
+
+    bombActive = true;
+    const bomb = bombs.create(bombX, bombY, "bomb").setImmovable();
+    const bombScaleX = (1 / 555) * fieldSquareLength;
+    const bombScaleY = (1 / 569) * fieldSquareLength;
+    bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
+    setTimeout(() => (bombActive = false), 1000);
+
+    this.tweens.add({
+      targets: bomb,
+      scaleX: bombScaleX / 1.5,
+      scaleY: bombScaleY / 1.5,
+      yoyo: true,
+      repeat: -1,
+      duration: 300,
+      ease: "Sine.easeInOut",
+    });
+
+    setTimeout(() => {
+      explodeBomb.apply(this, [bomb, bombX, bombY]);
+    }, 1000);
+
+    char.anims.play("placeBomb", true);
+  }
 }
