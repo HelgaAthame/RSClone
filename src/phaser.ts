@@ -4,6 +4,8 @@ import FieldSquare from "./utils/fieldSquare.js";
 
 let score = model.score;
 let livesCount = model.lives;
+let bombSpeed = model.bombSpeed;
+let level = model.level;
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -489,7 +491,7 @@ function dropBomb() {
 
     setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, 1000);
+    }, bombSpeed - (1000 * ( model.level - 1 ));
 
     char.anims.play("placeBomb", true);
   }
