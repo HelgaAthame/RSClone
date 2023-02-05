@@ -191,9 +191,10 @@ function create() {
 
         //lives reduction
         model.lives--;
-        livesCount = this.add.text(textStartX + 2 * fieldSquareLength, textStartY, model.lives, style);
+        livesCount = this.add.text(textStartX + 4 * fieldSquareLength, textStartY, model.lives, style);
         //end lives reduction
       char.destroy();
+
     }, 200);
     gameOver = true;
   });
@@ -337,8 +338,11 @@ function update() {
           livesCount = this.add.text(textStartX + 4 * fieldSquareLength, textStartY, model.lives, style);
           //end lives reduction
           char.destroy()
+
+
         }, 200);
         gameOver = true;
+
       } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
         const enemyToDestroy = enemies.children.entries.find((enemy) => {
           const [closestX, closestY] = findClosestSquare(enemy);
