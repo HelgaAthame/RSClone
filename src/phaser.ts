@@ -176,6 +176,7 @@ function create() {
         fieldMatrix[randomX][randomY].y,
         "enemy"
       )
+      .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.22)
       .refreshBody();
   }
@@ -183,31 +184,7 @@ function create() {
   this.physics.add.collider(char, stone);
   this.physics.add.collider(char, wood);
   this.physics.add.collider(char, enemies, () => {
-    char.setTint(0xff0000);
-    this.add.tween({
-      targets: char,
-      ease: "Sine.easeInOut",
-      duration: 200,
-      delay: 0,
-      alpha: {
-        getStart: () => 1,
-        getEnd: () => 0,
-      },
-    });
-    setTimeout(() => {
-      //lives reduction
-      model.lives--;
-      livesCount = this.add.text(
-        textStartX + 4 * fieldSquareLength,
-        textStartY,
-        model.lives,
-        style
-      );
-      //end lives reduction
-      char.destroy();
-    }, 200);
-    gameOver = true;
-    drawGameOver.apply(this);
+    charDie.apply(this);
   });
   this.physics.add.collider(char, bombs);
 
@@ -296,7 +273,7 @@ function create() {
   livesCount = this.add.text(
     textStartX + 4 * fieldSquareLength,
     textStartY,
-    model.lives,
+    Array(model.lives).fill("❤️").join(""),
     style
   );
   ///text end
@@ -304,7 +281,8 @@ function create() {
 
 function update() {
   if (gameOver) {
-    if (cursors.space.isDown) restartGame.apply(this);
+    if (cursors.space.isDown && model.lives) restartScene.apply(this);
+    else if (cursors.space.isDown && !model.lives) restartGame.apply(this);
     else return;
   }
 
@@ -322,15 +300,16 @@ function charMovement(): void {
   const curCharSquare = flatFieldMatrix.find(
     (square) => square.object === "char"
   );
-  if (!curCharSquare) throw Error("Current characher square was not found");
-  curCharSquare.object = "grass";
-  const newCharSquare = flatFieldMatrix.find(
-    (square) =>
-      Math.floor(square.x) === Math.floor(closestX) &&
-      Math.floor(square.y) === Math.floor(closestY)
-  );
-  if (!newCharSquare) throw Error("New characher square was not found");
-  newCharSquare.object = "char";
+  if (curCharSquare) {
+    curCharSquare.object = "grass";
+    const newCharSquare = flatFieldMatrix.find(
+      (square) =>
+        Math.floor(square.x) === Math.floor(closestX) &&
+        Math.floor(square.y) === Math.floor(closestY)
+    );
+    if (!newCharSquare) throw Error("New characher square was not found");
+    newCharSquare.object = "char";
+  }
 
   if (cursors.up.isDown) {
     char.setVelocityY(-charSpeed);
@@ -397,7 +376,11 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 }
 
 function drawGameOver() {
-  const gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
+  let gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
+  if (model.lives) {
+    gameOverString =
+      "YOU HAVE LOST LIVE\nPRESS SPACE TO CONTINUE\nPRESS ESC TO EXIT";
+  }
   const screenCenterX =
     this.cameras.main.worldView.x + this.cameras.main.width / 2;
   const screenCenterY =
@@ -409,13 +392,6 @@ function drawGameOver() {
     })
     .setOrigin(0.5)
     .setDepth(1);
-}
-
-function restartGame() {
-  this.scene.restart();
-  setTimeout(() => {
-    gameOver = false;
-  }, 1);
 }
 
 function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
@@ -452,20 +428,7 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
       sqaureToCheck.object = "grass";
       woodSquare.destroy();
     } else if (sqaureToCheck.object === "char") {
-      char.setTint(0xff0000);
-      this.add.tween({
-        targets: char,
-        ease: "Sine.easeInOut",
-        duration: 200,
-        delay: 0,
-        alpha: {
-          getStart: () => 1,
-          getEnd: () => 0,
-        },
-      });
-      setTimeout(() => char.destroy(), 200);
-      gameOver = true;
-      drawGameOver.apply(this);
+      charDie.apply(this);
     } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
       const enemyToDestroy = enemies.children.entries.find((enemy) => {
         const [closestX, closestY] = findClosestSquare(enemy);
@@ -530,4 +493,36 @@ function dropBomb() {
 
     char.anims.play("placeBomb", true);
   }
+}
+
+function charDie() {
+  model.lives--;
+  char.setTint(0xff0000);
+  this.add.tween({
+    targets: char,
+    ease: "Sine.easeInOut",
+    duration: 200,
+    delay: 0,
+    alpha: {
+      getStart: () => 1,
+      getEnd: () => 0,
+    },
+  });
+  setTimeout(() => char.destroy(), 200);
+  gameOver = true;
+  drawGameOver.apply(this);
+}
+function restartGame() {
+  model.lives = 3;
+  this.scene.restart();
+  setTimeout(() => {
+    gameOver = false;
+  }, 1);
+}
+function restartScene() {
+  this.scene.restart();
+  model.score = 0;
+  setTimeout(() => {
+    gameOver = false;
+  }, 1);
 }
