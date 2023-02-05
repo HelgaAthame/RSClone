@@ -137,7 +137,8 @@ function create() {
 
   char = this.physics.add
     .sprite(charStartX, charStartY, "char")
-    .setScale(0.85, 0.77)
+    .setSize(fieldSquareLength * 0.99, fieldSquareLength * 0.99)
+    .setScale(0.9, 0.9)
     .refreshBody();
 
   while (enemyCounter < curLvlEnemies) {
@@ -179,6 +180,7 @@ function create() {
     });
     setTimeout(() => char.destroy(), 200);
     gameOver = true;
+    drawGameOver.apply(this);
   });
   this.physics.add.collider(char, bombs);
 
@@ -252,6 +254,16 @@ function create() {
 }
 
 function update() {
+  const restartGame = () => {
+    this.scene.restart();
+    setTimeout(() => {
+      gameOver = false;
+    }, 500);
+  };
+
+  if (gameOver && cursors.space.isDown) {
+    restartGame();
+  }
   if (gameOver) return;
 
   const explodeBomb = (
@@ -305,24 +317,26 @@ function update() {
         });
         setTimeout(() => char.destroy(), 200);
         gameOver = true;
+        drawGameOver.apply(this);
       } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
         const enemyToDestroy = enemies.children.entries.find((enemy) => {
           const [closestX, closestY] = findClosestSquare(enemy);
           return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
         });
-        if (!enemyToDestroy) throw Error("The enemy was not found");
-        enemyToDestroy.setTint(0xff0000);
-        this.add.tween({
-          targets: enemyToDestroy,
-          ease: "Sine.easeInOut",
-          duration: 200,
-          delay: 0,
-          alpha: {
-            getStart: () => 1,
-            getEnd: () => 0,
-          },
-        });
-        setTimeout(() => enemyToDestroy.destroy(), 200);
+        if (enemyToDestroy) {
+          enemyToDestroy.setTint(0xff0000);
+          this.add.tween({
+            targets: enemyToDestroy,
+            ease: "Sine.easeInOut",
+            duration: 200,
+            delay: 0,
+            alpha: {
+              getStart: () => 1,
+              getEnd: () => 0,
+            },
+          });
+          setTimeout(() => enemyToDestroy.destroy(), 200);
+        }
       }
     };
 
@@ -371,7 +385,7 @@ function update() {
   };
 
   /* Char controls */
-  if (cursors.space.isDown) {
+  if (cursors.space.isDown && !gameOver) {
     dropBomb();
   }
 
@@ -461,4 +475,19 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
   const minDistSquareIndex = charToSquareDist.indexOf(minDistSquare);
   const closestSquare = flatFieldMatrix[minDistSquareIndex];
   return [closestSquare.x, closestSquare.y];
+}
+
+function drawGameOver() {
+  const gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
+  const screenCenterX =
+    this.cameras.main.worldView.x + this.cameras.main.width / 2;
+  const screenCenterY =
+    this.cameras.main.worldView.y + this.cameras.main.height / 2;
+  const gameOverText = this.add
+    .text(screenCenterX, screenCenterY, gameOverString, {
+      fontSize: "50px",
+      fill: "#fff",
+    })
+    .setOrigin(0.5)
+    .setDepth(1);
 }
