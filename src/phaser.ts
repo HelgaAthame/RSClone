@@ -2,8 +2,9 @@ import Phaser from "phaser";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
 
-let score = model.score;
-let livesCount = model.lives;
+//let score = model.score;
+//let livesCount = model.lives;
+let bombSpeed = model.bombSpeed;
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -16,10 +17,10 @@ const charStartX = fieldStartX + 1.5 * fieldSquareLength;
 const charStartY = height - 1.5 * fieldSquareLength;
 const charSpeed = 160;
 
-const enemySpeed = 80;
+let enemySpeed = model.enemySpeed;
 
-const textStartX = fieldStartX + 0.2 * fieldSquareLength;
-const textStartY = 0.2 * fieldSquareLength;
+const textStartX = fieldStartX + 0.5 * fieldSquareLength;
+const textStartY = 0.3 * fieldSquareLength;
 const style = {
   font: "bold 1rem Arial",
   fill: "#000",
@@ -63,7 +64,7 @@ let char: Phaser.Physics.Matter.Sprite,
 
 let gameOver = false;
 let bombActive = false;
-let curLvlEnemies = 3;
+let curLvlEnemies;
 
 export const game = new Phaser.Game(config);
 
@@ -85,6 +86,9 @@ function preload() {
 }
 
 function create() {
+
+  curLvlEnemies = model.enemies + model.level;
+  enemySpeed = model.enemySpeed + model.level * 10;
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
 
@@ -258,7 +262,7 @@ function create() {
 
   ///text
   const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
-  score = this.add.text(
+  const score = this.add.text(
     textStartX + 1.5 * fieldSquareLength,
     textStartY,
     model.score,
@@ -270,12 +274,20 @@ function create() {
     "LIVES  :",
     style
   );
-  livesCount = this.add.text(
+  const livesCount = this.add.text(
     textStartX + 4 * fieldSquareLength,
     textStartY,
     Array(model.lives).fill("❤️").join(""),
     style
   );
+  const levelTitle = this.add.text(textStartX + 9 * fieldSquareLength, textStartY, "LEVEL", style);
+  const levelNumber = this.add.text(
+    textStartX + 10 * fieldSquareLength,
+    textStartY,
+    model.level,
+    style
+  );
+
   ///text end
 }
 
@@ -389,6 +401,9 @@ function drawGameOver() {
     .text(screenCenterX, screenCenterY, gameOverString, {
       fontSize: "50px",
       fill: "#fff",
+      stroke: "#222",
+      strokeThickness: 5,
+      backgroundColor: "rgba(20, 20, 20, 0.75)"
     })
     .setOrigin(0.5)
     .setDepth(1);
@@ -446,7 +461,18 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
             getEnd: () => 0,
           },
         });
-        setTimeout(() => enemyToDestroy.destroy(), 200);
+        setTimeout(() => {
+          enemyToDestroy.destroy()
+          curLvlEnemies--;
+          if (curLvlEnemies === 0 && model.lives > 0) {
+            model.level ++ ;
+            console.log(`model.enemies = ${model.enemies}`);
+            console.log(`curLvlEnemies = ${curLvlEnemies}`);
+            console.log(`enemiesAlive = ${enemiesAlive.length}`);
+            gameOver = true;
+            restartScene.apply(this); // после перезагрузки сцены не появляются враги на игровом поле
+          }
+        }, 200);
       }
     }
   };
@@ -489,7 +515,7 @@ function dropBomb() {
 
     setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, 1000);
+    }, bombSpeed - (1000 * ( model.level - 1 )) );
 
     char.anims.play("placeBomb", true);
   }
