@@ -466,11 +466,8 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
           curLvlEnemies--;
           if (curLvlEnemies === 0 && model.lives > 0) {
             model.level ++ ;
-            console.log(`model.enemies = ${model.enemies}`);
-            console.log(`curLvlEnemies = ${curLvlEnemies}`);
-            console.log(`enemiesAlive = ${enemiesAlive.length}`);
             gameOver = true;
-            restartScene.apply(this); // после перезагрузки сцены не появляются враги на игровом поле
+            restartScene.apply(this);
           }
         }, 200);
       }
