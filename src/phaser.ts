@@ -334,9 +334,6 @@ function charMovement(): void {
   }
 }
 function enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
-  const randomMove1 = [-enemySpeed, enemySpeed][Math.floor(Math.random() * 2)];
-  const randomMove2 = [-enemySpeed, enemySpeed][Math.floor(Math.random() * 2)];
-
   const [closestX, closestY] = findClosestSquare(enemy);
   const flatFieldMatrix = fieldMatrix.flat();
 
@@ -351,14 +348,37 @@ function enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
   newEnemySquare.object = `enemy_${curEnemyID}`;
 
   if (
-    enemy.body.position.x !== enemy.body.prev.x &&
-    enemy.body.position.y !== enemy.body.prev.y
+    enemy.body.position.x == enemy.body.prev.x &&
+    enemy.body.position.y == enemy.body.prev.y
   ) {
-    return;
-  } else {
-    enemy.setVelocityY(randomMove1);
-    enemy.setVelocityX(randomMove2);
+    const random = Math.random();
+    if (random > 0.75) {
+      enemy.setVelocityX(0);
+      enemy.setVelocityY(160);
+    } else if (random > 0.5) {
+      enemy.setVelocityX(0);
+      enemy.setVelocityY(-160);
+    } else if (random > 0.25) {
+      enemy.setVelocityX(160);
+      enemy.setVelocityY(0);
+    } else {
+      enemy.setVelocityX(-160);
+      enemy.setVelocityY(0);
+    }
   }
+
+  // const randomMove1 = [-enemySpeed, enemySpeed][Math.floor(Math.random() * 2)];
+  // const randomMove2 = [-enemySpeed, enemySpeed][Math.floor(Math.random() * 2)];
+
+  // if (
+  //   enemy.body.position.x !== enemy.body.prev.x &&
+  //   enemy.body.position.y !== enemy.body.prev.y
+  // ) {
+  //   return;
+  // } else {
+  //   enemy.setVelocityY(randomMove1);
+  //   enemy.setVelocityX(randomMove2);
+  // }
 }
 
 function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
@@ -376,6 +396,7 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 }
 
 function drawGameOver() {
+  console.log("drawGameOver");
   let gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
   if (model.lives) {
     gameOverString =
