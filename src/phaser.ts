@@ -448,7 +448,14 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
             getEnd: () => 0,
           },
         });
-        setTimeout(() => enemyToDestroy.destroy(), 200);
+        setTimeout(() => {
+          enemyToDestroy.destroy()
+          curLvlEnemies--;
+          if (curLvlEnemies === 0) {
+            model.level ++ ;
+            restartScene.apply(this); // после перезагрузки сцены не появляются враги на игровом поле
+          }
+        }, 200);
       }
     }
   };
