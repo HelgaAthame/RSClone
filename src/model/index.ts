@@ -1,18 +1,19 @@
 import selectorChecker from "../utils/selectorChecker.js";
 
 type Buttons = {
-  arrowUp: String
-  arrowDown: String
-  arrowLeft: String
-  arrowRight: String
-  buttonA: String
-  buttonB: String
-  select: String
-  start: String
+  arrowUp: string
+  arrowDown: string
+  arrowLeft: string
+  arrowRight: string
+  buttonA: string
+  buttonB: string
+  select: string
+  start: string
 }
 
 export class Model {
   constructor () {
+    this._lives = 3;
     this._score = 0;
     this._isMuted = false;
     this._volume = 0.5;
@@ -27,12 +28,24 @@ export class Model {
       start: 'Enter'
     }
   }
-  _score: Number;
+  _lives: number;
+  _score: number;
   _buttons: Buttons;
   _isMuted: Boolean;
-  _volume: Number;
+  _volume: number;
 
-  set score (val: Number) {
+
+  set lives (val: number) {
+    this._lives = val;
+    //TODO добавить в БД
+  }
+
+  get lives () {
+    //TODO достать из БД
+    return this._lives;
+  }
+
+  set score (val: number) {
     this._score = val;
     //TODO добавить в БД
   }
@@ -59,7 +72,7 @@ export class Model {
     return this._isMuted;
   }
 
-  set volume (val: Number) {
+  set volume (val: number) {
     this._volume = val;
 
     const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;

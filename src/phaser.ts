@@ -3,6 +3,7 @@ import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
 
 let score = model.score;
+let livesCount = model.lives;
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -16,6 +17,12 @@ const charStartY = height - 1.5 * fieldSquareLength;
 const charSpeed = 160;
 
 const enemySpeed = 80;
+
+
+const textStartX = fieldStartX + 0.2 * fieldSquareLength;
+const textStartY = 0.2 * fieldSquareLength;
+const style = { font: "bold 1rem Arial", fill: "#000", wordWrap: true, wordWrapWidth: 2, align: "center", stroke: "#fff", strokeThickness: 3 };
+
 
 const fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
@@ -180,7 +187,14 @@ function create() {
         getEnd: () => 0,
       },
     });
-    setTimeout(() => char.destroy(), 200);
+    setTimeout(() => {
+
+        //lives reduction
+        model.lives--;
+        livesCount = this.add.text(textStartX + 2 * fieldSquareLength, textStartY, model.lives, style);
+        //end lives reduction
+      char.destroy();
+    }, 200);
     gameOver = true;
   });
   this.physics.add.collider(char, bombs);
@@ -255,12 +269,10 @@ function create() {
 
 
   ///text
-  const textStartX = fieldStartX + 0.2 * fieldSquareLength;
-  const textStartY = 0.2 * fieldSquareLength;
-
-  const style = { font: "bold 1rem Arial", fill: "#000", wordWrap: true, wordWrapWidth: 2, align: "center", stroke: "#fff", strokeThickness: 3 };
         const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
         score = this.add.text(textStartX + 1.5 * fieldSquareLength, textStartY, model.score, style);
+        const livesTitle = this.add.text(textStartX + 2.5 * fieldSquareLength, textStartY, "LIVES  :", style);
+        livesCount = this.add.text(textStartX + 4 * fieldSquareLength, textStartY, model.lives, style);
   ///text end
 
 
@@ -319,10 +331,11 @@ function update() {
           },
         });
         setTimeout(() => {
-          //score gorw
-          model.score++;
-          score = this.add.text(textStartX, textStartY, model.score, style);
-          //end score grow
+
+          //lives reduction
+          model.lives--;
+          livesCount = this.add.text(textStartX + 4 * fieldSquareLength, textStartY, model.lives, style);
+          //end lives reduction
           char.destroy()
         }, 200);
         gameOver = true;
@@ -343,7 +356,13 @@ function update() {
             getEnd: () => 0,
           },
         });
-        setTimeout(() => enemyToDestroy.destroy(), 200);
+        setTimeout(() => {
+          enemyToDestroy.destroy()
+          //score gorw
+          model.score ++;
+          score = this.add.text(textStartX, textStartY, model.score, style);
+          //end score grow
+        }, 200);
       }
     };
 
