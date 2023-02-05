@@ -65,7 +65,7 @@ let char: Phaser.Physics.Matter.Sprite,
 
 let gameOver = false;
 let bombActive = false;
-let curLvlEnemies = 3;
+let curLvlEnemies = model.enemies + model.level;
 
 export const game = new Phaser.Game(config);
 
@@ -491,7 +491,7 @@ function dropBomb() {
 
     setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, bombSpeed - (1000 * ( model.level - 1 ));
+    }, bombSpeed - (1000 * ( model.level - 1 )) );
 
     char.anims.play("placeBomb", true);
   }

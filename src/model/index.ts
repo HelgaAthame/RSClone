@@ -13,6 +13,7 @@ type Buttons = {
 
 export class Model {
   constructor () {
+    this.enemies = 2;
     this.level = 1;
     this.bombSpeed = 5000;
     this._lives = 3;
@@ -30,6 +31,7 @@ export class Model {
       start: 'Enter'
     }
   }
+  enemies: number;
   level: number;
   bombSpeed: number;
   _lives: number;
