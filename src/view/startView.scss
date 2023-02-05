@@ -43,12 +43,33 @@ $ancor-color: palevioletred;
 $disabled-color: #444;
 
 body {
+  overflow: hidden;
   background-color: black;
   font-family: Mayhem;
   color: #ddd;
   .main {
     @include flexCol;
     height: 95vh;
+
+    .begin {
+      @include flexCenter;
+      margin: 10vw;
+      padding-top: 12vh;
+      padding-right: 7vw;
+      font-size: 2rem;
+      height: 95vh;
+      background-image: url('../assets/bomb.png');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      .begin__text {
+      }
+      .active {
+        color: $ancor-color;
+        text-shadow: 0 0 10px $ancor-color;
+      }
+    }
+
     .logo {
       flex-grow: 1;
       background-image: url('./../assets/bomberman-logo.png');
@@ -56,15 +77,15 @@ body {
       background-position: center;
     }
     .nav {
-      @include flexCenter;
+      @include flexCol;
+      align-items: center;
       article {
         padding: $basic-padding;
-        @include ancor;
       }
-    }
-    .settings {
-      @include flexCenter;
-      @include ancor;
+      .active {
+        color: $ancor-color;
+        text-shadow: 0 0 10px $ancor-color;
+      }
     }
     .footer {
       @include flexBetween;
@@ -82,6 +103,10 @@ body {
           @include ancor;
           padding: $basic-padding;
         }
+        .active {
+          color: $ancor-color;
+          text-shadow: 0 0 10px $ancor-color;
+        }
       }
       .year {
         width: 33vw;
@@ -95,6 +120,12 @@ body {
         width: 33vw;
         img {
           width: 4rem;
+        }
+      }
+      .active {
+        img {
+          width: 5rem;
+          margin: -0.5rem;
         }
       }
     }
