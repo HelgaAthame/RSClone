@@ -18,11 +18,17 @@ const charSpeed = 160;
 
 const enemySpeed = 80;
 
-
 const textStartX = fieldStartX + 0.2 * fieldSquareLength;
 const textStartY = 0.2 * fieldSquareLength;
-const style = { font: "bold 1rem Arial", fill: "#000", wordWrap: true, wordWrapWidth: 2, align: "center", stroke: "#fff", strokeThickness: 3 };
-
+const style = {
+  font: "bold 1rem Arial",
+  fill: "#000",
+  wordWrap: true,
+  wordWrapWidth: 2,
+  align: "center",
+  stroke: "#fff",
+  strokeThickness: 3,
+};
 
 const fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
@@ -189,13 +195,16 @@ function create() {
       },
     });
     setTimeout(() => {
-
-        //lives reduction
-        model.lives--;
-        livesCount = this.add.text(textStartX + 4 * fieldSquareLength, textStartY, model.lives, style);
-        //end lives reduction
+      //lives reduction
+      model.lives--;
+      livesCount = this.add.text(
+        textStartX + 4 * fieldSquareLength,
+        textStartY,
+        model.lives,
+        style
+      );
+      //end lives reduction
       char.destroy();
-
     }, 200);
     gameOver = true;
     drawGameOver.apply(this);
@@ -270,20 +279,31 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
 
-
   ///text
-        const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
-        score = this.add.text(textStartX + 1.5 * fieldSquareLength, textStartY, model.score, style);
-        const livesTitle = this.add.text(textStartX + 2.5 * fieldSquareLength, textStartY, "LIVES  :", style);
-        livesCount = this.add.text(textStartX + 4 * fieldSquareLength, textStartY, model.lives, style);
+  const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
+  score = this.add.text(
+    textStartX + 1.5 * fieldSquareLength,
+    textStartY,
+    model.score,
+    style
+  );
+  const livesTitle = this.add.text(
+    textStartX + 2.5 * fieldSquareLength,
+    textStartY,
+    "LIVES  :",
+    style
+  );
+  livesCount = this.add.text(
+    textStartX + 4 * fieldSquareLength,
+    textStartY,
+    model.lives,
+    style
+  );
   ///text end
-
-
 }
 
 function update() {
-
-if (gameOver) {
+  if (gameOver) {
     if (cursors.space.isDown) restartGame.apply(this);
     else return;
   }
@@ -395,7 +415,7 @@ function restartGame() {
   this.scene.restart();
   setTimeout(() => {
     gameOver = false;
-  }, 500);
+  }, 1);
 }
 
 function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
