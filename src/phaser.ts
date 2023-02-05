@@ -184,7 +184,7 @@ function create() {
   this.physics.add.collider(char, stone);
   this.physics.add.collider(char, wood);
   this.physics.add.collider(char, enemies, () => {
-    charDie.apply(this);
+    if (!gameOver) charDie.apply(this);
   });
   this.physics.add.collider(char, bombs);
 
@@ -517,6 +517,7 @@ function dropBomb() {
 }
 
 function charDie() {
+  gameOver = true;
   model.lives--;
   char.setTint(0xff0000);
   this.add.tween({
@@ -530,7 +531,6 @@ function charDie() {
     },
   });
   setTimeout(() => char.destroy(), 200);
-  gameOver = true;
   drawGameOver.apply(this);
 }
 function restartGame() {
