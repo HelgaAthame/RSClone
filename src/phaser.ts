@@ -1,5 +1,8 @@
 import Phaser from "phaser";
+import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
+
+let score = model.score;
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -249,6 +252,18 @@ function create() {
   });
 
   cursors = this.input.keyboard.createCursorKeys();
+
+
+  ///text
+  const textStartX = fieldStartX + 0.2 * fieldSquareLength;
+  const textStartY = 0.2 * fieldSquareLength;
+
+  const style = { font: "bold 1rem Arial", fill: "#000", wordWrap: true, wordWrapWidth: 2, align: "center", stroke: "#fff", strokeThickness: 3 };
+        const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
+        score = this.add.text(textStartX + 1.5 * fieldSquareLength, textStartY, model.score, style);
+  ///text end
+
+
 }
 
 function update() {
@@ -303,7 +318,13 @@ function update() {
             getEnd: () => 0,
           },
         });
-        setTimeout(() => char.destroy(), 200);
+        setTimeout(() => {
+          //score gorw
+          model.score++;
+          score = this.add.text(textStartX, textStartY, model.score, style);
+          //end score grow
+          char.destroy()
+        }, 200);
         gameOver = true;
       } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
         const enemyToDestroy = enemies.children.entries.find((enemy) => {

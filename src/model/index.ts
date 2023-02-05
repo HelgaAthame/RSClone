@@ -13,6 +13,7 @@ type Buttons = {
 
 export class Model {
   constructor () {
+    this._score = 0;
     this._isMuted = false;
     this._volume = 0.5;
     this._buttons = {
@@ -26,9 +27,20 @@ export class Model {
       start: 'Enter'
     }
   }
+  _score: Number;
   _buttons: Buttons;
   _isMuted: Boolean;
   _volume: Number;
+
+  set score (val: Number) {
+    this._score = val;
+    //TODO добавить в БД
+  }
+
+  get score () {
+    //TODO достать из БД
+    return this._score;
+  }
 
   set isMuted (val: Boolean) {
     this._isMuted = val;
