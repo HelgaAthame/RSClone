@@ -78,9 +78,9 @@ function preload() {
     frameHeight: 64,
   });
 
-  this.load.image("grass", "./src/assets/grass.webp");
-  this.load.image("stone", "./src/assets/stone.webp");
-  this.load.image("wood", "./src/assets/wood.webp");
+  this.load.image("grass", "./src/assets/grass.jpg");
+  this.load.image("stone", "./src/assets/stone.jpg");
+  this.load.image("wood", "./src/assets/wood.jpg");
   this.load.image("bomb", "./src/assets/bomb.png");
   this.load.image("enemy", "./src/assets/enemy.png");
 }
