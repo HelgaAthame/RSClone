@@ -6,8 +6,8 @@ type Buttons = {
   arrowDown: string
   arrowLeft: string
   arrowRight: string
-  buttonA: string
-  buttonB: string
+  bombSet: string
+  bombRemove: string
   select: string
   start: string
 }
@@ -24,14 +24,14 @@ export class Model {
     this._isMuted = false;
     this._volume = 0.5;
     this._buttons = {
-      arrowUp: 'ArrowUp',
-      arrowDown: 'ArrowDown',
-      arrowLeft: 'ArrowLeft',
-      arrowRight: 'ArrowRight',
-      buttonA: 'X',
-      buttonB: 'Z',
-      select: 'RightShift',
-      start: 'Enter'
+      arrowUp: 'UP',
+      arrowDown: 'DOWN',
+      arrowLeft: 'LEFT',
+      arrowRight: 'RIGHT',
+      bombSet: 'SPACE',
+      bombRemove: 'Z',
+      select: 'STIFT',
+      start: 'ENTER'
     }
   }
   fieldMatrix: FieldSquare[][] | undefined;

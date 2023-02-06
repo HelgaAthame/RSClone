@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
 import { view } from "./view/index.js";
+import keys from './utils/keys.js;'
 
 //let score = model.score;
 //let livesCount = model.lives;

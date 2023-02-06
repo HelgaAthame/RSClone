@@ -1,4 +1,4 @@
-export const keys = {
+const keysObject = {
   'A': 'A',
   'AltRight': 'ALT',
   'AltLeft': 'ALT',
@@ -105,3 +105,5 @@ export const keys = {
   'Z': 'Z',
   'Digit0': 'ZERO'
 }
+
+export default keysObject;
