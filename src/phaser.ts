@@ -32,7 +32,7 @@ const style = {
   strokeThickness: 3,
 };
 
-const fieldMatrix: FieldSquare[][] = Array(ceilsNum)
+let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
@@ -63,7 +63,7 @@ let char: Phaser.Physics.Matter.Sprite,
   explosion: Phaser.GameObjects.Sprite,
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-let gameOver = false;
+export let gameOver = false;
 let bombActive = false;
 let curLvlEnemies: number;
 
@@ -290,6 +290,15 @@ function create() {
   );
 
   ///text end
+
+  //if there is field matrix in model - we take it
+  //if no - we write it into model
+  if (model.fieldMatrix) {
+    fieldMatrix = model.fieldMatrix;
+  } else {
+    model.fieldMatrix = fieldMatrix;
+  }
+
 }
 
 function update() {
@@ -306,6 +315,8 @@ function update() {
 
   const keyESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
   if (keyESC.isDown) {
+    gameOver = true;
+    model.fieldMatrix = fieldMatrix;//save field state
     view.settings.renderUI();
   }
 
@@ -555,4 +566,7 @@ function restartScene() {
   setTimeout(() => {
     gameOver = false;
   }, 1);
+}
+export function changeGameOver() {
+  gameOver = !gameOver;
 }

@@ -1,3 +1,4 @@
+import FieldSquare from "../utils/fieldSquare.js";
 import selectorChecker from "../utils/selectorChecker.js";
 
 type Buttons = {
@@ -13,6 +14,7 @@ type Buttons = {
 
 export class Model {
   constructor () {
+    this.fieldMatrix = undefined;
     this.enemySpeed = 50;
     this.enemies = 2;
     this.level = 1;
@@ -32,6 +34,7 @@ export class Model {
       start: 'Enter'
     }
   }
+  fieldMatrix: FieldSquare[][] | undefined;
   enemySpeed: number;
   enemies: number;
   level: number;

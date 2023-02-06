@@ -115,8 +115,10 @@ export class StartView {
             case 'start':
               const canvas = document.querySelector('canvas') as HTMLCanvasElement;
               if (canvas) canvas.style.display = 'initial';
-
+              //import { gameOver, changeGameOver } from '../phaser.js';
+              //if (gameOver) changeGameOver();
               const phaser = await import('../phaser.js');
+              if (phaser.gameOver) phaser.changeGameOver();
               const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
               bgAudio.pause();
               break;
