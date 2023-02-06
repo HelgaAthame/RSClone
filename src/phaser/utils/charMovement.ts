@@ -3,6 +3,8 @@ import gameObjects from "./../gameObjects.js";
 import findClosestSquare from "./findClosestSquare.js";
 
 export default function charMovement(): void {
+  const cursors = this.input.keyboard.createCursorKeys();
+
   const char = gameObjects.char.call(this);
   const [closestX, closestY] = findClosestSquare(char);
   const { fieldMatrix, charSpeed } = app.model;

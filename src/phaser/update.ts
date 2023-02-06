@@ -20,6 +20,6 @@ export default function update() {
     dropBomb.call(this);
   }
 
-  charMovement();
+  charMovement.apply(this);
   enemies.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
