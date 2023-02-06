@@ -1,9 +1,12 @@
 import Phaser from "phaser";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
+import { view } from "./view/index.js";
+import keys from './utils/keys.js;'
 
-let score = model.score;
-let livesCount = model.lives;
+//let score = model.score;
+//let livesCount = model.lives;
+let bombSpeed = model.bombSpeed;
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -16,10 +19,10 @@ const charStartX = fieldStartX + 1.5 * fieldSquareLength;
 const charStartY = height - 1.5 * fieldSquareLength;
 const charSpeed = 160;
 
-const enemySpeed = 80;
+let enemySpeed = model.enemySpeed;
 
-const textStartX = fieldStartX + 0.2 * fieldSquareLength;
-const textStartY = 0.2 * fieldSquareLength;
+const textStartX = fieldStartX + 0.5 * fieldSquareLength;
+const textStartY = 0.3 * fieldSquareLength;
 const style = {
   font: "bold 1rem Arial",
   fill: "#000",
@@ -30,7 +33,7 @@ const style = {
   strokeThickness: 3,
 };
 
-const fieldMatrix: FieldSquare[][] = Array(ceilsNum)
+let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
@@ -61,9 +64,9 @@ let char: Phaser.Physics.Matter.Sprite,
   explosion: Phaser.GameObjects.Sprite,
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-let gameOver = false;
+export let gameOver = false;
 let bombActive = false;
-let curLvlEnemies = 3;
+let curLvlEnemies: number;
 
 export const game = new Phaser.Game(config);
 
@@ -77,14 +80,17 @@ function preload() {
     frameHeight: 64,
   });
 
-  this.load.image("grass", "./src/assets/grass.webp");
-  this.load.image("stone", "./src/assets/stone.webp");
-  this.load.image("wood", "./src/assets/wood.webp");
+  this.load.image("grass", "./src/assets/grass.jpg");
+  this.load.image("stone", "./src/assets/stone.jpg");
+  this.load.image("wood", "./src/assets/wood.jpg");
   this.load.image("bomb", "./src/assets/bomb.png");
   this.load.image("enemy", "./src/assets/enemy.png");
 }
 
 function create() {
+
+  curLvlEnemies = model.enemies + model.level;
+  enemySpeed = model.enemySpeed + model.level * 10;
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
 
@@ -258,7 +264,7 @@ function create() {
 
   ///text
   const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
-  score = this.add.text(
+  const score = this.add.text(
     textStartX + 1.5 * fieldSquareLength,
     textStartY,
     model.score,
@@ -270,31 +276,64 @@ function create() {
     "LIVES  :",
     style
   );
-  livesCount = this.add.text(
+  const livesCount = this.add.text(
     textStartX + 4 * fieldSquareLength,
     textStartY,
     Array(model.lives).fill("❤️").join(""),
     style
   );
+  const levelTitle = this.add.text(textStartX + 9 * fieldSquareLength, textStartY, "LEVEL", style);
+  const levelNumber = this.add.text(
+    textStartX + 10 * fieldSquareLength,
+    textStartY,
+    model.level,
+    style
+  );
+
   ///text end
+
+  //if there is field matrix in model - we take it
+  //if no - we write it into model
+  if (model.fieldMatrix) {
+    fieldMatrix = model.fieldMatrix;
+  } else {
+    model.fieldMatrix = fieldMatrix;
+  }
+
 }
 
 function update() {
+  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+
   if (gameOver) {
-    if (cursors.space.isDown && model.lives) restartScene.apply(this);
-    else if (cursors.space.isDown && !model.lives) restartGame.apply(this);
+    if (/*cursors.space.isDown*/bombSet.isDown && model.lives) restartScene.apply(this);
+    else if (/*cursors.space.isDown*/bombSet.isDown && !model.lives) restartGame.apply(this);
     else return;
   }
 
-  if (!gameOver && cursors.space.isDown) {
+  if (!gameOver && /*cursors.space*/bombSet.isDown) {
     dropBomb.apply(this);
   }
 
-  charMovement();
+
+  const keyESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+  if (keyESC.isDown) {
+    gameOver = true;
+    model.fieldMatrix = fieldMatrix;//save field state
+    view.settings.renderUI();
+  }
+
+  charMovement.apply(this);
   enemies.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
 
 function charMovement(): void {
+  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+  const up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]);
+  const down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]);
+  const left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]);
+  const right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]);
+
   const [closestX, closestY] = findClosestSquare(char);
   const flatFieldMatrix = fieldMatrix.flat();
   const curCharSquare = flatFieldMatrix.find(
@@ -311,23 +350,23 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
-  if (cursors.up.isDown) {
+  if (/*cursors.*/up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
     char.anims.play("up", true);
-  } else if (cursors.right.isDown) {
+  } else if (/*cursors.*/right.isDown) {
     char.setVelocityX(charSpeed);
     char.setVelocityY(0);
     char.anims.play("right", true);
-  } else if (cursors.down.isDown) {
+  } else if (/*cursors.*/down.isDown) {
     char.setVelocityY(charSpeed);
     char.setVelocityX(0);
     char.anims.play("down", true);
-  } else if (cursors.left.isDown) {
+  } else if (/*cursors.*/left.isDown) {
     char.setVelocityX(-charSpeed);
     char.setVelocityY(0);
     char.anims.play("left", true);
-  } else if (!cursors.space.isDown) {
+  } else if (!/*cursors.space*/bombSet.isDown) {
     char.setVelocityX(0);
     char.setVelocityY(0);
     char.anims.play("turn", true);
@@ -396,11 +435,10 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 }
 
 function drawGameOver() {
-  console.log("drawGameOver");
-  let gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
+  let gameOverString = "GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT";
   if (model.lives) {
     gameOverString =
-      "YOU HAVE LOST LIVE\nPRESS SPACE TO CONTINUE\nPRESS ESC TO EXIT";
+      "YOU HAVE LOST LIVE\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT";
   }
   const screenCenterX =
     this.cameras.main.worldView.x + this.cameras.main.width / 2;
@@ -410,6 +448,9 @@ function drawGameOver() {
     .text(screenCenterX, screenCenterY, gameOverString, {
       fontSize: "50px",
       fill: "#fff",
+      stroke: "#222",
+      strokeThickness: 5,
+      backgroundColor: "rgba(20, 20, 20, 0.75)"
     })
     .setOrigin(0.5)
     .setDepth(1);
@@ -467,7 +508,15 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
             getEnd: () => 0,
           },
         });
-        setTimeout(() => enemyToDestroy.destroy(), 200);
+        setTimeout(() => {
+          enemyToDestroy.destroy()
+          curLvlEnemies--;
+          if (curLvlEnemies === 0 && model.lives > 0) {
+            model.level ++ ;
+            gameOver = true;
+            restartScene.apply(this);
+          }
+        }, 200);
       }
     }
   };
@@ -510,7 +559,7 @@ function dropBomb() {
 
     setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, 1000);
+    }, bombSpeed - (1000 * ( model.level - 1 )) );
 
     char.anims.play("placeBomb", true);
   }
@@ -546,4 +595,7 @@ function restartScene() {
   setTimeout(() => {
     gameOver = false;
   }, 1);
+}
+export function changeGameOver() {
+  gameOver = !gameOver;
 }

@@ -1,3 +1,4 @@
+import FieldSquare from "../utils/fieldSquare.js";
 import selectorChecker from "../utils/selectorChecker.js";
 
 type Buttons = {
@@ -5,29 +6,39 @@ type Buttons = {
   arrowDown: string
   arrowLeft: string
   arrowRight: string
-  buttonA: string
-  buttonB: string
+  bombSet: string
+  bombRemove: string
   select: string
   start: string
 }
 
 export class Model {
   constructor () {
+    this.fieldMatrix = undefined;
+    this.enemySpeed = 50;
+    this.enemies = 2;
+    this.level = 1;
+    this.bombSpeed = 5000;
     this._lives = 3;
     this._score = 0;
     this._isMuted = false;
     this._volume = 0.5;
     this._buttons = {
-      arrowUp: 'ArrowUp',
-      arrowDown: 'ArrowDown',
-      arrowLeft: 'ArrowLeft',
-      arrowRight: 'ArrowRight',
-      buttonA: 'X',
-      buttonB: 'Z',
-      select: 'RightShift',
-      start: 'Enter'
+      arrowUp: 'UP',
+      arrowDown: 'DOWN',
+      arrowLeft: 'LEFT',
+      arrowRight: 'RIGHT',
+      bombSet: 'SPACE',
+      bombRemove: 'Z',
+      select: 'STIFT',
+      start: 'ENTER'
     }
   }
+  fieldMatrix: FieldSquare[][] | undefined;
+  enemySpeed: number;
+  enemies: number;
+  level: number;
+  bombSpeed: number;
   _lives: number;
   _score: number;
   _buttons: Buttons;

@@ -2,21 +2,30 @@ import { model } from '../model/index.js';
 import { view } from './index.js';
 import selectorChecker from '../utils/selectorChecker.js';
 import './settingsView.scss';
+import keyz from '../utils/keys.js';
+import keysObject from '../utils/keys.js';
 
 export class SettingsView {
 
   renderUI() {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    if (canvas) {
+      //console.log(canvas);
+      canvas.style.display = 'none';
+    } else {
+      console.log('there is no canvas');
+    }
     const main = selectorChecker(document, 'main');
     main.innerHTML = `
       <section class="setting__title">settings</section>
       <section class="setting__wrapper">
         <div class="setting__table">
           <div class="setting__button">
-            <div class="sign arrow-up">🠕</div>
+            <div class="sign">🠕</div>
             <div class="key">${model.buttons.arrowUp}</div>
           </div>
           <div class="setting__button">
-            <div class="sign arrow-up">🠗</div>
+            <div class="sign">🠗</div>
             <div class="key">${model.buttons.arrowDown}</div>
           </div>
           <div class="setting__button">
@@ -29,11 +38,11 @@ export class SettingsView {
           </div>
           <div class="setting__button">
             <div class="sign">A</div>
-            <div class="key">${model.buttons.buttonA}</div>
+            <div class="key">${model.buttons.bombSet}</div>
           </div>
           <div class="setting__button">
             <div class="sign">B</div>
-            <div class="key">${model.buttons.buttonB}</div>
+            <div class="key">${model.buttons.bombRemove}</div>
           </div>
           <div class="setting__button">
             <div class="sign">select</div>
@@ -149,6 +158,7 @@ export class SettingsView {
           if ( i > 0 ) i--;
           signs[i].classList.add('active');
           keys[i].classList.add('blink');
+          ourTarget = keys[i];
           break;
         case 'ArrowDown':
           clearStyles ();
@@ -168,8 +178,8 @@ export class SettingsView {
               arrowDown: keys[1].innerHTML,
               arrowLeft: keys[2].innerHTML,
               arrowRight: keys[3].innerHTML,
-              buttonA: keys[4].innerHTML,
-              buttonB: keys[5].innerHTML,
+              bombSet: keys[4].innerHTML,
+              bombRemove: keys[5].innerHTML,
               select: keys[6].innerHTML,
               start: keys[7].innerHTML
             }
@@ -178,7 +188,8 @@ export class SettingsView {
           }
         default:
           const val = e.code.startsWith('Key') ? e.code.slice(3) : e.code;
-          if (ourTarget) ourTarget.textContent = val;
+          const comparedVal = keysObject[val];
+          if (ourTarget) ourTarget.textContent = comparedVal;
       }
     })
   }
