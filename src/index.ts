@@ -9,7 +9,7 @@ class App {
     this.model = model;
   }
 }
-const app = new App(view, new Model());
+export const app = new App(view, new Model());
 
 //рендер главного экрана
 app.view.start.renderUI();

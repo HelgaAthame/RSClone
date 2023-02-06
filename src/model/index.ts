@@ -1,37 +1,31 @@
 import selectorChecker from "../utils/selectorChecker.js";
+import FieldSquare from "../utils/fieldSquare.js";
 
 type Buttons = {
-  arrowUp: string
-  arrowDown: string
-  arrowLeft: string
-  arrowRight: string
-  buttonA: string
-  buttonB: string
-  select: string
-  start: string
-}
+  arrowUp: string;
+  arrowDown: string;
+  arrowLeft: string;
+  arrowRight: string;
+  buttonA: string;
+  buttonB: string;
+  select: string;
+  start: string;
+};
 
 export class Model {
-  constructor () {
-    this.enemySpeed = 50;
-    this.enemies = 2;
-    this.level = 1;
-    this.bombSpeed = 5000;
-    this._lives = 3;
-    this._score = 0;
-    this._isMuted = false;
-    this._volume = 0.5;
-    this._buttons = {
-      arrowUp: 'ArrowUp',
-      arrowDown: 'ArrowDown',
-      arrowLeft: 'ArrowLeft',
-      arrowRight: 'ArrowRight',
-      buttonA: 'X',
-      buttonB: 'Z',
-      select: 'RightShift',
-      start: 'Enter'
-    }
-  }
+  gameWidth: number;
+  gameHeight: number;
+  ceilsNum: number;
+  fieldSquareLength: number;
+  fieldStartX: number;
+  fieldMatrix: FieldSquare[][];
+  fieldImgSize: number;
+  charStartX: number;
+  charStartY: number;
+  charSpeed: number;
+
+  gameOver: boolean;
+  bombActive: boolean;
   enemySpeed: number;
   enemies: number;
   level: number;
@@ -42,64 +36,107 @@ export class Model {
   _isMuted: Boolean;
   _volume: number;
 
+  constructor() {
+    this.gameWidth = window.innerWidth;
+    this.gameHeight = window.innerHeight;
+    this.ceilsNum = 11;
+    this.fieldSquareLength = this.gameHeight / this.ceilsNum;
+    this.fieldStartX = this.gameWidth / 2 - this.gameHeight / 2;
 
-  set lives (val: number) {
+    this.fieldMatrix = Array(this.ceilsNum)
+      .fill([])
+      .map(() => Array(this.ceilsNum).fill({ x: 0, y: 0, object: null }));
+
+    this.fieldImgSize = 512;
+    this.charStartX = this.fieldStartX + 1.5 * this.fieldSquareLength;
+    this.charStartY = this.gameHeight - 1.5 * this.fieldSquareLength;
+    this.charSpeed = 160;
+
+    this.enemySpeed = 50;
+    this.enemies = 2;
+    this.level = 1;
+    this.gameOver = false;
+    this.bombActive = false;
+    this.bombSpeed = 5000;
+    this._lives = 3;
+    this._score = 0;
+    this._isMuted = false;
+    this._volume = 0.5;
+    this._buttons = {
+      arrowUp: "ArrowUp",
+      arrowDown: "ArrowDown",
+      arrowLeft: "ArrowLeft",
+      arrowRight: "ArrowRight",
+      buttonA: "X",
+      buttonB: "Z",
+      select: "RightShift",
+      start: "Enter",
+    };
+  }
+
+  set lives(val: number) {
     this._lives = val;
     //TODO добавить в БД
   }
 
-  get lives () {
+  get lives() {
     //TODO достать из БД
     return this._lives;
   }
 
-  set score (val: number) {
+  set score(val: number) {
     this._score = val;
     //TODO добавить в БД
   }
 
-  get score () {
+  get score() {
     //TODO достать из БД
     return this._score;
   }
 
-  set isMuted (val: Boolean) {
+  set isMuted(val: Boolean) {
     this._isMuted = val;
 
-    const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
-    const muteButton = selectorChecker(document, '.setting__sound-mute');
-    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+    const inputRange = selectorChecker(
+      document,
+      ".setting__sound-input"
+    ) as HTMLInputElement;
+    const muteButton = selectorChecker(document, ".setting__sound-mute");
+    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
 
-    muteButton.innerHTML = muteButton.innerHTML === '🔇' ? '🔈' : '🔇';
-    inputRange.value =  muteButton.innerHTML === '🔇' ? '1' : '0';
+    muteButton.innerHTML = muteButton.innerHTML === "🔇" ? "🔈" : "🔇";
+    inputRange.value = muteButton.innerHTML === "🔇" ? "1" : "0";
     bgAudio.volume = Number(inputRange.value);
     //TODO добавить в БД
   }
-  get isMuted ():Boolean {
+  get isMuted(): Boolean {
     //TODO взять значение из БД если оно есть
     return this._isMuted;
   }
 
-  set volume (val: number) {
+  set volume(val: number) {
     this._volume = val;
 
-    const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
-    const muteButton = selectorChecker(document, '.setting__sound-mute');
-    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
-    muteButton.innerHTML = inputRange.value === '0' ? '🔈' : '🔇';
+    const inputRange = selectorChecker(
+      document,
+      ".setting__sound-input"
+    ) as HTMLInputElement;
+    const muteButton = selectorChecker(document, ".setting__sound-mute");
+    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
+    muteButton.innerHTML = inputRange.value === "0" ? "🔈" : "🔇";
     bgAudio.volume = Number(inputRange.value);
     //todo сохранять в БД
   }
-  get volume () {
+  get volume() {
     //TODO взять из БД
     return this._volume;
   }
 
-  set buttons (val: Buttons) {
+  set buttons(val: Buttons) {
     this._buttons = val;
     //TODO сохранять в БД
   }
-  get buttons () {
+  get buttons() {
     //todo получить информацию из БД
     return this._buttons;
   }
