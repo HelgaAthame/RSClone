@@ -2,6 +2,9 @@ import { app } from "./../../index.js";
 import dropBomb from "./dropBomb.js";
 import drawExplosion from "./drawExplosion.js";
 import findClosestSquare from "./findClosestSquare.js";
+import charDie from "./charDie.js";
+import { model } from "../../model/index.js";
+import restartScene from "./restartScene.js";
 
 export default function explodeBomb(
   bomb: Phaser.GameObjects.Image,

@@ -1,7 +1,12 @@
 import { app } from "./../../index.js";
 import findClosestSquare from "./findClosestSquare.js";
+import explodeBomb from "./explodeBomb.js";
+import { model } from "../../model/index.js";
+import gameObjects from "./../gameObjects.js";
 
 export default function dropBomb() {
+  const char = gameObjects.char.apply(this);
+  const bombs = gameObjects.bombs.apply(this);
   const { fieldSquareLength } = app.model;
   let { bombActive } = app.model;
   if (!bombActive) {
@@ -31,7 +36,7 @@ export default function dropBomb() {
 
     setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, bombSpeed - 1000 * (model.level - 1));
+    }, model.bombSpeed - 1000 * (model.level - 1));
 
     char.anims.play("placeBomb", true);
   }
