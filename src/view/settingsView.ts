@@ -21,11 +21,11 @@ export class SettingsView {
       <section class="setting__wrapper">
         <div class="setting__table">
           <div class="setting__button">
-            <div class="sign arrow-up">🠕</div>
+            <div class="sign">🠕</div>
             <div class="key">${model.buttons.arrowUp}</div>
           </div>
           <div class="setting__button">
-            <div class="sign arrow-up">🠗</div>
+            <div class="sign">🠗</div>
             <div class="key">${model.buttons.arrowDown}</div>
           </div>
           <div class="setting__button">
@@ -158,6 +158,7 @@ export class SettingsView {
           if ( i > 0 ) i--;
           signs[i].classList.add('active');
           keys[i].classList.add('blink');
+          ourTarget = keys[i];
           break;
         case 'ArrowDown':
           clearStyles ();
