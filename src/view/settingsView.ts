@@ -6,6 +6,13 @@ import './settingsView.scss';
 export class SettingsView {
 
   renderUI() {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    if (canvas) {
+      //console.log(canvas);
+      canvas.style.display = 'none';
+    } else {
+      console.log('there is no canvas');
+    }
     const main = selectorChecker(document, 'main');
     main.innerHTML = `
       <section class="setting__title">settings</section>

@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
+import { view } from "./view/index.js";
 
 //let score = model.score;
 //let livesCount = model.lives;
@@ -64,7 +65,7 @@ let char: Phaser.Physics.Matter.Sprite,
 
 let gameOver = false;
 let bombActive = false;
-let curLvlEnemies;
+let curLvlEnemies: number;
 
 export const game = new Phaser.Game(config);
 
@@ -300,6 +301,12 @@ function update() {
 
   if (!gameOver && cursors.space.isDown) {
     dropBomb.apply(this);
+  }
+
+
+  const keyESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+  if (keyESC.isDown) {
+    view.settings.renderUI();
   }
 
   charMovement();

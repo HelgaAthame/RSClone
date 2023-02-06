@@ -113,6 +113,9 @@ export class StartView {
           const selected = selectorChecker(document, '.active') as HTMLElement;
            switch (selected.innerHTML) {
             case 'start':
+              const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+              if (canvas) canvas.style.display = 'initial';
+
               const phaser = await import('../phaser.js');
               const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
               bgAudio.pause();
