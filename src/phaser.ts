@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
+import { view } from "./view/index.js";
+import keys from './utils/keys.js;'
 
 //let score = model.score;
 //let livesCount = model.lives;
@@ -31,7 +33,7 @@ const style = {
   strokeThickness: 3,
 };
 
-const fieldMatrix: FieldSquare[][] = Array(ceilsNum)
+let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
@@ -62,9 +64,9 @@ let char: Phaser.Physics.Matter.Sprite,
   explosion: Phaser.GameObjects.Sprite,
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-let gameOver = false;
+export let gameOver = false;
 let bombActive = false;
-let curLvlEnemies;
+let curLvlEnemies: number;
 
 export const game = new Phaser.Game(config);
 
@@ -289,24 +291,49 @@ function create() {
   );
 
   ///text end
+
+  //if there is field matrix in model - we take it
+  //if no - we write it into model
+  if (model.fieldMatrix) {
+    fieldMatrix = model.fieldMatrix;
+  } else {
+    model.fieldMatrix = fieldMatrix;
+  }
+
 }
 
 function update() {
+  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+
   if (gameOver) {
-    if (cursors.space.isDown && model.lives) restartScene.apply(this);
-    else if (cursors.space.isDown && !model.lives) restartGame.apply(this);
+    if (/*cursors.space.isDown*/bombSet.isDown && model.lives) restartScene.apply(this);
+    else if (/*cursors.space.isDown*/bombSet.isDown && !model.lives) restartGame.apply(this);
     else return;
   }
 
-  if (!gameOver && cursors.space.isDown) {
+  if (!gameOver && /*cursors.space*/bombSet.isDown) {
     dropBomb.apply(this);
   }
 
-  charMovement();
+
+  const keyESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+  if (keyESC.isDown) {
+    gameOver = true;
+    model.fieldMatrix = fieldMatrix;//save field state
+    view.settings.renderUI();
+  }
+
+  charMovement.apply(this);
   enemies.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
 
 function charMovement(): void {
+  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+  const up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]);
+  const down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]);
+  const left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]);
+  const right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]);
+
   const [closestX, closestY] = findClosestSquare(char);
   const flatFieldMatrix = fieldMatrix.flat();
   const curCharSquare = flatFieldMatrix.find(
@@ -323,23 +350,23 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
-  if (cursors.up.isDown) {
+  if (/*cursors.*/up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
     char.anims.play("up", true);
-  } else if (cursors.right.isDown) {
+  } else if (/*cursors.*/right.isDown) {
     char.setVelocityX(charSpeed);
     char.setVelocityY(0);
     char.anims.play("right", true);
-  } else if (cursors.down.isDown) {
+  } else if (/*cursors.*/down.isDown) {
     char.setVelocityY(charSpeed);
     char.setVelocityX(0);
     char.anims.play("down", true);
-  } else if (cursors.left.isDown) {
+  } else if (/*cursors.*/left.isDown) {
     char.setVelocityX(-charSpeed);
     char.setVelocityY(0);
     char.anims.play("left", true);
-  } else if (!cursors.space.isDown) {
+  } else if (!/*cursors.space*/bombSet.isDown) {
     char.setVelocityX(0);
     char.setVelocityY(0);
     char.anims.play("turn", true);
@@ -388,10 +415,10 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 }
 
 function drawGameOver() {
-  let gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
+  let gameOverString = "GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT";
   if (model.lives) {
     gameOverString =
-      "YOU HAVE LOST LIVE\nPRESS SPACE TO CONTINUE\nPRESS ESC TO EXIT";
+      "YOU HAVE LOST LIVE\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT";
   }
   const screenCenterX =
     this.cameras.main.worldView.x + this.cameras.main.width / 2;
@@ -466,11 +493,8 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
           curLvlEnemies--;
           if (curLvlEnemies === 0 && model.lives > 0) {
             model.level ++ ;
-            console.log(`model.enemies = ${model.enemies}`);
-            console.log(`curLvlEnemies = ${curLvlEnemies}`);
-            console.log(`enemiesAlive = ${enemiesAlive.length}`);
             gameOver = true;
-            restartScene.apply(this); // после перезагрузки сцены не появляются враги на игровом поле
+            restartScene.apply(this);
           }
         }, 200);
       }
@@ -551,4 +575,7 @@ function restartScene() {
   setTimeout(() => {
     gameOver = false;
   }, 1);
+}
+export function changeGameOver() {
+  gameOver = !gameOver;
 }
