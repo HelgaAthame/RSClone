@@ -303,13 +303,15 @@ function create() {
 }
 
 function update() {
+  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+
   if (gameOver) {
-    if (cursors.space.isDown && model.lives) restartScene.apply(this);
-    else if (cursors.space.isDown && !model.lives) restartGame.apply(this);
+    if (/*cursors.space.isDown*/bombSet.isDown && model.lives) restartScene.apply(this);
+    else if (/*cursors.space.isDown*/bombSet.isDown && !model.lives) restartGame.apply(this);
     else return;
   }
 
-  if (!gameOver && cursors.space.isDown) {
+  if (!gameOver && /*cursors.space*/bombSet.isDown) {
     dropBomb.apply(this);
   }
 
@@ -321,11 +323,17 @@ function update() {
     view.settings.renderUI();
   }
 
-  charMovement();
+  charMovement.apply(this);
   enemies.children.entries.forEach((enemy) => enemyMovement(enemy));
 }
 
 function charMovement(): void {
+  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+  const up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]);
+  const down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]);
+  const left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]);
+  const right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]);
+
   const [closestX, closestY] = findClosestSquare(char);
   const flatFieldMatrix = fieldMatrix.flat();
   const curCharSquare = flatFieldMatrix.find(
@@ -342,23 +350,23 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
-  if (cursors.up.isDown) {
+  if (/*cursors.*/up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
     char.anims.play("up", true);
-  } else if (cursors.right.isDown) {
+  } else if (/*cursors.*/right.isDown) {
     char.setVelocityX(charSpeed);
     char.setVelocityY(0);
     char.anims.play("right", true);
-  } else if (cursors.down.isDown) {
+  } else if (/*cursors.*/down.isDown) {
     char.setVelocityY(charSpeed);
     char.setVelocityX(0);
     char.anims.play("down", true);
-  } else if (cursors.left.isDown) {
+  } else if (/*cursors.*/left.isDown) {
     char.setVelocityX(-charSpeed);
     char.setVelocityY(0);
     char.anims.play("left", true);
-  } else if (!cursors.space.isDown) {
+  } else if (!/*cursors.space*/bombSet.isDown) {
     char.setVelocityX(0);
     char.setVelocityY(0);
     char.anims.play("turn", true);
@@ -407,10 +415,10 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 }
 
 function drawGameOver() {
-  let gameOverString = "GAME OVER\nPRESS SPACE TO RESTART\nPRESS ESC TO EXIT";
+  let gameOverString = "GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT";
   if (model.lives) {
     gameOverString =
-      "YOU HAVE LOST LIVE\nPRESS SPACE TO CONTINUE\nPRESS ESC TO EXIT";
+      "YOU HAVE LOST LIVE\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT";
   }
   const screenCenterX =
     this.cameras.main.worldView.x + this.cameras.main.width / 2;
