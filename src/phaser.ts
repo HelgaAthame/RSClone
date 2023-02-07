@@ -262,35 +262,16 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
 
-  ///text
-  const scoreTitle = this.add.text(textStartX, textStartY, "SCORE :", style);
-  const score = this.add.text(
-    textStartX + 1 * fieldSquareLength,
-    textStartY,
-    model.score,
-    style
-  );
-  const livesTitle = this.add.text(
+  this.add.text(textStartX, textStartY, `SCORE : ${model.score}`, style);
+
+  this.add.text(
     textStartX + 4 * fieldSquareLength,
     textStartY,
-    "LIVES :",
+    `LIVES : ${("❤️").repeat(model.lives)}`,
     style
   );
-  const livesCount = this.add.text(
-    textStartX + 5 * fieldSquareLength,
-    textStartY,
-    ("❤️").repeat(model.lives),
-    style
-  );
-  const levelTitle = this.add.text(textStartX + 9 * fieldSquareLength, textStartY, "LEVEL :", style);
-  const levelNumber = this.add.text(
-    textStartX + 10 * fieldSquareLength,
-    textStartY,
-    model.level,
-    style
-  );
+  this.add.text(textStartX + 9 * fieldSquareLength, textStartY, `LEVEL : ${model.level}`, style);
 
-  ///text end
 
   //if there is field matrix in model - we take it
   //if no - we write it into model
