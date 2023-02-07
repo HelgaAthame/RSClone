@@ -27,7 +27,7 @@ let enemySpeed = model.enemySpeed;
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
 const style = {
-  font: 'bold 1.2rem Mayhem',
+  font: 'bold 1.3rem Mayhem',
   fill: "#000",
   wordWrap: true,
   wordWrapWidth: 2,
