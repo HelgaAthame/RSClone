@@ -62,6 +62,11 @@ let char: Phaser.Physics.Matter.Sprite,
   wood: Phaser.Physics.Arcade.StaticGroup,
   bombs: Phaser.GameObjects.Sprite,
   explosion: Phaser.GameObjects.Sprite,
+  explosionSound: Phaser.Sound.HTML5AudioSound,
+  charDeathSound: Phaser.Sound.HTML5AudioSound,
+  enemyDeathSound: Phaser.Sound.HTML5AudioSound,
+  bonusSound: Phaser.Sound.HTML5AudioSound,
+  putBombSound: Phaser.Sound.HTML5AudioSound,
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
 export let gameOver = false;
@@ -85,6 +90,13 @@ function preload() {
   this.load.image("wood", "./src/assets/wood.jpg");
   this.load.image("bomb", "./src/assets/bomb.png");
   this.load.image("enemy", "./src/assets/enemy1.png");
+
+  this.load.audio("explosion", './src/assets/sounds/bomb_explosion.ogg');
+  this.load.audio("charDeath", './src/assets/sounds/player_death.wav');
+  this.load.audio("bonus", './src/assets/sounds/bonus_sound_1.wav');
+  this.load.audio("enemyDeath", './src/assets/sounds/enemy_death.ogg');
+  this.load.audio("putBomb", './src/assets/sounds/put_bomb.mp3');
+
 }
 
 function create() {
@@ -94,11 +106,17 @@ function create() {
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
 
+  
   stone = this.physics.add.staticGroup();
   grass = this.physics.add.staticGroup();
   wood = this.physics.add.staticGroup();
   enemies = this.physics.add.group();
   bombs = this.physics.add.group();
+  explosionSound = this.sound.add("explosion", { loop: false });
+  charDeathSound = this.sound.add("charDeath", { loop: false });
+  enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
+  bonusSound = this.sound.add("bonus", { loop: false });
+  putBombSound = this.sound.add("putBomb", { loop: false });
   let enemyCounter = 0;
 
   for (let i = 1; i <= ceilsNum; i++) {
@@ -162,6 +180,8 @@ function create() {
     .setSize(fieldSquareLength * 0.99, fieldSquareLength * 0.99)
     .setScale(0.9, 0.9)
     .refreshBody();
+
+  char.on('destroy', () => charDeathSound.play());
 
   while (enemyCounter < curLvlEnemies) {
     const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
@@ -456,7 +476,6 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
   const prevX = x - fieldSquareLength;
   const nextY = y + fieldSquareLength;
   const prevY = y - fieldSquareLength;
-
   bomb.destroy();
 
   const checkSquare = (x: number, y: number) => {
@@ -491,6 +510,7 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         const [closestX, closestY] = findClosestSquare(enemy);
         return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
       });
+      enemyToDestroy?.on('destroy', () => enemyDeathSound.play());
       if (enemyToDestroy) {
         enemyToDestroy.setTint(0xff0000);
         this.add.tween({
@@ -529,15 +549,25 @@ function drawExplosion(x: number, y: number) {
   const explosionAnim = explosion.anims.play("bombExplosion", false);
   explosionAnim.once("animationcomplete", () => {
     explosionAnim.destroy();
+    
   });
 }
 
 function dropBomb() {
   if (!bombActive) {
     const [bombX, bombY] = findClosestSquare(char);
-
     bombActive = true;
     const bomb = bombs.create(bombX, bombY, "bomb").setImmovable();
+    putBombSound.play();
+    bomb.on('destroy', () => {
+      let areMoreActiveBombs: boolean; 
+      setTimeout(() => {
+        areMoreActiveBombs = this.children.list.find(item => item.texture.key === 'bomb');
+        if (!areMoreActiveBombs) putBombSound.stop()
+      },0);
+      
+      explosionSound.play()
+    } );
     const bombScaleX = (1 / 555) * fieldSquareLength;
     const bombScaleY = (1 / 569) * fieldSquareLength;
     bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
