@@ -112,7 +112,6 @@ function create() {
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
 
-  
   stone = this.physics.add.staticGroup();
   grass = this.physics.add.staticGroup();
   wood = this.physics.add.staticGroup();
@@ -357,8 +356,6 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
-  console.log(charDeathSound)
-
   if (/*cursors.*/up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
@@ -452,18 +449,19 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 
 function drawGameOver() {
   let gameOverString: string;
+  const screenCenterX =
+  this.cameras.main.worldView.x + this.cameras.main.width / 2;
+const screenCenterY =
+  this.cameras.main.worldView.y + this.cameras.main.height / 2;
   if (model.lives) {
-    let lostLife = "❤️";
     gameOverString =
-      `${("❤️").repeat(model.lives) + lostLife}\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
+      `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
+    
   } else {
-    gameOverString = `GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT`;
+    gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
 
   }
-  const screenCenterX =
-    this.cameras.main.worldView.x + this.cameras.main.width / 2;
-  const screenCenterY =
-    this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
   const gameOverText = this.add
     .text(screenCenterX, screenCenterY, gameOverString, {
       fontFamily: 'Mayhem',
@@ -476,6 +474,7 @@ function drawGameOver() {
     })
     .setOrigin(0.5)
     .setDepth(1);
+  
     
 }
 
