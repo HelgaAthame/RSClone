@@ -67,7 +67,8 @@ let char: Phaser.Physics.Matter.Sprite,
   enemyDeathSound: Phaser.Sound.HTML5AudioSound,
   bonusSound: Phaser.Sound.HTML5AudioSound,
   putBombSound: Phaser.Sound.HTML5AudioSound,
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys,
+  score: Phaser.GameObjects.Text;
 
 export let gameOver = false;
 let bombActive = false;
@@ -220,7 +221,6 @@ function create() {
   this.physics.add.collider(enemies, bombs);
 
   /*Draw explosion */
-
   this.anims.create({
     key: "bombExplosion",
     frames: this.anims.generateFrameNumbers("explosion", {
@@ -282,7 +282,7 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
 
-  this.add.text(textStartX, textStartY, `SCORE : ${model.score}`, style);
+  score = this.add.text(textStartX, textStartY, `SCORE : ${model.score}`, style);
 
   this.add.text(
     textStartX + 4 * fieldSquareLength,
@@ -510,7 +510,11 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         const [closestX, closestY] = findClosestSquare(enemy);
         return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
       });
-      enemyToDestroy?.on('destroy', () => enemyDeathSound.play());
+      enemyToDestroy?.on('destroy', () => {
+        model.score += 100;
+        score.setText(`SCORE: ${model.score}`);
+        enemyDeathSound.play()
+      } );
       if (enemyToDestroy) {
         enemyToDestroy.setTint(0xff0000);
         this.add.tween({
