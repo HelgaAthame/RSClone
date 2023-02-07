@@ -66,6 +66,7 @@ let char: Phaser.Physics.Matter.Sprite,
   bombs: Phaser.GameObjects.Sprite,
   explosion: Phaser.GameObjects.Sprite,
   explosionSound: Phaser.Sound.HTML5AudioSound,
+  charStepSound: Phaser.Sound.HTML5AudioSound,
   charDeathSound: Phaser.Sound.HTML5AudioSound,
   enemyDeathSound: Phaser.Sound.HTML5AudioSound,
   bonusSound: Phaser.Sound.HTML5AudioSound,
@@ -96,6 +97,7 @@ function preload() {
   this.load.image("enemy", "./src/assets/enemy1.png");
 
   this.load.audio("explosion", './src/assets/sounds/bomb_explosion.ogg');
+  this.load.audio("charStep", './src/assets/sounds/char_step.mp3');
   this.load.audio("charDeath", './src/assets/sounds/player_death.wav');
   this.load.audio("bonus", './src/assets/sounds/bonus_sound_1.wav');
   this.load.audio("enemyDeath", './src/assets/sounds/enemy_death.ogg');
@@ -117,6 +119,7 @@ function create() {
   enemies = this.physics.add.group();
   bombs = this.physics.add.group();
   explosionSound = this.sound.add("explosion", { loop: false });
+  charStepSound = this.sound.add("charStep", { loop: true });
   charDeathSound = this.sound.add("charDeath", { loop: false });
   enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
   bonusSound = this.sound.add("bonus", { loop: false });
@@ -354,26 +357,35 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
+  console.log(charDeathSound)
+
   if (/*cursors.*/up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
     char.anims.play("up", true);
+     if (!charStepSound.isPlaying) charStepSound.play();
+   
   } else if (/*cursors.*/right.isDown) {
     char.setVelocityX(charSpeed);
     char.setVelocityY(0);
     char.anims.play("right", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
   } else if (/*cursors.*/down.isDown) {
     char.setVelocityY(charSpeed);
     char.setVelocityX(0);
     char.anims.play("down", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
   } else if (/*cursors.*/left.isDown) {
     char.setVelocityX(-charSpeed);
     char.setVelocityY(0);
     char.anims.play("left", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
   } else if (!/*cursors.space*/bombSet.isDown) {
     char.setVelocityX(0);
     char.setVelocityY(0);
+
     char.anims.play("turn", true);
+    charStepSound.stop();
   }
 }
 function enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
