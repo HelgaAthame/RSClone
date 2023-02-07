@@ -456,6 +456,14 @@ function drawGameOver() {
     .setDepth(1);
 }
 
+function drawLevelComplete(context) {
+
+            //model.level ++ ;
+            gameOver = true;
+            //restartScene.apply(this);
+  view.win.renderUI(context);
+}
+
 function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
   const nextX = x + fieldSquareLength;
   const prevX = x - fieldSquareLength;
@@ -512,9 +520,10 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
           enemyToDestroy.destroy()
           curLvlEnemies--;
           if (curLvlEnemies === 0 && model.lives > 0) {
-            model.level ++ ;
-            gameOver = true;
-            restartScene.apply(this);
+            drawLevelComplete(this);
+            //model.level ++ ;
+            //gameOver = true;
+            //restartScene.apply(this);
           }
         }, 200);
       }
@@ -589,7 +598,7 @@ function restartGame() {
     gameOver = false;
   }, 1);
 }
-function restartScene() {
+export function restartScene() {
   this.scene.restart();
   model.score = 0;
   setTimeout(() => {

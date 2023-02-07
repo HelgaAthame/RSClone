@@ -14,7 +14,7 @@ export class StartView {
         <article class="begin__text">start</article>
       </section>
     `;
-    document.body.append(main);
+    document.body.prepend(main);
     this.addAudio();
   }
 
