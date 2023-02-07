@@ -15,7 +15,7 @@ type Buttons = {
 export class Model {
   constructor () {
     this.fieldMatrix = undefined;
-    this.enemySpeed = 50;
+    this.enemySpeed = 80;
     this.enemies = 2;
     this.level = 1;
     this.bombSpeed = 5000;
