@@ -384,9 +384,8 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
-  console.log(charDeathSound);
 
-  if (/*cursors.*/ up.isDown) {
+  if (/*cursors.*/up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
     char.anims.play("up", true);
@@ -478,30 +477,30 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 
 function drawGameOver() {
   let gameOverString: string;
-  if (model.lives) {
-    let lostLife = "❤️";
-    gameOverString = `${
-      "❤️".repeat(model.lives) + lostLife
-    }\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
-  } else {
-    gameOverString = `GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT`;
-  }
   const screenCenterX =
-    this.cameras.main.worldView.x + this.cameras.main.width / 2;
-  const screenCenterY =
-    this.cameras.main.worldView.y + this.cameras.main.height / 2;
-  const gameOverText = this.add
-    .text(screenCenterX, screenCenterY, gameOverString, {
-      fontFamily: "Mayhem",
+  this.cameras.main.worldView.x + this.cameras.main.width / 2;
+const screenCenterY =
+  this.cameras.main.worldView.y + this.cameras.main.height / 2;
+  if (model.lives) {
+
+    gameOverString =
+      `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
+  } else {
+    gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
+
+  }
+
+  this.add.text(screenCenterX, screenCenterY, gameOverString, {
+      fontFamily: 'Mayhem',
       fontSize: "50px",
       fill: "#fff",
       stroke: "#222",
       strokeThickness: 5,
       backgroundColor: "rgba(20, 20, 20, 0.75)",
-      align: "center",
+
+    align: 'center',
     })
-    .setOrigin(0.5)
-    .setDepth(1);
+    .setOrigin(0.5);
 }
 
 function drawLevelComplete(context) {
@@ -541,7 +540,6 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         );
       });
       if (!woodSquare) throw Error("Wood square was not found");
-      sqaureToCheck.object = "grass";
       woodSquare.destroy();
       drawRandomBonus.apply(this, [sqaureToCheck.x, sqaureToCheck.y]);
     } else if (sqaureToCheck.object === "char") {
@@ -580,6 +578,7 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         }, 200);
       }
     }
+    sqaureToCheck.object = "grass";
   };
 
   checkSquare(x, y);
@@ -659,9 +658,10 @@ function dropBomb() {
       ease: "Sine.easeInOut",
     });
 
-    setTimeout(() => {
+    model.activeBombs.push(setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, bombSpeed - 1000 * (model.level - 1));
+
+    }, bombSpeed - (1000 * ( model.level - 1 ))));
 
     char.anims.play("placeBomb", true);
   }
@@ -708,9 +708,12 @@ function restartGame() {
 export function restartScene() {
   this.scene.restart();
   model.score = 0;
-  setTimeout(() => {
-    gameOver = false;
-  }, 1);
+  setTimeout(() => gameOver = false, 1);
+
+    while (model.activeBombs.length > 0) {
+      window.clearTimeout(model.activeBombs.pop());
+    }
+    
 }
 export function changeGameOver() {
   gameOver = !gameOver;
