@@ -24,7 +24,7 @@ let enemySpeed = model.enemySpeed;
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
 const style = {
-  font: "bold 1rem Arial",
+  font: "bold 1.2rem Arial",
   fill: "#000",
   wordWrap: true,
   wordWrapWidth: 2,
@@ -263,9 +263,9 @@ function create() {
   cursors = this.input.keyboard.createCursorKeys();
 
   ///text
-  const scoreTitle = this.add.text(textStartX, textStartY, "SCORE  :", style);
+  const scoreTitle = this.add.text(textStartX, textStartY, "SCORE :", style);
   const score = this.add.text(
-    textStartX + 1.5 * fieldSquareLength,
+    textStartX + 1 * fieldSquareLength,
     textStartY,
     model.score,
     style
@@ -273,7 +273,7 @@ function create() {
   const livesTitle = this.add.text(
     textStartX + 4 * fieldSquareLength,
     textStartY,
-    "LIVES  :",
+    "LIVES :",
     style
   );
   const livesCount = this.add.text(
@@ -282,7 +282,7 @@ function create() {
     ("❤️").repeat(model.lives),
     style
   );
-  const levelTitle = this.add.text(textStartX + 9 * fieldSquareLength, textStartY, "LEVEL", style);
+  const levelTitle = this.add.text(textStartX + 9 * fieldSquareLength, textStartY, "LEVEL :", style);
   const levelNumber = this.add.text(
     textStartX + 10 * fieldSquareLength,
     textStartY,
