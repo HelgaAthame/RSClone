@@ -3,9 +3,9 @@ import loadFont from "./utils/loadFont.js";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
 import { view } from "./view/index.js";
-import keys from './utils/keys.js;'
+import keys from "./utils/keys.js;";
 
-loadFont('Mayhem', './src/assets/fonts/retro-land-mayhem.ttf');
+loadFont("Mayhem", "./src/assets/fonts/retro-land-mayhem.ttf");
 
 //let score = model.score;
 //let livesCount = model.lives;
@@ -27,7 +27,7 @@ let enemySpeed = model.enemySpeed;
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
 const style = {
-  font: 'bold 1.3rem Mayhem',
+  font: "bold 1.3rem Mayhem",
   fill: "#000",
   wordWrap: true,
   wordWrapWidth: 2,
@@ -62,8 +62,10 @@ let char: Phaser.Physics.Matter.Sprite,
   enemies: Phaser.GameObjects.Group,
   grass: Phaser.Physics.Arcade.StaticGroup,
   stone: Phaser.Physics.Arcade.StaticGroup,
+  hearts: Phaser.Physics.Arcade.StaticGroup,
   wood: Phaser.Physics.Arcade.StaticGroup,
   bombs: Phaser.GameObjects.Sprite,
+  superBombs: Phaser.GameObjects.Sprite,
   explosion: Phaser.GameObjects.Sprite,
   explosionSound: Phaser.Sound.HTML5AudioSound,
   charStepSound: Phaser.Sound.HTML5AudioSound,
@@ -94,30 +96,31 @@ function preload() {
   this.load.image("stone", "./src/assets/stone.jpg");
   this.load.image("wood", "./src/assets/wood.jpg");
   this.load.image("bomb", "./src/assets/bomb.png");
+  this.load.image("superBomb", "./src/assets/super_bomb.png");
   this.load.image("enemy", "./src/assets/enemy1.png");
+  this.load.image("heart", "./src/assets/heart.png");
 
-  this.load.audio("explosion", './src/assets/sounds/bomb_explosion.ogg');
-  this.load.audio("charStep", './src/assets/sounds/char_step.mp3');
-  this.load.audio("charDeath", './src/assets/sounds/player_death.wav');
-  this.load.audio("bonus", './src/assets/sounds/bonus_sound_1.wav');
-  this.load.audio("enemyDeath", './src/assets/sounds/enemy_death.ogg');
-  this.load.audio("putBomb", './src/assets/sounds/put_bomb.mp3');
-
+  this.load.audio("explosion", "./src/assets/sounds/bomb_explosion.ogg");
+  this.load.audio("charStep", "./src/assets/sounds/char_step.mp3");
+  this.load.audio("charDeath", "./src/assets/sounds/player_death.wav");
+  this.load.audio("bonus", "./src/assets/sounds/bonus_sound_1.wav");
+  this.load.audio("enemyDeath", "./src/assets/sounds/enemy_death.ogg");
+  this.load.audio("putBomb", "./src/assets/sounds/put_bomb.mp3");
 }
 
 function create() {
-
   curLvlEnemies = model.enemies + model.level;
   enemySpeed = model.enemySpeed + model.level * 10;
   /* Draw field */
   /* BIG WIDTH ONLY!!! */
 
-  
   stone = this.physics.add.staticGroup();
   grass = this.physics.add.staticGroup();
   wood = this.physics.add.staticGroup();
+  hearts = this.physics.add.staticGroup();
   enemies = this.physics.add.group();
   bombs = this.physics.add.group();
+  superBombs = this.physics.add.group();
   explosionSound = this.sound.add("explosion", { loop: false });
   charStepSound = this.sound.add("charStep", { loop: true });
   charDeathSound = this.sound.add("charDeath", { loop: false });
@@ -185,10 +188,10 @@ function create() {
   char = this.physics.add
     .sprite(charStartX, charStartY, "char")
     .setSize(fieldSquareLength * 0.99, fieldSquareLength * 0.99)
-    .setScale(0.9, 0.9)
+    .setDisplaySize(fieldSquareLength * 0.99, fieldSquareLength * 1.5)
     .refreshBody();
 
-  char.on('destroy', () => charDeathSound.play());
+  char.on("destroy", () => charDeathSound.play());
 
   while (enemyCounter < curLvlEnemies) {
     const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
@@ -209,8 +212,8 @@ function create() {
         fieldMatrix[randomX][randomY].y,
         "enemy"
       )
-      .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-      .setScale(0.9)
+      .setSize(fieldSquareLength, fieldSquareLength)
+      .setDisplaySize(fieldSquareLength, fieldSquareLength)
       .refreshBody();
   }
 
@@ -219,6 +222,9 @@ function create() {
   this.physics.add.collider(char, enemies, () => {
     if (!gameOver) charDie.apply(this);
   });
+
+  this.physics.add.overlap(char, hearts, collectHeart, null, this);
+  this.physics.add.overlap(char, superBombs, collectSuperBomb, null, this);
   this.physics.add.collider(char, bombs);
 
   this.physics.add.collider(enemies, enemies);
@@ -288,16 +294,25 @@ function create() {
 
   cursors = this.input.keyboard.createCursorKeys();
 
-  score = this.add.text(textStartX, textStartY, `SCORE : ${model.score}`, style);
+  score = this.add.text(
+    textStartX,
+    textStartY,
+    `SCORE : ${model.score}`,
+    style
+  );
 
   this.add.text(
     textStartX + 4 * fieldSquareLength,
     textStartY,
-    `LIVES : ${("❤️").repeat(model.lives)}`,
+    `LIVES : ${"❤️".repeat(model.lives)}`,
     style
   );
-  this.add.text(textStartX + 9 * fieldSquareLength, textStartY, `LEVEL : ${model.level}`, style);
-
+  this.add.text(
+    textStartX + 9 * fieldSquareLength,
+    textStartY,
+    `LEVEL : ${model.level}`,
+    style
+  );
 
   //if there is field matrix in model - we take it
   //if no - we write it into model
@@ -306,27 +321,29 @@ function create() {
   } else {
     model.fieldMatrix = fieldMatrix;
   }
-
 }
 
 function update() {
-  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
+  const bombSet = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
+  );
 
   if (gameOver) {
-    if (/*cursors.space.isDown*/bombSet.isDown && model.lives) restartScene.apply(this);
-    else if (/*cursors.space.isDown*/bombSet.isDown && !model.lives) restartGame.apply(this);
+    if (/*cursors.space.isDown*/ bombSet.isDown && model.lives)
+      restartScene.apply(this);
+    else if (/*cursors.space.isDown*/ bombSet.isDown && !model.lives)
+      restartGame.apply(this);
     else return;
   }
 
-  if (!gameOver && /*cursors.space*/bombSet.isDown) {
+  if (!gameOver && /*cursors.space*/ bombSet.isDown) {
     dropBomb.apply(this);
   }
-
 
   const keyESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
   if (keyESC.isDown) {
     gameOver = true;
-    model.fieldMatrix = fieldMatrix;//save field state
+    model.fieldMatrix = fieldMatrix; //save field state
     view.settings.renderUI();
   }
 
@@ -335,11 +352,21 @@ function update() {
 }
 
 function charMovement(): void {
-  const bombSet = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]);
-  const up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]);
-  const down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]);
-  const left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]);
-  const right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]);
+  const bombSet = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
+  );
+  const up = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]
+  );
+  const down = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]
+  );
+  const left = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]
+  );
+  const right = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]
+  );
 
   const [closestX, closestY] = findClosestSquare(char);
   const flatFieldMatrix = fieldMatrix.flat();
@@ -357,30 +384,29 @@ function charMovement(): void {
     newCharSquare.object = "char";
   }
 
-  console.log(charDeathSound)
+  console.log(charDeathSound);
 
-  if (/*cursors.*/up.isDown) {
+  if (/*cursors.*/ up.isDown) {
     char.setVelocityY(-charSpeed);
     char.setVelocityX(0);
     char.anims.play("up", true);
-     if (!charStepSound.isPlaying) charStepSound.play();
-   
-  } else if (/*cursors.*/right.isDown) {
+    if (!charStepSound.isPlaying) charStepSound.play();
+  } else if (/*cursors.*/ right.isDown) {
     char.setVelocityX(charSpeed);
     char.setVelocityY(0);
     char.anims.play("right", true);
     if (!charStepSound.isPlaying) charStepSound.play();
-  } else if (/*cursors.*/down.isDown) {
+  } else if (/*cursors.*/ down.isDown) {
     char.setVelocityY(charSpeed);
     char.setVelocityX(0);
     char.anims.play("down", true);
     if (!charStepSound.isPlaying) charStepSound.play();
-  } else if (/*cursors.*/left.isDown) {
+  } else if (/*cursors.*/ left.isDown) {
     char.setVelocityX(-charSpeed);
     char.setVelocityY(0);
     char.anims.play("left", true);
     if (!charStepSound.isPlaying) charStepSound.play();
-  } else if (!/*cursors.space*/bombSet.isDown) {
+  } else if (!(/*cursors.space*/ bombSet.isDown)) {
     char.setVelocityX(0);
     char.setVelocityY(0);
 
@@ -454,11 +480,11 @@ function drawGameOver() {
   let gameOverString: string;
   if (model.lives) {
     let lostLife = "❤️";
-    gameOverString =
-      `${("❤️").repeat(model.lives) + lostLife}\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
+    gameOverString = `${
+      "❤️".repeat(model.lives) + lostLife
+    }\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
   } else {
     gameOverString = `GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT`;
-
   }
   const screenCenterX =
     this.cameras.main.worldView.x + this.cameras.main.width / 2;
@@ -466,24 +492,22 @@ function drawGameOver() {
     this.cameras.main.worldView.y + this.cameras.main.height / 2;
   const gameOverText = this.add
     .text(screenCenterX, screenCenterY, gameOverString, {
-      fontFamily: 'Mayhem',
+      fontFamily: "Mayhem",
       fontSize: "50px",
       fill: "#fff",
       stroke: "#222",
       strokeThickness: 5,
       backgroundColor: "rgba(20, 20, 20, 0.75)",
-    align: 'center'
+      align: "center",
     })
     .setOrigin(0.5)
     .setDepth(1);
-    
 }
 
 function drawLevelComplete(context) {
-
-            //model.level ++ ;
-            gameOver = true;
-            //restartScene.apply(this);
+  //model.level ++ ;
+  gameOver = true;
+  //restartScene.apply(this);
   view.win.renderUI(context);
 }
 
@@ -519,6 +543,7 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
       if (!woodSquare) throw Error("Wood square was not found");
       sqaureToCheck.object = "grass";
       woodSquare.destroy();
+      drawRandomBonus.apply(this, [sqaureToCheck.x, sqaureToCheck.y]);
     } else if (sqaureToCheck.object === "char") {
       charDie.apply(this);
     } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
@@ -526,11 +551,11 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         const [closestX, closestY] = findClosestSquare(enemy);
         return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
       });
-      enemyToDestroy?.on('destroy', () => {
+      enemyToDestroy?.on("destroy", () => {
         model.score += 100;
         score.setText(`SCORE: ${model.score}`);
-        enemyDeathSound.play()
-      } );
+        enemyDeathSound.play();
+      });
       if (enemyToDestroy) {
         enemyToDestroy.setTint(0xff0000);
         this.add.tween({
@@ -544,7 +569,7 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
           },
         });
         setTimeout(() => {
-          enemyToDestroy.destroy()
+          enemyToDestroy.destroy();
           curLvlEnemies--;
           if (curLvlEnemies === 0 && model.lives > 0) {
             drawLevelComplete(this);
@@ -564,12 +589,41 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
   checkSquare(x, prevY);
 }
 
+function drawRandomBonus(x: number, y: number) {
+  const random = Math.random();
+  let group: typeof hearts | typeof superBombs | null = null;
+  let image: "heart" | "superBomb" | null = null;
+  if (random > 0.8) {
+    group = hearts;
+    image = "heart";
+  } else if (random > 0.6) {
+    group = superBombs;
+    image = "superBomb";
+  }
+
+  if (group && image) {
+    const item = group
+      .create(x, y, image)
+      .setSize(fieldSquareLength, fieldSquareLength)
+      .setDisplaySize(fieldSquareLength, fieldSquareLength)
+      .refreshBody();
+
+    this.tweens.add({
+      targets: item,
+      scaleX: item.scaleX / 1.3,
+      scaleY: item.scaleY / 1.3,
+      yoyo: true,
+      repeat: -1,
+      duration: 300,
+      ease: "Sine.easeInOut",
+    });
+  }
+}
 function drawExplosion(x: number, y: number) {
   explosion = this.physics.add.sprite(x, y, "explosion");
   const explosionAnim = explosion.anims.play("bombExplosion", false);
   explosionAnim.once("animationcomplete", () => {
     explosionAnim.destroy();
-    
   });
 }
 
@@ -579,15 +633,17 @@ function dropBomb() {
     bombActive = true;
     const bomb = bombs.create(bombX, bombY, "bomb").setImmovable();
     putBombSound.play();
-    bomb.on('destroy', () => {
-      let areMoreActiveBombs: boolean; 
+    bomb.on("destroy", () => {
+      let areMoreActiveBombs: boolean;
       setTimeout(() => {
-        areMoreActiveBombs = this.children.list.find(item => item.texture.key === 'bomb');
-        if (!areMoreActiveBombs) putBombSound.stop()
-      },0);
-      
-      explosionSound.play()
-    } );
+        areMoreActiveBombs = this.children.list.find(
+          (item) => item.texture.key === "bomb"
+        );
+        if (!areMoreActiveBombs) putBombSound.stop();
+      }, 0);
+
+      explosionSound.play();
+    });
     const bombScaleX = (1 / 555) * fieldSquareLength;
     const bombScaleY = (1 / 569) * fieldSquareLength;
     bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
@@ -605,7 +661,7 @@ function dropBomb() {
 
     setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, bombSpeed - (1000 * ( model.level - 1 )) );
+    }, bombSpeed - 1000 * (model.level - 1));
 
     char.anims.play("placeBomb", true);
   }
@@ -628,6 +684,20 @@ function charDie() {
   setTimeout(() => char.destroy(), 200);
   drawGameOver.apply(this);
 }
+
+function collectHeart(player, heart) {
+  heart.disableBody(true, true);
+  model.score += 50;
+  model.lives++;
+
+  // scoreText.setText('Score: ' + score);
+}
+function collectSuperBomb(player, superBomb) {
+  superBomb.disableBody(true, true);
+
+  // scoreText.setText('Score: ' + score);
+}
+
 function restartGame() {
   model.lives = 3;
   this.scene.restart();
