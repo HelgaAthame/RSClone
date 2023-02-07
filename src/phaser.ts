@@ -271,15 +271,15 @@ function create() {
     style
   );
   const livesTitle = this.add.text(
-    textStartX + 2.5 * fieldSquareLength,
+    textStartX + 4 * fieldSquareLength,
     textStartY,
     "LIVES  :",
     style
   );
   const livesCount = this.add.text(
-    textStartX + 4 * fieldSquareLength,
+    textStartX + 5 * fieldSquareLength,
     textStartY,
-    Array(model.lives).fill("❤️").join(""),
+    ("❤️").repeat(model.lives),
     style
   );
   const levelTitle = this.add.text(textStartX + 9 * fieldSquareLength, textStartY, "LEVEL", style);
@@ -435,10 +435,14 @@ function findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
 }
 
 function drawGameOver() {
-  let gameOverString = "GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT";
+  let gameOverString: string;
   if (model.lives) {
+    let lostLife = "❤️";
     gameOverString =
-      "YOU HAVE LOST LIVE\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT";
+      `${("❤️").repeat(model.lives) + lostLife}\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
+  } else {
+    gameOverString = `GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT`;
+
   }
   const screenCenterX =
     this.cameras.main.worldView.x + this.cameras.main.width / 2;
@@ -450,10 +454,12 @@ function drawGameOver() {
       fill: "#fff",
       stroke: "#222",
       strokeThickness: 5,
-      backgroundColor: "rgba(20, 20, 20, 0.75)"
+      backgroundColor: "rgba(20, 20, 20, 0.75)",
+    align: 'center'
     })
     .setOrigin(0.5)
     .setDepth(1);
+    
 }
 
 function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
