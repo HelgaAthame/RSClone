@@ -84,7 +84,7 @@ function preload() {
   this.load.image("stone", "./src/assets/stone.jpg");
   this.load.image("wood", "./src/assets/wood.jpg");
   this.load.image("bomb", "./src/assets/bomb.png");
-  this.load.image("enemy", "./src/assets/enemy.png");
+  this.load.image("enemy", "./src/assets/enemy1.png");
 }
 
 function create() {
@@ -182,8 +182,8 @@ function create() {
         fieldMatrix[randomX][randomY].y,
         "enemy"
       )
-      .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
-      .setScale(0.22)
+      .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+      .setScale(0.9)
       .refreshBody();
   }
 
@@ -374,15 +374,15 @@ function enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
     const random = Math.random();
     if (random > 0.75) {
       enemy.setVelocityX(0);
-      enemy.setVelocityY(160);
+      enemy.setVelocityY(enemySpeed);
     } else if (random > 0.5) {
       enemy.setVelocityX(0);
-      enemy.setVelocityY(-160);
+      enemy.setVelocityY(-enemySpeed);
     } else if (random > 0.25) {
-      enemy.setVelocityX(160);
+      enemy.setVelocityX(enemySpeed);
       enemy.setVelocityY(0);
     } else {
-      enemy.setVelocityX(-160);
+      enemy.setVelocityX(-enemySpeed);
       enemy.setVelocityY(0);
     }
   }
@@ -443,6 +443,14 @@ function drawGameOver() {
     
 }
 
+function drawLevelComplete(context) {
+
+            //model.level ++ ;
+            gameOver = true;
+            //restartScene.apply(this);
+  view.win.renderUI(context);
+}
+
 function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
   const nextX = x + fieldSquareLength;
   const prevX = x - fieldSquareLength;
@@ -499,9 +507,10 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
           enemyToDestroy.destroy()
           curLvlEnemies--;
           if (curLvlEnemies === 0 && model.lives > 0) {
-            model.level ++ ;
-            gameOver = true;
-            restartScene.apply(this);
+            drawLevelComplete(this);
+            //model.level ++ ;
+            //gameOver = true;
+            //restartScene.apply(this);
           }
         }, 200);
       }
@@ -576,7 +585,7 @@ function restartGame() {
     gameOver = false;
   }, 1);
 }
-function restartScene() {
+export function restartScene() {
   this.scene.restart();
   model.score = 0;
   setTimeout(() => {
