@@ -13,6 +13,19 @@ type Buttons = {
 }
 
 export class Model {
+  
+  fieldMatrix: FieldSquare[][] | undefined;
+  enemySpeed: number;
+  enemies: number;
+  level: number;
+  bombSpeed: number;
+  activeBombs: ReturnType<typeof setTimeout>[];
+  _lives: number;
+  _score: number;
+  _buttons: Buttons;
+  _isMuted: Boolean;
+  _volume: number;
+
   constructor () {
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
@@ -32,18 +45,10 @@ export class Model {
       bombRemove: 'Z',
       select: 'STIFT',
       start: 'ENTER'
-    }
+    };
+    this.activeBombs = [];
   }
-  fieldMatrix: FieldSquare[][] | undefined;
-  enemySpeed: number;
-  enemies: number;
-  level: number;
-  bombSpeed: number;
-  _lives: number;
-  _score: number;
-  _buttons: Buttons;
-  _isMuted: Boolean;
-  _volume: number;
+
 
 
   set lives (val: number) {

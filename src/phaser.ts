@@ -456,26 +456,21 @@ const screenCenterY =
   if (model.lives) {
     gameOverString =
       `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
-    
   } else {
     gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
 
   }
 
-  const gameOverText = this.add
-    .text(screenCenterX, screenCenterY, gameOverString, {
+  this.add.text(screenCenterX, screenCenterY, gameOverString, {
       fontFamily: 'Mayhem',
       fontSize: "50px",
       fill: "#fff",
       stroke: "#222",
       strokeThickness: 5,
       backgroundColor: "rgba(20, 20, 20, 0.75)",
-    align: 'center'
+    align: 'center',
     })
-    .setOrigin(0.5)
-    .setDepth(1);
-  
-    
+    .setOrigin(0.5);
 }
 
 function drawLevelComplete(context) {
@@ -516,7 +511,6 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         );
       });
       if (!woodSquare) throw Error("Wood square was not found");
-      sqaureToCheck.object = "grass";
       woodSquare.destroy();
     } else if (sqaureToCheck.object === "char") {
       charDie.apply(this);
@@ -554,6 +548,7 @@ function explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
         }, 200);
       }
     }
+    sqaureToCheck.object = "grass";
   };
 
   checkSquare(x, y);
@@ -568,7 +563,6 @@ function drawExplosion(x: number, y: number) {
   const explosionAnim = explosion.anims.play("bombExplosion", false);
   explosionAnim.once("animationcomplete", () => {
     explosionAnim.destroy();
-    
   });
 }
 
@@ -602,9 +596,9 @@ function dropBomb() {
       ease: "Sine.easeInOut",
     });
 
-    setTimeout(() => {
+    model.activeBombs.push(setTimeout(() => {
       explodeBomb.apply(this, [bomb, bombX, bombY]);
-    }, bombSpeed - (1000 * ( model.level - 1 )) );
+    }, bombSpeed - (1000 * ( model.level - 1 ))));
 
     char.anims.play("placeBomb", true);
   }
@@ -637,9 +631,12 @@ function restartGame() {
 export function restartScene() {
   this.scene.restart();
   model.score = 0;
-  setTimeout(() => {
-    gameOver = false;
-  }, 1);
+  setTimeout(() => gameOver = false, 1);
+
+    while (model.activeBombs.length > 0) {
+      window.clearTimeout(model.activeBombs.pop());
+    }
+    
 }
 export function changeGameOver() {
   gameOver = !gameOver;
