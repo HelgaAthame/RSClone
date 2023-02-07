@@ -1,8 +1,11 @@
 import Phaser from "phaser";
+import loadFont from "./utils/loadFont.js";
 import { model } from "./model/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
 import { view } from "./view/index.js";
 import keys from './utils/keys.js;'
+
+loadFont('Mayhem', './src/assets/fonts/retro-land-mayhem.ttf');
 
 //let score = model.score;
 //let livesCount = model.lives;
@@ -24,7 +27,7 @@ let enemySpeed = model.enemySpeed;
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
 const style = {
-  font: "bold 1.2rem Arial",
+  font: 'bold 1.2rem Mayhem',
   fill: "#000",
   wordWrap: true,
   wordWrapWidth: 2,
@@ -451,6 +454,7 @@ function drawGameOver() {
     this.cameras.main.worldView.y + this.cameras.main.height / 2;
   const gameOverText = this.add
     .text(screenCenterX, screenCenterY, gameOverString, {
+      fontFamily: 'Mayhem',
       fontSize: "50px",
       fill: "#fff",
       stroke: "#222",
