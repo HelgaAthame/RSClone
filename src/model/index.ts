@@ -15,6 +15,7 @@ type Buttons = {
 
 export class Model {
   constructor () {
+    this._uid = '';
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
     this.enemies = 2;
@@ -45,7 +46,14 @@ export class Model {
   _buttons: Buttons;
   _isMuted: Boolean;
   _volume: number;
+  _uid: string;
 
+  set uid( val: string) {
+    this._uid = val;
+  }
+  get uid() {
+    return this._uid;
+  }
 
   set lives (val: number) {
     this._lives = val;
