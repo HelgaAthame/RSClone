@@ -1,6 +1,7 @@
 import { doc } from 'firebase/firestore';
 import GithubLogo from '../assets/logos/github.png';
 import RsschoolLogo from '../assets/logos/logo-rs.svg';
+import { firebase } from '../firebase/firebase.js';
 import selectorChecker from '../utils/selectorChecker.js';
 import { view } from './index.js';
 import './startView.scss';
@@ -15,6 +16,7 @@ export class StartView {
       </section>
     `;
     document.body.prepend(main);
+    firebase.googleAuth();
     this.addAudio();
   }
 

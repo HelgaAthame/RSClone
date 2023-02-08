@@ -1,5 +1,6 @@
 import FieldSquare from "../utils/fieldSquare.js";
 import selectorChecker from "../utils/selectorChecker.js";
+import { db } from '../firebase-config.js';
 
 type Buttons = {
   arrowUp: string
