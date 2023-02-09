@@ -45,7 +45,7 @@ let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
 export class GameScene extends Phaser.Scene {
-  char: Phaser.Physics.Matter.Sprite | Phaser.GameObjects.Sprite;
+  char: Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
   grass: Phaser.Physics.Arcade.StaticGroup;
   stone: Phaser.Physics.Arcade.StaticGroup;
@@ -330,7 +330,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.charMovement();
-    this.enemies.children.entries.forEach((enemy) => this.enemyMovement(enemy));
+    this.enemies.children.entries.forEach((enemy) =>
+      this.enemyMovement(enemy as Phaser.Physics.Matter.Sprite)
+    );
   }
 
   charMovement(): void {
@@ -351,7 +353,9 @@ export class GameScene extends Phaser.Scene {
       Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]
     );
 
-    const [closestX, closestY] = this.findClosestSquare(this.char);
+    const [closestX, closestY] = this.findClosestSquare(
+      this.char as Phaser.Physics.Matter.Sprite
+    );
     const flatFieldMatrix = fieldMatrix.flat();
     const curCharSquare = flatFieldMatrix.find(
       (square) => square.object === "char"
@@ -367,31 +371,33 @@ export class GameScene extends Phaser.Scene {
       newCharSquare.object = "char";
     }
 
+    const thisChar = this.char as Phaser.Physics.Matter.Sprite;
+
     if (up.isDown) {
-      this.char.setVelocityY(-charSpeed);
-      this.char.setVelocityX(0);
-      this.char.anims.play("up", true);
+      thisChar.setVelocityY(-charSpeed);
+      thisChar.setVelocityX(0);
+      thisChar.anims.play("up", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (right.isDown) {
-      this.char.setVelocityX(charSpeed);
-      this.char.setVelocityY(0);
-      this.char.anims.play("right", true);
+      thisChar.setVelocityX(charSpeed);
+      thisChar.setVelocityY(0);
+      thisChar.anims.play("right", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (down.isDown) {
-      this.char.setVelocityY(charSpeed);
-      this.char.setVelocityX(0);
-      this.char.anims.play("down", true);
+      thisChar.setVelocityY(charSpeed);
+      thisChar.setVelocityX(0);
+      thisChar.anims.play("down", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (/*cursors.*/ left.isDown) {
-      this.char.setVelocityX(-charSpeed);
-      this.char.setVelocityY(0);
-      this.char.anims.play("left", true);
+      thisChar.setVelocityX(-charSpeed);
+      thisChar.setVelocityY(0);
+      thisChar.anims.play("left", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (!(/*cursors.space*/ bombSet.isDown)) {
-      this.char.setVelocityX(0);
-      this.char.setVelocityY(0);
+      thisChar.setVelocityX(0);
+      thisChar.setVelocityY(0);
 
-      this.char.anims.play("turn", true);
+      thisChar.anims.play("turn", true);
       this.charStepSound.stop();
     }
   }
@@ -514,7 +520,9 @@ export class GameScene extends Phaser.Scene {
       if (sqaureToCheck.object === "wood") {
         const woodSquare = this.wood.children.entries.find((woodSquare) => {
           return (
-            sqaureToCheck.x === woodSquare.x && sqaureToCheck.y === woodSquare.y
+            sqaureToCheck.x ===
+              (woodSquare as Phaser.Physics.Matter.Sprite).x &&
+            sqaureToCheck.y === (woodSquare as Phaser.Physics.Matter.Sprite).y
           );
         });
         if (!woodSquare) throw Error("Wood square was not found");
@@ -523,7 +531,9 @@ export class GameScene extends Phaser.Scene {
         this.charDie();
       } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
         const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
-          const [closestX, closestY] = this.findClosestSquare(enemy);
+          const [closestX, closestY] = this.findClosestSquare(
+            enemy as Phaser.Physics.Matter.Sprite
+          );
           return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
         });
         enemyToDestroy?.on("destroy", () => {
@@ -532,7 +542,7 @@ export class GameScene extends Phaser.Scene {
           this.enemyDeathSound.play();
         });
         if (enemyToDestroy) {
-          enemyToDestroy.setTint(0xff0000);
+          (enemyToDestroy as Phaser.Physics.Matter.Sprite).setTint(0xff0000);
           this.add.tween({
             targets: enemyToDestroy,
             ease: "Sine.easeInOut",
@@ -575,7 +585,9 @@ export class GameScene extends Phaser.Scene {
 
   dropBomb() {
     if (!bombActive) {
-      const [bombX, bombY] = this.findClosestSquare(this.char);
+      const [bombX, bombY] = this.findClosestSquare(
+        this.char as Phaser.Physics.Matter.Sprite
+      );
       bombActive = true;
       const bomb = this.bombs.create(bombX, bombY, "bomb").setImmovable();
       this.putBombSound.play();
@@ -583,7 +595,8 @@ export class GameScene extends Phaser.Scene {
         let areMoreActiveBombs: boolean;
         setTimeout(() => {
           areMoreActiveBombs = !!this.children.list.find(
-            (item) => item.texture.key === "bomb"
+            (item) =>
+              (item as Phaser.Physics.Matter.Sprite).texture.key === "bomb"
           );
           if (!areMoreActiveBombs) this.putBombSound.stop();
         }, 0);
@@ -675,5 +688,7 @@ class Bomberman extends Phaser.Game {
 
 export const game = new Bomberman(config);
 
-export const changeGameOver =
-  game.config.sceneConfig[0].prototype.changeGameOver;
+export const changeGameOver = game.scene.scenes["0"].changeGameOver;
+
+/* export const changeGameOver =
+  game.config.sceneConfig[0].prototype.changeGameOver; */
