@@ -45,7 +45,7 @@ let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
 export class GameScene extends Phaser.Scene {
-  char: Phaser.Physics.Matter.Sprite;
+  char: Phaser.Physics.Matter.Sprite | Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
   grass: Phaser.Physics.Arcade.StaticGroup;
   stone: Phaser.Physics.Arcade.StaticGroup;
@@ -334,6 +334,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   charMovement(): void {
+    console.log(Phaser.Input.Keyboard);
     const bombSet = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
@@ -673,3 +674,6 @@ class Bomberman extends Phaser.Game {
 }
 
 export const game = new Bomberman(config);
+
+export const changeGameOver =
+  game.config.sceneConfig[0].prototype.changeGameOver;
