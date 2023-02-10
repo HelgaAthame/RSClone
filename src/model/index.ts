@@ -8,6 +8,7 @@ export class Model {
   level: number;
   enemySpeed: number;
   curLvlEnemies: number;
+  enemyCounter: number;
   bombSpeed: number;
   activeBombs: ReturnType<typeof setTimeout>[];
   _lives: number;
@@ -29,6 +30,7 @@ export class Model {
     this.level = 1;
     this.enemySpeed = this.level * 80;
     this.curLvlEnemies = this.enemies + this.level;
+    this.enemyCounter = 0;
     this.bombSpeed = 1500;
     this._lives = 3;
     this._score = 0;

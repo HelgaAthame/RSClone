@@ -89,9 +89,6 @@ class GameScene extends Phaser.Scene {
   create() {
     /* Draw field */
     /* BIG WIDTH ONLY!!! */
-
-    let enemyCounter = 0;
-
     this.grass = this.physics.add.staticGroup();
     this.stone = this.physics.add.staticGroup();
     this.wood = this.physics.add.staticGroup();
@@ -175,7 +172,7 @@ class GameScene extends Phaser.Scene {
       this.charDeathSound.play();
     });
 
-    while (enemyCounter < model.curLvlEnemies) {
+    while (model.enemyCounter < model.curLvlEnemies) {
       const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
       const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
 
@@ -186,8 +183,8 @@ class GameScene extends Phaser.Scene {
         (randomX === ceilsNum - 2 && randomY === 2)
       )
         continue;
-      fieldMatrix[randomX][randomY].object = `enemy_${enemyCounter}`;
-      enemyCounter++;
+      fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
+      model.enemyCounter++;
       this.enemies
         .create(
           fieldMatrix[randomX][randomY].x,
@@ -486,11 +483,13 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
-    this.stageMusic.stop();
     model.level++;
+    model.curLvlEnemies = model.enemies + model.level;
     model.score += model.curLvlScore;
     model.curLvlScore = 0;
     model.gameOver = true;
+    this.stageMusic.stop();
+    this.charStepSound.stop();
     this.stageClearSound.play();
     view.win.renderUI(this);
   }
@@ -556,8 +555,8 @@ class GameScene extends Phaser.Scene {
           });
           setTimeout(() => {
             enemyToDestroy.destroy();
-            model.curLvlEnemies--;
-            if (model.curLvlEnemies === 0 && model.lives > 0) {
+            model.enemyCounter--;
+            if (model.enemyCounter === 0 && model.lives > 0) {
               this.drawLevelComplete();
             }
           }, 200);
@@ -657,6 +656,9 @@ class GameScene extends Phaser.Scene {
     model.score = 0;
     model.curLvlScore = 0;
     model.lives = 3;
+    model.level = 0;
+    model.enemies = 2;
+    model.enemyCounter = 0;
     this.scene.restart();
     setTimeout(() => {
       model.gameOver = false;
@@ -664,6 +666,7 @@ class GameScene extends Phaser.Scene {
   }
   restartScene() {
     model.curLvlScore = model.score;
+    model.enemyCounter = 0;
     this.scene.restart();
 
     setTimeout(() => (model.gameOver = false), 0);
