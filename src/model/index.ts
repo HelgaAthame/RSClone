@@ -1,22 +1,13 @@
 import FieldSquare from "../utils/fieldSquare.js";
 import selectorChecker from "../utils/selectorChecker.js";
-
-type Buttons = {
-  arrowUp: "UP";
-  arrowDown: "DOWN";
-  arrowLeft: "LEFT";
-  arrowRight: "RIGHT";
-  bombSet: "SPACE";
-  bombRemove: "Z";
-  select: "SHIFT";
-  start: "ENTER";
-};
+import { Buttons } from "../utils/buttons.js";
 
 export class Model {
   fieldMatrix: FieldSquare[][] | undefined;
-  enemySpeed: number;
   enemies: number;
   level: number;
+  enemySpeed: number;
+  curLvlEnemies: number;
   bombSpeed: number;
   activeBombs: ReturnType<typeof setTimeout>[];
   _lives: number;
@@ -24,12 +15,17 @@ export class Model {
   _buttons: Buttons;
   _isMuted: Boolean;
   _volume: number;
+  gameOver: boolean;
+  bombActive: boolean;
+  maxBombs: number;
+  bombIsPlanting: boolean;
 
   constructor() {
     this.fieldMatrix = undefined;
-    this.enemySpeed = 80;
     this.enemies = 2;
     this.level = 1;
+    this.enemySpeed = this.enemies + this.level * 10;
+    this.curLvlEnemies = this.enemies + this.level;
     this.bombSpeed = 5000;
     this._lives = 3;
     this._score = 0;
@@ -46,6 +42,9 @@ export class Model {
       start: "ENTER",
     };
     this.activeBombs = [];
+    this.gameOver = false;
+    this.maxBombs = 2;
+    this.bombIsPlanting = false;
   }
 
   set lives(val: number) {

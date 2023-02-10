@@ -1,4 +1,4 @@
-import { Model } from "./model/index.js";
+import { Model, model } from "./model/index.js";
 import { View, view } from "./view/index.js";
 
 class App {
@@ -9,7 +9,7 @@ class App {
     this.model = model;
   }
 }
-const app = new App(view, new Model());
+const app = new App(view, model);
 
 //рендер главного экрана
 app.view.start.renderUI();

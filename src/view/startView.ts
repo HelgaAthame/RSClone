@@ -3,6 +3,7 @@ import GithubLogo from "../assets/logos/github.png";
 import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
+import { model } from "../model/index.js";
 import "./startView.scss";
 
 export class StartView {
@@ -119,7 +120,7 @@ export class StartView {
               ) as HTMLCanvasElement;
               if (canvas) canvas.style.display = "initial";
               const phaser = await import("../phaser.js");
-              if (phaser.gameOver) phaser.gameScene.changeGameOver();
+              if (model.gameOver) phaser.gameScene.changeGameOver();
               const bgAudio = selectorChecker(
                 document,
                 ".bgAudio"
