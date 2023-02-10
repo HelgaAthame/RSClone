@@ -510,6 +510,7 @@ class GameScene extends Phaser.Scene {
     model.nextLvl();
     this.stageMusic.stop();
     this.charStepSound.stop();
+    this.putBombSound.stop();
     this.stageClearSound.play();
 
     view.win.renderUI(this);
@@ -713,7 +714,7 @@ class GameScene extends Phaser.Scene {
       const item = group
         .create(x, y, image)
         .setSize(fieldSquareLength, fieldSquareLength)
-        .setDisplaySize(fieldSquareLength, fieldSquareLength)
+        .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
         .refreshBody();
 
       this.tweens.add({
