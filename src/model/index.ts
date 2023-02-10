@@ -12,6 +12,7 @@ export class Model {
   activeBombs: ReturnType<typeof setTimeout>[];
   _lives: number;
   _score: number;
+  curLvlScore: number;
   _buttons: Buttons;
   _isMuted: Boolean;
   _volume: number;
@@ -24,13 +25,14 @@ export class Model {
 
   constructor() {
     this.fieldMatrix = undefined;
-    this.enemies = 0;
+    this.enemies = 2;
     this.level = 1;
     this.enemySpeed = this.level * 80;
     this.curLvlEnemies = this.enemies + this.level;
     this.bombSpeed = 1500;
     this._lives = 3;
     this._score = 0;
+    this.curLvlScore = 0;
     this._isMuted = false;
     this._volume = 0.5;
     this._buttons = {
