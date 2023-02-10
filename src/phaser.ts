@@ -44,7 +44,7 @@ let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
-export class GameScene extends Phaser.Scene {
+class GameScene extends Phaser.Scene {
   char: Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
   grass: Phaser.Physics.Arcade.StaticGroup;
@@ -303,20 +303,18 @@ export class GameScene extends Phaser.Scene {
       model.fieldMatrix = fieldMatrix;
     }
   }
-  update(timer: number) {
+  update() {
     const bombSet = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
 
     if (gameOver) {
-      if (/*cursors.space.isDown*/ bombSet.isDown && model.lives)
-        this.restartScene();
-      else if (/*cursors.space.isDown*/ bombSet.isDown && !model.lives)
-        this.restartGame();
+      if (bombSet.isDown && model.lives) this.restartScene();
+      else if (bombSet.isDown && !model.lives) this.restartGame();
       else return;
     }
 
-    if (!gameOver && /*cursors.space*/ bombSet.isDown) {
+    if (!gameOver && bombSet.isDown) {
       this.dropBomb();
     }
 
@@ -336,7 +334,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   charMovement(): void {
-    console.log(Phaser.Input.Keyboard);
     const bombSet = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
@@ -414,10 +411,13 @@ export class GameScene extends Phaser.Scene {
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
     newEnemySquare.object = `enemy_${curEnemyID}`;
+    console.log(Phaser.Physics.Arcade.Body);
 
     if (
-      enemy.body.position.x == enemy.body.prev.x &&
-      enemy.body.position.y == enemy.body.prev.y
+      enemy.body.position.x ===
+        (enemy.body as Phaser.Physics.Arcade.Body).prev.x &&
+      enemy.body.position.y ===
+        (enemy.body as Phaser.Physics.Arcade.Body).prev.y
     ) {
       const random = Math.random();
       if (random > 0.75) {
@@ -666,6 +666,7 @@ export class GameScene extends Phaser.Scene {
     gameOver = !gameOver;
   }
 }
+export const gameScene = new GameScene();
 
 const config = {
   type: Phaser.AUTO,
@@ -677,7 +678,7 @@ const config = {
       gravity: { y: 0 },
     },
   },
-  scene: [GameScene],
+  scene: gameScene,
 };
 
 class Bomberman extends Phaser.Game {
@@ -686,9 +687,7 @@ class Bomberman extends Phaser.Game {
   }
 }
 
-export const game = new Bomberman(config);
-
-export const changeGameOver = game.scene.scenes["0"].changeGameOver;
+new Bomberman(config);
 
 /* export const changeGameOver =
   game.config.sceneConfig[0].prototype.changeGameOver; */

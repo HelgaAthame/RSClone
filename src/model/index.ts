@@ -2,14 +2,14 @@ import FieldSquare from "../utils/fieldSquare.js";
 import selectorChecker from "../utils/selectorChecker.js";
 
 type Buttons = {
-  arrowUp: string;
-  arrowDown: string;
-  arrowLeft: string;
-  arrowRight: string;
-  bombSet: string;
-  bombRemove: string;
-  select: string;
-  start: string;
+  arrowUp: "UP";
+  arrowDown: "DOWN";
+  arrowLeft: "LEFT";
+  arrowRight: "RIGHT";
+  bombSet: "SPACE";
+  bombRemove: "Z";
+  select: "SHIFT";
+  start: "ENTER";
 };
 
 export class Model {
@@ -42,7 +42,7 @@ export class Model {
       arrowRight: "RIGHT",
       bombSet: "SPACE",
       bombRemove: "Z",
-      select: "STIFT",
+      select: "SHIFT",
       start: "ENTER",
     };
     this.activeBombs = [];

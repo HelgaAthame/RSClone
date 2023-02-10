@@ -1,14 +1,14 @@
-import { doc } from 'firebase/firestore';
-import GithubLogo from '../assets/logos/github.png';
-import RsschoolLogo from '../assets/logos/logo-rs.svg';
-import selectorChecker from '../utils/selectorChecker.js';
-import { view } from './index.js';
-import './startView.scss';
+import { doc } from "firebase/firestore";
+import GithubLogo from "../assets/logos/github.png";
+import RsschoolLogo from "../assets/logos/logo-rs.svg";
+import selectorChecker from "../utils/selectorChecker.js";
+import { view } from "./index.js";
+import "./startView.scss";
 
 export class StartView {
   renderUI() {
-    const main = document.createElement('main');
-    main.classList.add('main');
+    const main = document.createElement("main");
+    main.classList.add("main");
     main.innerHTML = `
       <section class="begin">
         <article class="begin__text">start</article>
@@ -18,8 +18,8 @@ export class StartView {
     this.addAudio();
   }
 
-  renderStartScreen () {
-    const main = selectorChecker(document, 'main');
+  renderStartScreen() {
+    const main = selectorChecker(document, "main");
     main.innerHTML = `
     <section class="logo"></section>
     <nav class="nav">
@@ -47,7 +47,7 @@ export class StartView {
     this.addListeners();
   }
 
-  addListeners () {
+  addListeners() {
     //this.addStartListener();
     //this.addSettingsListener();
     this.moveMenu();
@@ -71,100 +71,105 @@ export class StartView {
     })
   }*/
 
-  moveMenu () {
+  moveMenu() {
     let i = 0; //number of the first element in nav menu to be selected
     let k = 2; //number of the first element in footer links to be selected
-    const navs: NodeListOf<HTMLDivElement> = document.querySelectorAll('.article');
-    const footerlinks: NodeListOf<HTMLDivElement> = document.querySelectorAll('.footer-link');
+    const navs: NodeListOf<HTMLDivElement> =
+      document.querySelectorAll(".article");
+    const footerlinks: NodeListOf<HTMLDivElement> =
+      document.querySelectorAll(".footer-link");
 
-    document.addEventListener('keyup', async function foo (e) {
-
-      function clearStyles () {
-        navs.forEach(article => {
-          article.classList.remove('active');
+    document.addEventListener("keyup", async function foo(e) {
+      function clearStyles() {
+        navs.forEach((article) => {
+          article.classList.remove("active");
         });
-        footerlinks.forEach(link => {
-          link.classList.remove('active');
+        footerlinks.forEach((link) => {
+          link.classList.remove("active");
         });
       }
 
       switch (e.code) {
-        case 'ArrowUp':
-          clearStyles ();
-          if ( i > 0 ) i--;
-          navs[i].classList.add('active');
+        case "ArrowUp":
+          clearStyles();
+          if (i > 0) i--;
+          navs[i].classList.add("active");
           break;
-        case 'ArrowDown':
-          clearStyles ();
-          if ( i < navs.length -1 ) i++;
-          navs[i].classList.add('active');
+        case "ArrowDown":
+          clearStyles();
+          if (i < navs.length - 1) i++;
+          navs[i].classList.add("active");
           break;
-        case 'ArrowLeft':
-          clearStyles ();
-          if ( k > 0 ) k--;
-          footerlinks[k].classList.add('active');
+        case "ArrowLeft":
+          clearStyles();
+          if (k > 0) k--;
+          footerlinks[k].classList.add("active");
           break;
-        case 'ArrowRight':
-          clearStyles ();
-          if ( k < footerlinks.length - 1 ) k++;
-          footerlinks[k].classList.add('active');
+        case "ArrowRight":
+          clearStyles();
+          if (k < footerlinks.length - 1) k++;
+          footerlinks[k].classList.add("active");
           break;
-        case 'Enter':
-          const selected = selectorChecker(document, '.active') as HTMLElement;
-           switch (selected.innerHTML) {
-            case 'start':
-              const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-              if (canvas) canvas.style.display = 'initial';
-              const phaser = await import('../phaser.js');
-              if (phaser.gameOver) phaser.changeGameOver();
-              const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+        case "Enter":
+          const selected = selectorChecker(document, ".active") as HTMLElement;
+          switch (selected.innerHTML) {
+            case "start":
+              const canvas = document.querySelector(
+                "canvas"
+              ) as HTMLCanvasElement;
+              if (canvas) canvas.style.display = "initial";
+              const phaser = await import("../phaser.js");
+              if (phaser.gameOver) phaser.gameScene.changeGameOver();
+              const bgAudio = selectorChecker(
+                document,
+                ".bgAudio"
+              ) as HTMLAudioElement;
               bgAudio.pause();
               break;
-            case 'continue':
+            case "continue":
               break;
-            case 'settings':
+            case "settings":
               view.settings.renderUI();
               break;
-            case 'Olga':
+            case "Olga":
               selected.click();
               break;
-            case 'Gleb':
+            case "Gleb":
               selected.click();
               break;
-            case 'Alex':
+            case "Alex":
               selected.click();
               break;
             default:
               selected.click();
               break;
-           }
-          document.removeEventListener('keyup', foo);
+          }
+          document.removeEventListener("keyup", foo);
           break;
-
       }
-    })
+    });
   }
 
-  addAudio () {
+  addAudio() {
     let loaded = false;
-    const bgAudio = new Audio('../src/assets/sounds/title-screen.mp3');
-    bgAudio.classList.add('bgAudio');
+    const bgAudio = new Audio("../src/assets/sounds/title-screen.mp3");
+    bgAudio.classList.add("bgAudio");
     bgAudio.loop = true;
     bgAudio.volume = 0.5;
     document.body.append(bgAudio);
 
-    const beginText = selectorChecker(document, '.begin__text');
+    const beginText = selectorChecker(document, ".begin__text");
 
-    document.addEventListener('keyup', (e) => {
-      beginText.classList.add('active');
-      if (loaded === false && e.code === 'Enter') {
-        beginText.classList.remove('active');
+    document.addEventListener("keyup", (e) => {
+      beginText.classList.add("active");
+      if (loaded === false && e.code === "Enter") {
+        beginText.classList.remove("active");
         loaded = true;
         bgAudio.play();
 
         this.renderStartScreen();
       }
-    })
+    });
     /*beginText.addEventListener('click', () => {
       loaded = true;
       bgAudio.play();
