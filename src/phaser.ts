@@ -116,13 +116,6 @@ class GameScene extends Phaser.Scene {
     this.bonusSound = this.sound.add("bonus", { loop: false });
     this.putBombSound = this.sound.add("putBomb", { loop: false });
 
-    this.score = this.add.text(
-      textStartX,
-      textStartY,
-      `SCORE : ${score}`,
-      style
-    );
-
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
         const curSquareXCenter =
@@ -298,6 +291,8 @@ class GameScene extends Phaser.Scene {
       style
     );
 
+    this.score = this.add.text(textStartX, textStartY, `SCORE : ${score}`, style);
+
     //if there is field matrix in model - we take it
     //if no - we write it into model
     if (model.fieldMatrix) {
@@ -414,7 +409,6 @@ class GameScene extends Phaser.Scene {
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
     newEnemySquare.object = `enemy_${curEnemyID}`;
-    console.log(activeBombs);
 
     if (
       enemy.body.position.x ===
@@ -478,10 +472,10 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
-    //level ++ ;
+    level++;
     gameOver = true;
-    //restartScene.apply(this);
-    view.win.renderUI(this);
+    //this.restartScene();
+    view.win.renderUI.call(this);
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {

@@ -22,11 +22,11 @@ export class Model {
 
   constructor() {
     this.fieldMatrix = undefined;
-    this.enemies = 2;
+    this.enemies = 1;
     this.level = 1;
-    this.enemySpeed = this.enemies + this.level * 10;
+    this.enemySpeed = this.level * 80;
     this.curLvlEnemies = this.enemies + this.level;
-    this.bombSpeed = 5000;
+    this.bombSpeed = 3000;
     this._lives = 3;
     this._score = 0;
     this._isMuted = false;
