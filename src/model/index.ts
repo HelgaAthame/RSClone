@@ -4,7 +4,6 @@ import { Buttons } from "../utils/buttons.js";
 
 export class Model {
   fieldMatrix: FieldSquare[][] | undefined;
-  enemies: number;
   level: number;
   enemySpeed: number;
   curLvlEnemies: number;
@@ -26,10 +25,9 @@ export class Model {
 
   constructor() {
     this.fieldMatrix = undefined;
-    this.enemies = 0;
     this.level = 1;
     this.enemySpeed = 80;
-    this.curLvlEnemies = this.enemies + this.level;
+    this.curLvlEnemies = 3;
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this._lives = 3;

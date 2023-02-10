@@ -484,10 +484,9 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
-    model.curLvlEnemies = model.enemies + model.level;
     model.score += model.curLvlScore;
     model.curLvlScore = 0;
-    model.enemies++;
+    model.curLvlEnemies++;
     if (model.bombSpeed > 1000) model.bombSpeed -= 100;
     if (model.enemySpeed < 200) model.enemySpeed += 20;
     //model.gameOver = true;
@@ -662,7 +661,7 @@ class GameScene extends Phaser.Scene {
     model.curLvlScore = 0;
     model.lives = 3;
     model.level = 0;
-    model.enemies = 2;
+    model.curLvlEnemies++;
     model.enemyCounter = 0;
     setTimeout(() => {
       model.gameOver = false;
