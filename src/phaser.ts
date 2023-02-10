@@ -94,7 +94,6 @@ class GameScene extends Phaser.Scene {
 
     this.grass = this.physics.add.staticGroup();
     this.stone = this.physics.add.staticGroup();
-    this.grass = this.physics.add.staticGroup();
     this.wood = this.physics.add.staticGroup();
     this.enemies = this.physics.add.group();
     this.bombs = this.physics.add.group();
@@ -171,7 +170,11 @@ class GameScene extends Phaser.Scene {
       .setScale(0.9, 0.9)
       .refreshBody();
 
-    this.char.on("destroy", () => this.charDeathSound.play());
+    this.char.on("destroy", () => {
+      this.stageMusic.stop();
+      this.charStepSound.stop();
+      this.charDeathSound.play();
+    });
 
     while (enemyCounter < model.curLvlEnemies) {
       const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
@@ -322,9 +325,11 @@ class GameScene extends Phaser.Scene {
       model.isGamePaused = !model.isGamePaused;
       model.escIsPressed = true;
       if (model.isGamePaused) {
-        this.stageMusic.stop();
-        //gameOver = true;
+        this.scene.pause();
+        //model.gameOver = true;
         model.fieldMatrix = fieldMatrix; //save field state
+      } else {
+        this.scene.resume();
       }
 
       setTimeout(() => (model.escIsPressed = false), 300);
@@ -479,6 +484,7 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
+    this.stageMusic.stop();
     model.level++;
     model.gameOver = true;
     this.stageClearSound.play();
@@ -617,7 +623,6 @@ class GameScene extends Phaser.Scene {
   }
 
   charDie() {
-    this.stageMusic.stop();
     model.gameOver = true;
     model.lives--;
     this.char.setTint(0xff0000);
@@ -631,6 +636,7 @@ class GameScene extends Phaser.Scene {
         getEnd: () => 0,
       },
     });
+
     setTimeout(() => this.char.destroy(), 200);
     this.drawGameOver();
   }
