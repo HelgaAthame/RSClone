@@ -24,7 +24,7 @@ export class StartView {
     main.innerHTML = `
     <section class="logo"></section>
     <nav class="nav">
-      <article class="start article">start</article>
+      <article class="start article active">start</article>
       <article class="continue article">continue</article>
       <article class="settings article">settings</article>
     </nav>

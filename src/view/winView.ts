@@ -18,7 +18,7 @@ export class WinView {
         <article class="win-esc">press ESC to go to start menu</article>
       </section>
     `;
-    this.addListeners();
+    this.addListeners.call(this);
   }
 
   addListeners() {

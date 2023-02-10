@@ -103,7 +103,6 @@ class GameScene extends Phaser.Scene {
     let enemyCounter = 0;
 
     this.grass = this.physics.add.staticGroup();
-
     this.stone = this.physics.add.staticGroup();
     this.grass = this.physics.add.staticGroup();
     this.wood = this.physics.add.staticGroup();
@@ -291,7 +290,12 @@ class GameScene extends Phaser.Scene {
       style
     );
 
-    this.score = this.add.text(textStartX, textStartY, `SCORE : ${score}`, style);
+    this.score = this.add.text(
+      textStartX,
+      textStartY,
+      `SCORE : ${score}`,
+      style
+    );
 
     //if there is field matrix in model - we take it
     //if no - we write it into model
