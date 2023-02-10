@@ -219,15 +219,15 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.char,
       this.hearts,
-      this.collectHeart,
-      null,
+      this.collectHeart as ArcadePhysicsCallback,
+      undefined,
       this
     );
     this.physics.add.overlap(
       this.char,
       this.superBombs,
-      this.collectSuperBomb,
-      null,
+      this.collectSuperBomb as ArcadePhysicsCallback,
+      undefined,
       this
     );
 
@@ -729,14 +729,20 @@ class GameScene extends Phaser.Scene {
     }
   }
 
-  collectHeart(player, heart) {
+  collectHeart(
+    char: Phaser.Physics.Arcade.Sprite,
+    heart: Phaser.Physics.Arcade.Sprite
+  ) {
     heart.disableBody(true, true);
     model.curLvlScore += 50;
     this.lives.setText(`LIVES : ${"❤️".repeat(++model.lives)}`);
 
     // scoreText.setText('Score: ' + score);
   }
-  collectSuperBomb(player, superBomb) {
+  collectSuperBomb(
+    char: Phaser.Physics.Arcade.Sprite,
+    superBomb: Phaser.Physics.Arcade.Sprite
+  ) {
     superBomb.disableBody(true, true);
 
     // scoreText.setText('Score: ' + score);
