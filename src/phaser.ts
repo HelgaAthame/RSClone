@@ -50,6 +50,8 @@ let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
 class GameScene extends Phaser.Scene {
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  score: Phaser.GameObjects.Text;
   char: Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
   grass: Phaser.Physics.Arcade.StaticGroup;
@@ -63,8 +65,8 @@ class GameScene extends Phaser.Scene {
   enemyDeathSound: Phaser.Sound.BaseSound;
   bonusSound: Phaser.Sound.BaseSound;
   putBombSound: Phaser.Sound.BaseSound;
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-  score: Phaser.GameObjects.Text;
+  stageClearSound: Phaser.Sound.BaseSound;
+  stageMusic: Phaser.Sound.BaseSound;
 
   constructor() {
     super({
@@ -94,6 +96,8 @@ class GameScene extends Phaser.Scene {
     this.load.audio("bonus", "./src/assets/sounds/bonus_sound_1.wav");
     this.load.audio("enemyDeath", "./src/assets/sounds/enemy_death.ogg");
     this.load.audio("putBomb", "./src/assets/sounds/put_bomb.mp3");
+    this.load.audio("stageClear", "./src/assets/sounds/stage_clear.mp3");
+    this.load.audio("stageMusic", "./src/assets/sounds/stage_music.mp3");
   }
 
   create() {
@@ -114,6 +118,10 @@ class GameScene extends Phaser.Scene {
     this.enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
     this.bonusSound = this.sound.add("bonus", { loop: false });
     this.putBombSound = this.sound.add("putBomb", { loop: false });
+    this.stageClearSound = this.sound.add("stageClear", { loop: false });
+    this.stageMusic = this.sound.add("stageMusic", { loop: true });
+
+    this.stageMusic.play();
 
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
@@ -478,8 +486,8 @@ class GameScene extends Phaser.Scene {
   drawLevelComplete() {
     level++;
     gameOver = true;
-    //this.restartScene();
-    view.win.renderUI.call(this);
+    this.stageClearSound.play();
+    view.win.renderUI(this);
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {

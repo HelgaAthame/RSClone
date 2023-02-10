@@ -4,7 +4,7 @@ import { view } from "./index.js";
 import "./winview.scss";
 
 export class WinView {
-  renderUI() {
+  renderUI(context) {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     canvas.style.display = "none";
 
@@ -18,10 +18,10 @@ export class WinView {
         <article class="win-esc">press ESC to go to start menu</article>
       </section>
     `;
-    this.addListeners.call(this);
+    this.addListeners(context);
   }
 
-  addListeners() {
+  addListeners(context) {
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
         model.level++;
@@ -30,7 +30,7 @@ export class WinView {
         document.removeEventListener("keyup", callback);
 
         const phaser = await import("../phaser.js");
-        phaser.gameScene.restartScene.call(this);
+        phaser.gameScene.restartScene.call(context);
       }
       if (e.code === "Esc") {
         view.start.renderUI();
