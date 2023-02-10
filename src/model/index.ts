@@ -19,6 +19,8 @@ export class Model {
   bombActive: boolean;
   maxBombs: number;
   bombIsPlanting: boolean;
+  isGamePaused: boolean;
+  escIsPressed: boolean;
 
   constructor() {
     this.fieldMatrix = undefined;
@@ -45,6 +47,8 @@ export class Model {
     this.gameOver = false;
     this.maxBombs = 2;
     this.bombIsPlanting = false;
+    this.isGamePaused = false;
+    this.escIsPressed = false;
   }
 
   set lives(val: number) {

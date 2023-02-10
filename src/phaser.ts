@@ -8,20 +8,6 @@ import FieldSquare from "./utils/fieldSquare.js";
 
 loadFont("Mayhem", "./src/assets/fonts/retro-land-mayhem.ttf");
 
-let {
-  curLvlEnemies,
-  enemySpeed,
-  bombSpeed,
-  level,
-  lives,
-  gameOver,
-  score,
-  buttons,
-  activeBombs,
-  maxBombs,
-  bombIsPlanting,
-} = model;
-
 const width = window.innerWidth;
 const height = window.innerHeight;
 const ceilsNum = 11;
@@ -187,7 +173,7 @@ class GameScene extends Phaser.Scene {
 
     this.char.on("destroy", () => this.charDeathSound.play());
 
-    while (enemyCounter < curLvlEnemies) {
+    while (enemyCounter < model.curLvlEnemies) {
       const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
       const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
 
@@ -214,7 +200,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.char, this.stone);
     this.physics.add.collider(this.char, this.wood);
     this.physics.add.collider(this.char, this.enemies, () => {
-      if (!gameOver) this.charDie();
+      if (!model.gameOver) this.charDie();
     });
     this.physics.add.collider(this.char, this.bombs);
 
@@ -288,20 +274,20 @@ class GameScene extends Phaser.Scene {
     this.add.text(
       textStartX + 4 * fieldSquareLength,
       textStartY,
-      `LIVES : ${"❤️".repeat(lives)}`,
+      `LIVES : ${"❤️".repeat(model.lives)}`,
       style
     );
     this.add.text(
       textStartX + 9 * fieldSquareLength,
       textStartY,
-      `LEVEL : ${level}`,
+      `LEVEL : ${model.level}`,
       style
     );
 
     this.score = this.add.text(
       textStartX,
       textStartY,
-      `SCORE : ${score}`,
+      `SCORE : ${model.score}`,
       style
     );
 
@@ -315,25 +301,34 @@ class GameScene extends Phaser.Scene {
   }
   update() {
     const bombSet = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[buttons.bombSet]
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
 
-    if (gameOver) {
-      if (bombSet.isDown && lives) this.restartScene();
-      else if (bombSet.isDown && !lives) this.restartGame();
+    if (model.gameOver) {
+      if (bombSet.isDown && model.lives) this.restartScene();
+      else if (bombSet.isDown && !model.lives) this.restartGame();
       else return;
     }
 
-    if (!gameOver && bombSet.isDown) {
+    if (!model.gameOver && bombSet.isDown) {
       this.dropBomb();
     }
 
     const keyESC = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
     );
-    if (keyESC.isDown) {
-      gameOver = true;
-      model.fieldMatrix = fieldMatrix; //save field state
+
+    if (keyESC.isDown && !model.escIsPressed) {
+      model.isGamePaused = !model.isGamePaused;
+      model.escIsPressed = true;
+      if (model.isGamePaused) {
+        this.stageMusic.stop();
+        //gameOver = true;
+        model.fieldMatrix = fieldMatrix; //save field state
+      }
+
+      setTimeout(() => (model.escIsPressed = false), 300);
+
       view.settings.renderUI();
     }
 
@@ -345,19 +340,19 @@ class GameScene extends Phaser.Scene {
 
   charMovement(): void {
     const bombSet = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[buttons.bombSet]
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
     const up = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[buttons.arrowUp]
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]
     );
     const down = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[buttons.arrowDown]
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]
     );
     const left = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[buttons.arrowLeft]
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]
     );
     const right = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[buttons.arrowRight]
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]
     );
 
     const [closestX, closestY] = this.findClosestSquare(
@@ -431,15 +426,15 @@ class GameScene extends Phaser.Scene {
       const random = Math.random();
       if (random > 0.75) {
         enemy.setVelocityX(0);
-        enemy.setVelocityY(enemySpeed);
+        enemy.setVelocityY(model.enemySpeed);
       } else if (random > 0.5) {
         enemy.setVelocityX(0);
-        enemy.setVelocityY(-enemySpeed);
+        enemy.setVelocityY(-model.enemySpeed);
       } else if (random > 0.25) {
-        enemy.setVelocityX(enemySpeed);
+        enemy.setVelocityX(model.enemySpeed);
         enemy.setVelocityY(0);
       } else {
-        enemy.setVelocityX(-enemySpeed);
+        enemy.setVelocityX(-model.enemySpeed);
         enemy.setVelocityY(0);
       }
     }
@@ -465,10 +460,10 @@ class GameScene extends Phaser.Scene {
       this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY =
       this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    if (lives) {
-      gameOverString = `You have ${lives}❤️ left \nPRESS ${buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
+    if (model.lives) {
+      gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
-      gameOverString = `GAME OVER\nPRESS ${buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
+      gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
 
     this.add
@@ -484,8 +479,8 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
-    level++;
-    gameOver = true;
+    model.level++;
+    model.gameOver = true;
     this.stageClearSound.play();
     view.win.renderUI(this);
   }
@@ -533,8 +528,8 @@ class GameScene extends Phaser.Scene {
           return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
         });
         enemyToDestroy?.on("destroy", () => {
-          score += 100;
-          this.score.setText(`SCORE: ${score}`);
+          model.score += 100;
+          this.score.setText(`SCORE: ${model.score}`);
           this.enemyDeathSound.play();
         });
         if (enemyToDestroy) {
@@ -551,12 +546,9 @@ class GameScene extends Phaser.Scene {
           });
           setTimeout(() => {
             enemyToDestroy.destroy();
-            curLvlEnemies--;
-            if (curLvlEnemies === 0 && lives > 0) {
+            model.curLvlEnemies--;
+            if (model.curLvlEnemies === 0 && model.lives > 0) {
               this.drawLevelComplete();
-              //level ++ ;
-              //gameOver = true;
-              //restartScene.apply(this);
             }
           }, 200);
         }
@@ -580,30 +572,30 @@ class GameScene extends Phaser.Scene {
   }
 
   dropBomb() {
-    if (activeBombs.length < maxBombs && !bombIsPlanting) {
+    if (model.activeBombs.length < model.maxBombs && !model.bombIsPlanting) {
       const [bombX, bombY] = this.findClosestSquare(
         this.char as Phaser.Physics.Matter.Sprite
       );
       const bomb = this.bombs.create(bombX, bombY, "bomb").setImmovable();
-      bombIsPlanting = true;
+      model.bombIsPlanting = true;
       this.putBombSound.play();
 
-      setTimeout(() => (bombIsPlanting = false), 100);
+      setTimeout(() => (model.bombIsPlanting = false), 500);
 
       const curBomb = setTimeout(() => {
         this.explodeBomb(bomb, bombX, bombY);
-      }, bombSpeed - 1000 * (level - 1));
+      }, model.bombSpeed - 1000 * (model.level - 1));
 
-      activeBombs.push(curBomb);
+      model.activeBombs.push(curBomb);
 
       bomb.on("destroy", () => {
-        const findCurBomb = activeBombs.find((bomb) => bomb === curBomb);
+        const findCurBomb = model.activeBombs.find((bomb) => bomb === curBomb);
         clearTimeout(findCurBomb);
-        activeBombs.shift();
+        model.activeBombs.shift();
         this.explosionSound.play();
 
         setTimeout(() => {
-          if (activeBombs.length === 0) this.putBombSound.stop();
+          if (model.activeBombs.length === 0) this.putBombSound.stop();
         }, 0);
       });
       const bombScaleX = (1 / 555) * fieldSquareLength;
@@ -625,8 +617,9 @@ class GameScene extends Phaser.Scene {
   }
 
   charDie() {
-    gameOver = true;
-    lives--;
+    this.stageMusic.stop();
+    model.gameOver = true;
+    model.lives--;
     this.char.setTint(0xff0000);
     this.add.tween({
       targets: this.char,
@@ -642,24 +635,25 @@ class GameScene extends Phaser.Scene {
     this.drawGameOver();
   }
   restartGame() {
-    lives = 3;
+    model.lives = 3;
     this.scene.restart();
+
     setTimeout(() => {
-      gameOver = false;
+      model.gameOver = false;
     }, 1);
   }
   restartScene() {
     this.scene.restart();
-    score = 0;
-    setTimeout(() => (gameOver = false), 1);
+    model.score = 0;
+    setTimeout(() => (model.gameOver = false), 1);
 
-    while (activeBombs.length > 0) {
-      window.clearTimeout(activeBombs.pop());
+    while (model.activeBombs.length > 0) {
+      window.clearTimeout(model.activeBombs.pop());
     }
     this.bombs.destroy();
   }
   changeGameOver() {
-    gameOver = !gameOver;
+    model.gameOver = !model.gameOver;
   }
 }
 export const gameScene = new GameScene();

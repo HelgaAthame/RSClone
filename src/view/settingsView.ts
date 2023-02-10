@@ -8,11 +8,12 @@ import keysObject from "../utils/keys.js";
 export class SettingsView {
   renderUI() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-    if (canvas) {
-      canvas.style.display = "none";
-    } else {
-      console.log("there is no canvas");
+    if (!model.isGamePaused) {
+      canvas.style.display = "initial";
+      return;
     }
+    canvas.style.display = "none";
+
     const main = selectorChecker(document, "main");
     main.innerHTML = `
       <section class="setting__title">settings</section>
