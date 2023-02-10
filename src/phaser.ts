@@ -344,6 +344,7 @@ class GameScene extends Phaser.Scene {
   }
 
   charMovement(): void {
+    if (model.gameOver) return;
     const bombSet = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
@@ -625,7 +626,7 @@ class GameScene extends Phaser.Scene {
   charDie() {
     model.gameOver = true;
     model.lives--;
-    this.char.setTint(0xff0000);
+    /*     this.char.setTint(0xff0000);
     this.add.tween({
       targets: this.char,
       ease: "Sine.easeInOut",
@@ -635,9 +636,9 @@ class GameScene extends Phaser.Scene {
         getStart: () => 1,
         getEnd: () => 0,
       },
-    });
+    }); */
 
-    setTimeout(() => this.char.destroy(), 200);
+    /* setTimeout(() =>  */ this.char.destroy(); /* , 200); */
     this.drawGameOver();
   }
   restartGame() {
@@ -684,6 +685,3 @@ class Bomberman extends Phaser.Game {
 }
 
 new Bomberman(config);
-
-/* export const changeGameOver =
-  game.config.sceneConfig[0].prototype.changeGameOver; */
