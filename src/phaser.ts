@@ -17,7 +17,6 @@ const fieldImgSize = 512;
 
 const charStartX = fieldStartX + 1.5 * fieldSquareLength;
 const charStartY = height - 1.5 * fieldSquareLength;
-const charSpeed = 160;
 
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
@@ -286,7 +285,7 @@ class GameScene extends Phaser.Scene {
     this.score = this.add.text(
       textStartX,
       textStartY,
-      `SCORE : ${model.curLvlScore}`,
+      `SCORE : ${model.score}`,
       style
     );
 
@@ -381,22 +380,22 @@ class GameScene extends Phaser.Scene {
     const thisChar = this.char as Phaser.Physics.Matter.Sprite;
 
     if (up.isDown) {
-      thisChar.setVelocityY(-charSpeed);
+      thisChar.setVelocityY(-model.charSpeed);
       thisChar.setVelocityX(0);
       thisChar.anims.play("up", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (right.isDown) {
-      thisChar.setVelocityX(charSpeed);
+      thisChar.setVelocityX(model.charSpeed);
       thisChar.setVelocityY(0);
       thisChar.anims.play("right", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (down.isDown) {
-      thisChar.setVelocityY(charSpeed);
+      thisChar.setVelocityY(model.charSpeed);
       thisChar.setVelocityX(0);
       thisChar.anims.play("down", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
     } else if (/*cursors.*/ left.isDown) {
-      thisChar.setVelocityX(-charSpeed);
+      thisChar.setVelocityX(-model.charSpeed);
       thisChar.setVelocityY(0);
       thisChar.anims.play("left", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
@@ -484,18 +483,12 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
-    model.score += model.curLvlScore;
-    model.curLvlScore = 0;
-    model.curLvlEnemies++;
-    if (model.bombSpeed > 1000) model.bombSpeed -= 100;
-    if (model.enemySpeed < 200) model.enemySpeed += 20;
-    //model.gameOver = true;
+    model.nextLvl();
     this.stageMusic.stop();
     this.charStepSound.stop();
     this.stageClearSound.play();
 
     view.win.renderUI(this);
-    model.level++;
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
@@ -542,7 +535,7 @@ class GameScene extends Phaser.Scene {
         });
         enemyToDestroy?.on("destroy", () => {
           model.curLvlScore += 100;
-          this.score.setText(`SCORE: ${model.curLvlScore}`);
+          this.score.setText(`SCORE: ${model.score + model.curLvlScore}`);
           this.enemyDeathSound.play();
         });
         if (enemyToDestroy) {
@@ -657,19 +650,14 @@ class GameScene extends Phaser.Scene {
     this.drawGameOver();
   }
   restartGame() {
-    model.score = 0;
-    model.curLvlScore = 0;
-    model.lives = 3;
-    model.level = 0;
-    model.curLvlEnemies++;
-    model.enemyCounter = 0;
+    model.resetGame();
     setTimeout(() => {
       model.gameOver = false;
     }, 0);
     this.scene.restart();
   }
   restartScene() {
-    model.curLvlScore = model.score;
+    model.curLvlScore = 0;
     model.enemyCounter = 0;
 
     setTimeout(() => (model.gameOver = false), 0);

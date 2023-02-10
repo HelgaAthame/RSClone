@@ -5,6 +5,7 @@ import { Buttons } from "../utils/buttons.js";
 export class Model {
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
+  charSpeed: number;
   enemySpeed: number;
   curLvlEnemies: number;
   enemyCounter: number;
@@ -26,6 +27,7 @@ export class Model {
   constructor() {
     this.fieldMatrix = undefined;
     this.level = 1;
+    this.charSpeed = 160;
     this.enemySpeed = 80;
     this.curLvlEnemies = 3;
     this.enemyCounter = 0;
@@ -51,6 +53,26 @@ export class Model {
     this.bombIsPlanting = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
+  }
+
+  resetGame() {
+    this.score = 0;
+    this.curLvlScore = 0;
+    this.lives = 3;
+    this.level = 1;
+    this.curLvlEnemies = 3;
+    this.enemyCounter = 0;
+    this.bombSpeed = 1600;
+    this.enemySpeed = 80;
+  }
+
+  nextLvl() {
+    this.score += this.curLvlScore;
+    this.curLvlScore = 0;
+    this.curLvlEnemies++;
+    if (this.bombSpeed > 1000) this.bombSpeed -= 100;
+    if (this.enemySpeed < 200) this.enemySpeed += 20;
+    if (this.level % 2 === 0) this.charSpeed += 5;
   }
 
   set lives(val: number) {
