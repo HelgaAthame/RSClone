@@ -28,10 +28,10 @@ export class Model {
     this.fieldMatrix = undefined;
     this.enemies = 0;
     this.level = 1;
-    this.enemySpeed = this.level * 80;
+    this.enemySpeed = 80;
     this.curLvlEnemies = this.enemies + this.level;
     this.enemyCounter = 0;
-    this.bombSpeed = 1500;
+    this.bombSpeed = 1600;
     this._lives = 3;
     this._score = 0;
     this.curLvlScore = 0;

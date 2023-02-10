@@ -325,7 +325,9 @@ class GameScene extends Phaser.Scene {
       if (model.isGamePaused) {
         this.scene.pause();
         this.stageMusic.pause();
-        this.charStepSound.stop();
+        setTimeout(() => {
+          this.charStepSound.stop();
+        }, 0);
         model.fieldMatrix = fieldMatrix; //save field state
       }
 
@@ -485,6 +487,9 @@ class GameScene extends Phaser.Scene {
     model.curLvlEnemies = model.enemies + model.level;
     model.score += model.curLvlScore;
     model.curLvlScore = 0;
+    model.enemies++;
+    if (model.bombSpeed > 1000) model.bombSpeed -= 100;
+    if (model.enemySpeed < 200) model.enemySpeed += 20;
     //model.gameOver = true;
     this.stageMusic.stop();
     this.charStepSound.stop();
@@ -602,7 +607,7 @@ class GameScene extends Phaser.Scene {
 
       const curBomb = setTimeout(() => {
         this.explodeBomb(bomb, bombX, bombY);
-      }, model.bombSpeed - 1000 * (model.level - 1));
+      }, model.bombSpeed);
 
       model.activeBombs.push(curBomb);
 
