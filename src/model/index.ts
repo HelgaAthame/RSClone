@@ -26,7 +26,7 @@ export class Model {
 
   constructor() {
     this.fieldMatrix = undefined;
-    this.enemies = 2;
+    this.enemies = 0;
     this.level = 1;
     this.enemySpeed = this.level * 80;
     this.curLvlEnemies = this.enemies + this.level;

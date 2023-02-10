@@ -320,14 +320,13 @@ class GameScene extends Phaser.Scene {
     );
 
     if (keyESC.isDown && !model.escIsPressed) {
-      model.isGamePaused = !model.isGamePaused;
+      model.isGamePaused = true;
       model.escIsPressed = true;
       if (model.isGamePaused) {
         this.scene.pause();
-        //model.gameOver = true;
+        this.stageMusic.pause();
+        this.charStepSound.stop();
         model.fieldMatrix = fieldMatrix; //save field state
-      } else {
-        this.scene.resume();
       }
 
       setTimeout(() => (model.escIsPressed = false), 300);
@@ -483,15 +482,16 @@ class GameScene extends Phaser.Scene {
   }
 
   drawLevelComplete() {
-    model.level++;
     model.curLvlEnemies = model.enemies + model.level;
     model.score += model.curLvlScore;
     model.curLvlScore = 0;
-    model.gameOver = true;
+    //model.gameOver = true;
     this.stageMusic.stop();
     this.charStepSound.stop();
     this.stageClearSound.play();
+
     view.win.renderUI(this);
+    model.level++;
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
@@ -556,7 +556,7 @@ class GameScene extends Phaser.Scene {
           setTimeout(() => {
             enemyToDestroy.destroy();
             model.enemyCounter--;
-            if (model.enemyCounter === 0 && model.lives > 0) {
+            if (model.enemyCounter === 0) {
               this.drawLevelComplete();
             }
           }, 200);
@@ -659,15 +659,14 @@ class GameScene extends Phaser.Scene {
     model.level = 0;
     model.enemies = 2;
     model.enemyCounter = 0;
-    this.scene.restart();
     setTimeout(() => {
       model.gameOver = false;
     }, 0);
+    this.scene.restart();
   }
   restartScene() {
     model.curLvlScore = model.score;
     model.enemyCounter = 0;
-    this.scene.restart();
 
     setTimeout(() => (model.gameOver = false), 0);
 
@@ -675,6 +674,7 @@ class GameScene extends Phaser.Scene {
       window.clearTimeout(model.activeBombs.pop());
     }
     this.bombs.destroy();
+    this.scene.restart();
   }
   changeGameOver() {
     model.gameOver = !model.gameOver;

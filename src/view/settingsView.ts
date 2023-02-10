@@ -4,14 +4,12 @@ import selectorChecker from "../utils/selectorChecker.js";
 import "./settingsView.scss";
 import keyz from "../utils/keys.js";
 import keysObject from "../utils/keys.js";
+import { gameScene } from "../phaser.js";
 
 export class SettingsView {
-  renderUI() {
+  async renderUI() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-    if (!model.isGamePaused) {
-      canvas.style.display = "initial";
-      return;
-    }
+
     canvas.style.display = "none";
 
     const main = selectorChecker(document, "main");
@@ -145,7 +143,7 @@ export class SettingsView {
 
     let ourTarget: HTMLDivElement;
 
-    document.addEventListener("keyup", async function f(e) {
+    document.addEventListener("keydown", async function f(e) {
       function clearStyles() {
         signs.forEach((article) => {
           article.classList.remove("active");
@@ -157,6 +155,19 @@ export class SettingsView {
       }
 
       switch (e.code) {
+        case "Escape":
+          if (model.isGamePaused) {
+            const canvas = document.querySelector(
+              "canvas"
+            ) as HTMLCanvasElement;
+            canvas.style.display = "initial";
+
+            const phaser = await import("../phaser.js");
+
+            phaser.gameScene.scene.resume();
+            phaser.gameScene.stageMusic.resume();
+          }
+
         case "ArrowUp":
           clearStyles();
           if (i > 0) i--;
