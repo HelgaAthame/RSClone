@@ -37,6 +37,7 @@ let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
 class GameScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   score: Phaser.GameObjects.Text;
+  lives: Phaser.GameObjects.Text;
   char: Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
   grass: Phaser.Physics.Arcade.StaticGroup;
@@ -44,6 +45,9 @@ class GameScene extends Phaser.Scene {
   wood: Phaser.Physics.Arcade.StaticGroup;
   bombs: Phaser.Physics.Arcade.Group;
   explosion: Phaser.GameObjects.Sprite;
+  hearts: Phaser.Physics.Arcade.StaticGroup;
+  superBombs: Phaser.Physics.Arcade.StaticGroup;
+
   explosionSound: Phaser.Sound.BaseSound;
   charStepSound: Phaser.Sound.BaseSound;
   charDeathSound: Phaser.Sound.BaseSound;
@@ -78,11 +82,13 @@ class GameScene extends Phaser.Scene {
     this.load.audio("explosion", "./src/assets/sounds/bomb_explosion.ogg");
     this.load.audio("charStep", "./src/assets/sounds/char_step.mp3");
     this.load.audio("charDeath", "./src/assets/sounds/player_death.wav");
-    this.load.audio("bonus", "./src/assets/sounds/bonus_sound_1.wav");
+    this.load.audio("bonusSound", "./src/assets/sounds/bonus_sound_1.wav");
     this.load.audio("enemyDeath", "./src/assets/sounds/enemy_death.ogg");
     this.load.audio("putBomb", "./src/assets/sounds/put_bomb.mp3");
     this.load.audio("stageClear", "./src/assets/sounds/stage_clear.mp3");
     this.load.audio("stageMusic", "./src/assets/sounds/stage_music.mp3");
+    this.load.image("superBomb", "./src/assets/super_bomb.png");
+    this.load.image("heart", "./src/assets/heart.png");
   }
 
   create() {
@@ -93,11 +99,14 @@ class GameScene extends Phaser.Scene {
     this.wood = this.physics.add.staticGroup();
     this.enemies = this.physics.add.group();
     this.bombs = this.physics.add.group();
+    this.hearts = this.physics.add.staticGroup();
+    this.superBombs = this.physics.add.staticGroup();
+
     this.explosionSound = this.sound.add("explosion", { loop: false });
     this.charStepSound = this.sound.add("charStep", { loop: true });
     this.charDeathSound = this.sound.add("charDeath", { loop: false });
     this.enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
-    this.bonusSound = this.sound.add("bonus", { loop: false });
+    this.bonusSound = this.sound.add("bonusSound", { loop: false });
     this.putBombSound = this.sound.add("putBomb", { loop: false });
     this.stageClearSound = this.sound.add("stageClear", { loop: false });
     this.stageMusic = this.sound.add("stageMusic", { loop: true });
@@ -207,6 +216,21 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemies, this.stone);
     this.physics.add.collider(this.enemies, this.bombs);
 
+    this.physics.add.overlap(
+      this.char,
+      this.hearts,
+      this.collectHeart,
+      null,
+      this
+    );
+    this.physics.add.overlap(
+      this.char,
+      this.superBombs,
+      this.collectSuperBomb,
+      null,
+      this
+    );
+
     /*Draw explosion */
     this.anims.create({
       key: "bombExplosion",
@@ -269,7 +293,7 @@ class GameScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.add.text(
+    this.lives = this.add.text(
       textStartX + 4 * fieldSquareLength,
       textStartY,
       `LIVES : ${"❤️".repeat(model.lives)}`,
@@ -524,6 +548,7 @@ class GameScene extends Phaser.Scene {
         });
         if (!woodSquare) throw Error("Wood square was not found");
         woodSquare.destroy();
+        this.drawRandomBonus(x, y);
       } else if (sqaureToCheck.object === "char") {
         this.charDie();
       } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
@@ -670,6 +695,50 @@ class GameScene extends Phaser.Scene {
   }
   changeGameOver() {
     model.gameOver = !model.gameOver;
+  }
+
+  drawRandomBonus(x: number, y: number) {
+    const random = Math.random();
+    let group: typeof this.hearts | typeof this.superBombs | null = null;
+    let image: "heart" | "superBomb" | null = null;
+    if (random > 0.8) {
+      group = this.hearts;
+      image = "heart";
+    } else if (random > 0.6) {
+      group = this.superBombs;
+      image = "superBomb";
+    }
+
+    if (group && image) {
+      const item = group
+        .create(x, y, image)
+        .setSize(fieldSquareLength, fieldSquareLength)
+        .setDisplaySize(fieldSquareLength, fieldSquareLength)
+        .refreshBody();
+
+      this.tweens.add({
+        targets: item,
+        scaleX: item.scaleX / 1.3,
+        scaleY: item.scaleY / 1.3,
+        yoyo: true,
+        repeat: -1,
+        duration: 300,
+        ease: "Sine.easeInOut",
+      });
+    }
+  }
+
+  collectHeart(player, heart) {
+    heart.disableBody(true, true);
+    model.curLvlScore += 50;
+    this.lives.setText(`LIVES : ${"❤️".repeat(++model.lives)}`);
+
+    // scoreText.setText('Score: ' + score);
+  }
+  collectSuperBomb(player, superBomb) {
+    superBomb.disableBody(true, true);
+
+    // scoreText.setText('Score: ' + score);
   }
 }
 export const gameScene = new GameScene();
