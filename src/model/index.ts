@@ -16,6 +16,11 @@ type Buttons = {
 
 export class Model {
   constructor () {
+    this.charSpeed = 160;
+    this.curLvlEnemies = 3;
+    this.enemyCounter = 0;
+    this.bombSpeed = 1600;
+    this.curLvlScore = 0;    
     this.uid = '';
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
@@ -36,18 +41,35 @@ export class Model {
       select: 'STIFT',
       start: 'ENTER'
     };
+    this.activeBombs = [];
+    this.gameOver = false;
+    this.maxBombs = 2;
+    this.bombIsPlanting = false;
+    this.isGamePaused = false;
+    this.escIsPressed = false;
   }
+
   fieldMatrix: FieldSquare[][] | undefined;
-  enemySpeed: number;
-  enemies: number;
   level: number;
+  charSpeed: number;
+  enemySpeed: number;
+  curLvlEnemies: number;
+  enemyCounter: number;
   bombSpeed: number;
+  activeBombs: ReturnType<typeof setTimeout>[];
   lives: number;
+  curLvlScore: number;
   score: number;
   buttons: Buttons;
   _isMuted: Boolean;
   _volume: number;
   uid: string;
+  gameOver: boolean;
+  bombActive: boolean;
+  maxBombs: number;
+  bombIsPlanting: boolean;
+  isGamePaused: boolean;
+  escIsPressed: boolean;
 
   async saveToBd () {
     await setDoc(doc(db, "users", this.uid), {
@@ -80,9 +102,28 @@ export class Model {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
+
+  resetGame() {
+    this.score = 0;
+    this.curLvlScore = 0;
+    this.lives = 3;
+    this.level = 1;
+    this.curLvlEnemies = 3;
+    this.enemyCounter = 0;
+    this.bombSpeed = 1600;
+    this.enemySpeed = 80;
   }
 
-  set isMuted (val: Boolean) {
+  nextLvl() {
+    this.score += this.curLvlScore;
+    this.curLvlScore = 0;
+    this.curLvlEnemies++;
+    if (this.bombSpeed > 1000) this.bombSpeed -= 100;
+    if (this.enemySpeed < 200) this.enemySpeed += 20;
+    if (this.level % 2 === 0) this.charSpeed += 5;
+  }
+
+  set isMuted(val: Boolean) {
     this._isMuted = val;
 
     //const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
@@ -97,11 +138,12 @@ export class Model {
     bgAudio.volume = Number(inputRange.value);
     }
   }
+
   get isMuted ():Boolean {
     return this._isMuted;
   }
 
-  set volume (val: number) {
+  set volume(val: number) {
     this._volume = val;
 
     const inputRange = document.querySelector('.setting__sound-input') as HTMLInputElement;
