@@ -9,6 +9,10 @@ import { gameScene } from "../phaser.js";
 import "./startView.scss";
 
 export class StartView {
+  constructor () {
+    this.phaser;
+  }
+  phaser: { gameScene: any; }
   renderUI() {
     const main = document.createElement("main");
     main.classList.add("main");
@@ -134,16 +138,24 @@ export class StartView {
           const selected = selectorChecker(document, ".active") as HTMLElement;
           const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
-          let phaser;
+          //let phaser: { gameScene: any; };
           switch (selected.innerHTML) {
             case "Start":
               //model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
-              phaser = await import("../phaser.js");
+              if (!view.start.phaser) {
+                console.log('нет  фазера');
+                view.start.phaser = await import("../phaser.js");
+              }
+              //view.start.phaser = await import("../phaser.js");
               //if (model.gameOver) phaser.gameScene.changeGameOver();
-              if (phaser) {
+              if (view.start.phaser && view.start.phaser.gameScene) {
                 model.resetGame();
-                phaser.gameScene.restartGame();
+                //setTimeout(() => {phaser.gameScene.restartGame();}, 10);
+                console.log(model.enemyCounter);
+                //model.enemyCounter = 3;
+                //alert(model.enemyCounter);
+                //view.start.phaser.gameScene.restartGame();
               }
               pauseBGAudio();
               break;
