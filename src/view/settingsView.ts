@@ -10,7 +10,7 @@ export class SettingsView {
   async renderUI() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
-    canvas.style.display = "none";
+    if (canvas)  canvas.style.display = "none";
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
