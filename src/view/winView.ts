@@ -4,7 +4,7 @@ import { view } from "./index.js";
 import "./winview.scss";
 
 export class WinView {
-  renderUI(context) {
+  renderUI(context: this) {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     canvas.style.display = "none";
 
@@ -21,7 +21,7 @@ export class WinView {
     this.addListeners(context);
   }
 
-  addListeners(context) {
+  addListeners(context: this) {
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
         model.level++;
