@@ -1,55 +1,10 @@
 import FieldSquare from "../utils/fieldSquare.js";
 import selectorChecker from "../utils/selectorChecker.js";
-import { db } from '../firebase-config.js';
+import { db } from "../firebase-config.js";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-
-type Buttons = {
-  arrowUp: string
-  arrowDown: string
-  arrowLeft: string
-  arrowRight: string
-  bombSet: string
-  bombRemove: string
-  select: string
-  start: string
-}
+import { Buttons } from "../utils/buttons.js";
 
 export class Model {
-  constructor () {
-    this.charSpeed = 160;
-    this.curLvlEnemies = 3;
-    this.enemyCounter = 0;
-    this.bombSpeed = 1600;
-    this.curLvlScore = 0;
-    this.uid = '';
-    this.fieldMatrix = undefined;
-    this.enemySpeed = 80;
-    this.enemies = 2;
-    this.level = 1;
-    this.bombSpeed = 5000;
-    this.lives = 3;
-    this.score = 0;
-    this._isMuted = false;
-    this._volume = 0.5;
-    this.buttons = {
-      arrowUp: 'UP',
-      arrowDown: 'DOWN',
-      arrowLeft: 'LEFT',
-      arrowRight: 'RIGHT',
-      bombSet: 'SPACE',
-      bombRemove: 'Z',
-      select: 'STIFT',
-      start: 'ENTER'
-    };
-    this.activeBombs = [];
-    this.gameOver = false;
-    this.maxBombs = 2;
-    this.bombIsPlanting = false;
-    this.isGamePaused = false;
-    this.escIsPressed = false;
-  }
-
-  enemies: number;
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
   charSpeed: number;
@@ -72,7 +27,40 @@ export class Model {
   isGamePaused: boolean;
   escIsPressed: boolean;
 
-  async saveToBd () {
+  constructor() {
+    this.charSpeed = 160;
+    this.curLvlEnemies = 3;
+    this.enemyCounter = 0;
+    this.bombSpeed = 1600;
+    this.curLvlScore = 0;
+    this.uid = "";
+    this.fieldMatrix = undefined;
+    this.enemySpeed = 80;
+    this.level = 1;
+    this.bombSpeed = 5000;
+    this.lives = 3;
+    this.score = 0;
+    this._isMuted = false;
+    this._volume = 0.5;
+    this.buttons = {
+      arrowUp: "UP",
+      arrowDown: "DOWN",
+      arrowLeft: "LEFT",
+      arrowRight: "RIGHT",
+      bombSet: "SPACE",
+      bombRemove: "Z",
+      select: "SHIFT",
+      start: "ENTER",
+    };
+    this.activeBombs = [];
+    this.gameOver = false;
+    this.maxBombs = 2;
+    this.bombIsPlanting = false;
+    this.isGamePaused = false;
+    this.escIsPressed = false;
+  }
+
+  async saveToBd() {
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -80,11 +68,11 @@ export class Model {
       isMuted: this.isMuted,
       volume: this.volume,
       buttons: this.buttons,
-      fieldMatrix: JSON.stringify(this.fieldMatrix)
+      fieldMatrix: JSON.stringify(this.fieldMatrix),
     });
   }
 
-  async takeFromBD () {
+  async takeFromBD() {
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
@@ -98,7 +86,6 @@ export class Model {
       this.volume = data.volume;
       this.buttons = data.buttons;
       this.fieldMatrix = JSON.parse(data.fieldMatrix);
-
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -129,34 +116,38 @@ export class Model {
     this._isMuted = val;
 
     //const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
-    const inputRange = document.querySelector('.setting__sound-input') as HTMLInputElement;
+    const inputRange = document.querySelector(
+      ".setting__sound-input"
+    ) as HTMLInputElement;
     //const muteButton = selectorChecker(document, '.setting__sound-mute');
-    const muteButton = document.querySelector('.setting__sound-mute');
+    const muteButton = document.querySelector(".setting__sound-mute");
     //const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
-    const bgAudio = document.querySelector('.bgAudio') as HTMLAudioElement;
-    if ( muteButton && inputRange && bgAudio ) {
-    muteButton.innerHTML = muteButton.innerHTML === '🔇' ? '🔈' : '🔇';
-    inputRange.value =  muteButton.innerHTML === '🔇' ? '1' : '0';
-    bgAudio.volume = Number(inputRange.value);
+    const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
+    if (muteButton && inputRange && bgAudio) {
+      muteButton.innerHTML = muteButton.innerHTML === "🔇" ? "🔈" : "🔇";
+      inputRange.value = muteButton.innerHTML === "🔇" ? "1" : "0";
+      bgAudio.volume = Number(inputRange.value);
     }
   }
 
-  get isMuted ():Boolean {
+  get isMuted(): Boolean {
     return this._isMuted;
   }
 
   set volume(val: number) {
     this._volume = val;
 
-    const inputRange = document.querySelector('.setting__sound-input') as HTMLInputElement;
-    const muteButton = document.querySelector('.setting__sound-mute');
-    const bgAudio = document.querySelector('.bgAudio') as HTMLAudioElement;
+    const inputRange = document.querySelector(
+      ".setting__sound-input"
+    ) as HTMLInputElement;
+    const muteButton = document.querySelector(".setting__sound-mute");
+    const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
     if (inputRange && muteButton && bgAudio) {
-      muteButton.innerHTML = inputRange.value === '0' ? '🔈' : '🔇';
+      muteButton.innerHTML = inputRange.value === "0" ? "🔈" : "🔇";
       bgAudio.volume = Number(inputRange.value);
     }
   }
-  get volume () {
+  get volume() {
     return this._volume;
   }
 }
