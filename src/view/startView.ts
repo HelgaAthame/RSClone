@@ -85,6 +85,7 @@ export class StartView {
       document.querySelectorAll(".footer-link");
 
     document.addEventListener("keyup", async function foo(e) {
+
       function clearStyles() {
         navs.forEach((article) => {
           article.classList.remove("active");
@@ -92,6 +93,15 @@ export class StartView {
         footerlinks.forEach((link) => {
           link.classList.remove("active");
         });
+      }
+
+      function pauseBGAudio() {
+        const bgAudio = selectorChecker(
+          document,
+          ".bgAudio"
+        ) as HTMLAudioElement;
+
+        bgAudio.pause();
       }
 
       switch (e.code) {
@@ -118,23 +128,22 @@ export class StartView {
 
         case "Enter":
           const selected = selectorChecker(document, ".active") as HTMLElement;
+          const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
+          let phaser;
           switch (selected.innerHTML) {
             case "start":
               //model.takeFromBD.call(model);
-              const canvas = document.querySelector(
-                "canvas"
-              ) as HTMLCanvasElement;
               if (canvas) canvas.style.display = "initial";
-              const phaser = await import("../phaser.js");
+              phaser = await import("../phaser.js");
               if (model.gameOver) phaser.gameScene.changeGameOver();
-              const bgAudio = selectorChecker(
-                document,
-                ".bgAudio"
-              ) as HTMLAudioElement;
-
-              bgAudio.pause();
+              pauseBGAudio();
               break;
             case "continue":
+              model.takeFromBD.call(model);
+              if (canvas) canvas.style.display = "initial";
+              model.gameOver = false;
+              pauseBGAudio();
               break;
             case "settings":
               view.settings.renderUI();
