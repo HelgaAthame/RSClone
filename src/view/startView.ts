@@ -117,7 +117,7 @@ export class StartView {
            switch (selected.innerHTML) {
             case 'start':
 
-              model.takeFromBD.call(model);
+              //model.takeFromBD.call(model);
               const canvas = document.querySelector('canvas') as HTMLCanvasElement;
               if (canvas) canvas.style.display = 'initial';
               const phaser = await import('../phaser.js');

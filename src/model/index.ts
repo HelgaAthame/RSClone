@@ -96,25 +96,23 @@ export class Model {
     inputRange.value =  muteButton.innerHTML === '🔇' ? '1' : '0';
     bgAudio.volume = Number(inputRange.value);
     }
-    //TODO добавить в БД
   }
   get isMuted ():Boolean {
-    //TODO взять значение из БД если оно есть
     return this._isMuted;
   }
 
   set volume (val: number) {
     this._volume = val;
 
-    const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
-    const muteButton = selectorChecker(document, '.setting__sound-mute');
-    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
-    muteButton.innerHTML = inputRange.value === '0' ? '🔈' : '🔇';
-    bgAudio.volume = Number(inputRange.value);
-    //todo сохранять в БД
+    const inputRange = document.querySelector('.setting__sound-input') as HTMLInputElement;
+    const muteButton = document.querySelector('.setting__sound-mute');
+    const bgAudio = document.querySelector('.bgAudio') as HTMLAudioElement;
+    if (inputRange && muteButton && bgAudio) {
+      muteButton.innerHTML = inputRange.value === '0' ? '🔈' : '🔇';
+      bgAudio.volume = Number(inputRange.value);
+    }
   }
   get volume () {
-    //TODO взять из БД
     return this._volume;
   }
 }

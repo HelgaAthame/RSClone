@@ -420,7 +420,7 @@ function drawGameOver() {
   if (model.lives) {
     let lostLife = "❤️";
     gameOverString =
-      `${("❤️").repeat(model.lives) + lostLife}\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
+      `${("❤️").repeat(model.lives)}\nPRESS BOMBSET KEY TO CONTINUE\nPRESS ESC TO EXIT`;
   } else {
     gameOverString = `GAME OVER\nPRESS BOMBSET KEY TO RESTART\nPRESS ESC TO EXIT`;
 
@@ -440,7 +440,7 @@ function drawGameOver() {
     })
     .setOrigin(0.5)
     .setDepth(1);
-    
+
 }
 
 function drawLevelComplete(context) {
