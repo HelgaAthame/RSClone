@@ -30,7 +30,7 @@ export class StartView {
       <article class="start article active">Start</article>
       <article class="continue article">Continue</article>
       <article class="settings article">Settings</article>
-      <article class="settings article">Leaderbord</article>
+      <article class="settings article">Leaderboard</article>
     </nav>
     <footer class="footer">
       <section class="github">
@@ -105,7 +105,7 @@ export class StartView {
 
         bgAudio.pause();
       }
-
+      console.log(e.code);
       switch (e.code) {
         case "ArrowUp":
           clearStyles();
@@ -134,20 +134,23 @@ export class StartView {
 
           let phaser;
           switch (selected.innerHTML) {
-            case "start":
+            case "Start":
               //model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
               phaser = await import("../phaser.js");
               if (model.gameOver) phaser.gameScene.changeGameOver();
               pauseBGAudio();
               break;
-            case "continue":
+            case "Continue":
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
               model.gameOver = false;
               pauseBGAudio();
               break;
-            case "settings":
+            case "Settings":
+              view.settings.renderUI();
+              break;
+            case "Leaderboard":
               view.settings.renderUI();
               break;
             case "Olga":
