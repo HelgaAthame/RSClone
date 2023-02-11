@@ -161,11 +161,10 @@ export class SettingsView {
         });
         saveButton.classList.remove("active");
       }
-
-      console.log(view.settings.findKey(model.buttons.arrowUp))
-      console.log(e.code)
+      console.log(e.code);
       switch (e.code) {
         case "Escape":
+          console.log('escape pressed');
           if (model.isGamePaused) {
             const canvas = document.querySelector(
               "canvas"
@@ -179,7 +178,6 @@ export class SettingsView {
           }
 
         case view.settings.findKey(model.buttons.arrowUp):
-          console.log('arraow app is')
           clearStyles();
           if (i > 0) i--;
           signs[i].classList.add("active");
@@ -188,7 +186,6 @@ export class SettingsView {
           break;
         case view.settings.findKey(model.buttons.arrowDown):
 
-        console.log('arraow down is')
           clearStyles();
           if (i < signs.length) i++;
           if (i < signs.length) {
