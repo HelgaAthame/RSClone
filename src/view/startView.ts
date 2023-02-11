@@ -92,8 +92,8 @@ export class StartView {
 
 
 
-    document.addEventListener("keyup", async function foo(e) {
-
+    document.addEventListener("keydown", async function foo(e) {
+      console.log('сработал event listener na key');
       function clearStyles() {
         navs.forEach((article) => {
           article.classList.remove("active");
@@ -144,19 +144,28 @@ export class StartView {
               //model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
               if (!view.start.phaser) {
+                console.log(view.start.phaser);
                 console.log('нет  фазера');
                 view.start.phaser = await import("../phaser.js");
+              } else {
+                console.log(view.start.phaser);
+                console.log('есть!  фазер');
+                model.resetGame();
+                console.log(model.enemyCounter);
+                view.start.phaser.gameScene.restartGame();
               }
               //view.start.phaser = await import("../phaser.js");
               //if (model.gameOver) phaser.gameScene.changeGameOver();
-              if (view.start.phaser && view.start.phaser.gameScene) {
+              /*if (view.start.phaser && view.start.phaser.gameScene) {
+                console.log(view.start.phaser);
+                console.log('есть!  фазер');
                 model.resetGame();
                 //setTimeout(() => {phaser.gameScene.restartGame();}, 10);
                 console.log(model.enemyCounter);
                 //model.enemyCounter = 3;
                 //alert(model.enemyCounter);
-                //view.start.phaser.gameScene.restartGame();
-              }
+                view.start.phaser.gameScene.restartGame();
+              }*/
               pauseBGAudio();
               break;
             case "Continue":
@@ -184,7 +193,7 @@ export class StartView {
               selected.click();
               break;
           }
-          document.removeEventListener("keyup", foo);
+          document.removeEventListener("keydown", foo);
           break;
       }
     });
@@ -200,7 +209,7 @@ export class StartView {
 
     const beginText = selectorChecker(document, ".begin__text");
 
-    document.addEventListener("keyup", (e) => {
+    document.addEventListener("keydown", (e) => {
       beginText.classList.add("active");
       if (loaded === false && e.code === "Enter") {
         beginText.classList.remove("active");
