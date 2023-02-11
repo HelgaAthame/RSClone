@@ -3,8 +3,10 @@ import loadFont from "./utils/loadFont.js";
 import { model } from "./model/index.js";
 import { view } from "./view/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
+import { view } from "./view/index.js";
+import keys from "./utils/keys.js;";
 
-//import keys from "./utils/keys.js;";
+loadFont("Mayhem", "./src/assets/fonts/retro-land-mayhem.ttf");
 
 loadFont("Mayhem", "./src/assets/fonts/retro-land-mayhem.ttf");
 
@@ -20,10 +22,10 @@ const charStartY = height - 1.5 * fieldSquareLength;
 
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
-const style: Partial<Phaser.GameObjects.TextStyle> = {
-  fontFamily: "Mayhem",
-  fontSize: "1.3rem",
-  color: "#000",
+const style = {
+  font: "bold 1.3rem Mayhem",
+  fill: "#000",
+  wordWrap: true,
   wordWrapWidth: 2,
   align: "center",
   stroke: "#fff",
@@ -34,8 +36,40 @@ let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
   .fill([])
   .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
 
-class GameScene extends Phaser.Scene {
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+const config = {
+  type: Phaser.AUTO,
+  width: width,
+  height: height,
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+    },
+  },
+  scene: {
+    char: "",
+    preload: preload,
+    create: create,
+    update: update,
+  },
+};
+
+let char: Phaser.Physics.Matter.Sprite,
+  enemies: Phaser.GameObjects.Group,
+  grass: Phaser.Physics.Arcade.StaticGroup,
+  stone: Phaser.Physics.Arcade.StaticGroup,
+  hearts: Phaser.Physics.Arcade.StaticGroup,
+  wood: Phaser.Physics.Arcade.StaticGroup,
+  bombs: Phaser.GameObjects.Sprite,
+  superBombs: Phaser.GameObjects.Sprite,
+  explosion: Phaser.GameObjects.Sprite,
+  explosionSound: Phaser.Sound.HTML5AudioSound,
+  charStepSound: Phaser.Sound.HTML5AudioSound,
+  charDeathSound: Phaser.Sound.HTML5AudioSound,
+  enemyDeathSound: Phaser.Sound.HTML5AudioSound,
+  bonusSound: Phaser.Sound.HTML5AudioSound,
+  putBombSound: Phaser.Sound.HTML5AudioSound,
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys,
   score: Phaser.GameObjects.Text;
   lives: Phaser.GameObjects.Text;
   char: Phaser.GameObjects.Sprite;
@@ -73,45 +107,42 @@ class GameScene extends Phaser.Scene {
       frameHeight: 64,
     });
 
-    this.load.image("grass", "./src/assets/grass.jpg");
-    this.load.image("stone", "./src/assets/stone.jpg");
-    this.load.image("wood", "./src/assets/wood.jpg");
-    this.load.image("bomb", "./src/assets/bomb.png");
-    this.load.image("enemy", "./src/assets/enemy1.png");
+  this.load.image("grass", "./src/assets/grass.jpg");
+  this.load.image("stone", "./src/assets/stone.jpg");
+  this.load.image("wood", "./src/assets/wood.jpg");
+  this.load.image("bomb", "./src/assets/bomb.png");
+  this.load.image("superBomb", "./src/assets/super_bomb.png");
+  this.load.image("enemy", "./src/assets/enemy1.png");
+  this.load.image("heart", "./src/assets/heart.png");
 
-    this.load.audio("explosion", "./src/assets/sounds/bomb_explosion.ogg");
-    this.load.audio("charStep", "./src/assets/sounds/char_step.mp3");
-    this.load.audio("charDeath", "./src/assets/sounds/player_death.wav");
-    this.load.audio("bonusSound", "./src/assets/sounds/bonus_sound_1.wav");
-    this.load.audio("enemyDeath", "./src/assets/sounds/enemy_death.ogg");
-    this.load.audio("putBomb", "./src/assets/sounds/put_bomb.mp3");
-    this.load.audio("stageClear", "./src/assets/sounds/stage_clear.mp3");
-    this.load.audio("stageMusic", "./src/assets/sounds/stage_music.mp3");
-    this.load.image("superBomb", "./src/assets/super_bomb.png");
-    this.load.image("heart", "./src/assets/heart.png");
-  }
+  this.load.audio("explosion", "./src/assets/sounds/bomb_explosion.ogg");
+  this.load.audio("charStep", "./src/assets/sounds/char_step.mp3");
+  this.load.audio("charDeath", "./src/assets/sounds/player_death.wav");
+  this.load.audio("bonus", "./src/assets/sounds/bonus_sound_1.wav");
+  this.load.audio("enemyDeath", "./src/assets/sounds/enemy_death.ogg");
+  this.load.audio("putBomb", "./src/assets/sounds/put_bomb.mp3");
+}
 
-  create() {
-    /* Draw field */
-    /* BIG WIDTH ONLY!!! */
-    this.grass = this.physics.add.staticGroup();
-    this.stone = this.physics.add.staticGroup();
-    this.wood = this.physics.add.staticGroup();
-    this.enemies = this.physics.add.group();
-    this.bombs = this.physics.add.group();
-    this.hearts = this.physics.add.staticGroup();
-    this.superBombs = this.physics.add.staticGroup();
+function create() {
+  curLvlEnemies = model.enemies + model.level;
+  enemySpeed = model.enemySpeed + model.level * 10;
+  /* Draw field */
+  /* BIG WIDTH ONLY!!! */
 
-    this.explosionSound = this.sound.add("explosion", { loop: false });
-    this.charStepSound = this.sound.add("charStep", { loop: true });
-    this.charDeathSound = this.sound.add("charDeath", { loop: false });
-    this.enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
-    this.bonusSound = this.sound.add("bonusSound", { loop: false });
-    this.putBombSound = this.sound.add("putBomb", { loop: false });
-    this.stageClearSound = this.sound.add("stageClear", { loop: false });
-    this.stageMusic = this.sound.add("stageMusic", { loop: true });
-
-    this.stageMusic.play();
+  stone = this.physics.add.staticGroup();
+  grass = this.physics.add.staticGroup();
+  wood = this.physics.add.staticGroup();
+  hearts = this.physics.add.staticGroup();
+  enemies = this.physics.add.group();
+  bombs = this.physics.add.group();
+  superBombs = this.physics.add.group();
+  explosionSound = this.sound.add("explosion", { loop: false });
+  charStepSound = this.sound.add("charStep", { loop: true });
+  charDeathSound = this.sound.add("charDeath", { loop: false });
+  enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
+  bonusSound = this.sound.add("bonus", { loop: false });
+  putBombSound = this.sound.add("putBomb", { loop: false });
+  let enemyCounter = 0;
 
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
@@ -169,52 +200,47 @@ class GameScene extends Phaser.Scene {
       }
     }
 
-    this.char = this.physics.add
-      .sprite(charStartX, charStartY, "char")
-      .setSize(fieldSquareLength * 0.99, fieldSquareLength * 0.99)
-      .setScale(0.9, 0.9)
-      .refreshBody();
+  char = this.physics.add
+    .sprite(charStartX, charStartY, "char")
+    .setSize(fieldSquareLength * 0.99, fieldSquareLength * 0.99)
+    .setDisplaySize(fieldSquareLength * 0.99, fieldSquareLength * 1.5)
+    .refreshBody();
 
-    this.char.on("destroy", () => {
-      this.charStepSound.stop();
-      this.charDeathSound.play();
-    });
+  char.on("destroy", () => charDeathSound.play());
 
     while (model.enemyCounter < model.curLvlEnemies) {
       const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
       const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
 
-      if (
-        fieldMatrix[randomX][randomY].object !== "grass" ||
-        (randomX === ceilsNum - 2 && randomY === 1) ||
-        (randomX === ceilsNum - 3 && randomY === 1) ||
-        (randomX === ceilsNum - 2 && randomY === 2)
+    if (
+      fieldMatrix[randomX][randomY].object !== "grass" ||
+      (randomX === ceilsNum - 2 && randomY === 1) ||
+      (randomX === ceilsNum - 3 && randomY === 1) ||
+      (randomX === ceilsNum - 2 && randomY === 2)
+    )
+      continue;
+    fieldMatrix[randomX][randomY].object = `enemy_${enemyCounter}`;
+    enemyCounter++;
+    enemies
+      .create(
+        fieldMatrix[randomX][randomY].x,
+        fieldMatrix[randomX][randomY].y,
+        "enemy"
       )
-        continue;
-      fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
-      model.enemyCounter++;
-      this.enemies
-        .create(
-          fieldMatrix[randomX][randomY].x,
-          fieldMatrix[randomX][randomY].y,
-          "enemy"
-        )
-        .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-        .setScale(0.9)
-        .refreshBody();
-    }
+      .setSize(fieldSquareLength, fieldSquareLength)
+      .setDisplaySize(fieldSquareLength, fieldSquareLength)
+      .refreshBody();
+  }
 
-    this.physics.add.collider(this.char, this.stone);
-    this.physics.add.collider(this.char, this.wood);
-    this.physics.add.collider(this.char, this.enemies, () => {
-      if (!model.gameOver) this.charDie();
-    });
-    this.physics.add.collider(this.char, this.bombs);
+  this.physics.add.collider(char, stone);
+  this.physics.add.collider(char, wood);
+  this.physics.add.collider(char, enemies, () => {
+    if (!gameOver) charDie.apply(this);
+  });
 
-    this.physics.add.collider(this.enemies, this.enemies);
-    this.physics.add.collider(this.enemies, this.wood);
-    this.physics.add.collider(this.enemies, this.stone);
-    this.physics.add.collider(this.enemies, this.bombs);
+  this.physics.add.overlap(char, hearts, collectHeart, null, this);
+  this.physics.add.overlap(char, superBombs, collectSuperBomb, null, this);
+  this.physics.add.collider(char, bombs);
 
     this.physics.add.overlap(
       this.char,
@@ -293,71 +319,58 @@ class GameScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.lives = this.add.text(
-      textStartX + 4 * fieldSquareLength,
-      textStartY,
-      `LIVES : ${"❤️".repeat(model.lives)}`,
-      style
-    );
-    this.add.text(
-      textStartX + 9 * fieldSquareLength,
-      textStartY,
-      `LEVEL : ${model.level}`,
-      style
-    );
+  score = this.add.text(
+    textStartX,
+    textStartY,
+    `SCORE : ${model.score}`,
+    style
+  );
 
-    this.score = this.add.text(
-      textStartX,
-      textStartY,
-      `SCORE : ${model.score}`,
-      style
-    );
+  this.add.text(
+    textStartX + 4 * fieldSquareLength,
+    textStartY,
+    `LIVES : ${"❤️".repeat(model.lives)}`,
+    style
+  );
+  this.add.text(
+    textStartX + 9 * fieldSquareLength,
+    textStartY,
+    `LEVEL : ${model.level}`,
+    style
+  );
 
-    //if there is field matrix in model - we take it
-    //if no - we write it into model
-    if (model.fieldMatrix) {
-      fieldMatrix = model.fieldMatrix;
-    } else {
-      model.fieldMatrix = fieldMatrix;
-    }
+  //if there is field matrix in model - we take it
+  //if no - we write it into model
+  if (model.fieldMatrix) {
+    fieldMatrix = model.fieldMatrix;
+  } else {
+    model.fieldMatrix = fieldMatrix;
   }
-  update() {
-    const bombSet = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
-    );
+}
 
-    if (model.gameOver) {
-      this.stageMusic.stop();
-      this.putBombSound.stop();
-      if (bombSet.isDown && model.lives) this.restartScene();
-      else if (bombSet.isDown && !model.lives) this.restartGame();
-      else return;
-    }
+function update() {
+  const bombSet = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
+  );
 
-    if (!model.gameOver && bombSet.isDown) {
-      this.dropBomb();
-    }
+  if (gameOver) {
+    if (/*cursors.space.isDown*/ bombSet.isDown && model.lives)
+      restartScene.apply(this);
+    else if (/*cursors.space.isDown*/ bombSet.isDown && !model.lives)
+      restartGame.apply(this);
+    else return;
+  }
 
-    const keyESC = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC
-    );
+  if (!gameOver && /*cursors.space*/ bombSet.isDown) {
+    dropBomb.apply(this);
+  }
 
-    if (keyESC.isDown && !model.escIsPressed) {
-      model.isGamePaused = true;
-      model.escIsPressed = true;
-      if (model.isGamePaused) {
-        this.scene.pause();
-        this.stageMusic.pause();
-        setTimeout(() => {
-          this.charStepSound.stop();
-        }, 0);
-        model.fieldMatrix = fieldMatrix; //save field state
-      }
-
-      setTimeout(() => (model.escIsPressed = false), 300);
-
-      view.settings.renderUI();
-    }
+  const keyESC = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+  if (keyESC.isDown) {
+    gameOver = true;
+    model.fieldMatrix = fieldMatrix; //save field state
+    view.settings.renderUI();
+  }
 
     this.charMovement();
     this.enemies.children.entries.forEach((enemy) =>
@@ -365,67 +378,63 @@ class GameScene extends Phaser.Scene {
     );
   }
 
-  charMovement(): void {
-    if (model.gameOver) return;
-    const bombSet = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
-    );
-    const up = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]
-    );
-    const down = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]
-    );
-    const left = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]
-    );
-    const right = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]
-    );
+function charMovement(): void {
+  const bombSet = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
+  );
+  const up = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowUp]
+  );
+  const down = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowDown]
+  );
+  const left = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowLeft]
+  );
+  const right = this.input.keyboard.addKey(
+    Phaser.Input.Keyboard.KeyCodes[model.buttons.arrowRight]
+  );
 
-    const [closestX, closestY] = this.findClosestSquare(
-      this.char as Phaser.Physics.Matter.Sprite
+  const [closestX, closestY] = findClosestSquare(char);
+  const flatFieldMatrix = fieldMatrix.flat();
+  const curCharSquare = flatFieldMatrix.find(
+    (square) => square.object === "char"
+  );
+  if (curCharSquare) {
+    curCharSquare.object = "grass";
+    const newCharSquare = flatFieldMatrix.find(
+      (square) =>
+        Math.floor(square.x) === Math.floor(closestX) &&
+        Math.floor(square.y) === Math.floor(closestY)
     );
-    const flatFieldMatrix = fieldMatrix.flat();
-    const curCharSquare = flatFieldMatrix.find(
-      (square) => square.object === "char"
-    );
-    if (curCharSquare) {
-      curCharSquare.object = "grass";
-      const newCharSquare = flatFieldMatrix.find(
-        (square) =>
-          Math.floor(square.x) === Math.floor(closestX) &&
-          Math.floor(square.y) === Math.floor(closestY)
-      );
-      if (!newCharSquare) throw Error("New characher square was not found");
-      newCharSquare.object = "char";
-    }
+    if (!newCharSquare) throw Error("New characher square was not found");
+    newCharSquare.object = "char";
+  }
 
-    const thisChar = this.char as Phaser.Physics.Matter.Sprite;
 
-    if (up.isDown) {
-      thisChar.setVelocityY(-model.charSpeed);
-      thisChar.setVelocityX(0);
-      thisChar.anims.play("up", true);
-      if (!this.charStepSound.isPlaying) this.charStepSound.play();
-    } else if (right.isDown) {
-      thisChar.setVelocityX(model.charSpeed);
-      thisChar.setVelocityY(0);
-      thisChar.anims.play("right", true);
-      if (!this.charStepSound.isPlaying) this.charStepSound.play();
-    } else if (down.isDown) {
-      thisChar.setVelocityY(model.charSpeed);
-      thisChar.setVelocityX(0);
-      thisChar.anims.play("down", true);
-      if (!this.charStepSound.isPlaying) this.charStepSound.play();
-    } else if (/*cursors.*/ left.isDown) {
-      thisChar.setVelocityX(-model.charSpeed);
-      thisChar.setVelocityY(0);
-      thisChar.anims.play("left", true);
-      if (!this.charStepSound.isPlaying) this.charStepSound.play();
-    } else if (!(/*cursors.space*/ bombSet.isDown)) {
-      thisChar.setVelocityX(0);
-      thisChar.setVelocityY(0);
+  if (/*cursors.*/up.isDown) {
+    char.setVelocityY(-charSpeed);
+    char.setVelocityX(0);
+    char.anims.play("up", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
+  } else if (/*cursors.*/ right.isDown) {
+    char.setVelocityX(charSpeed);
+    char.setVelocityY(0);
+    char.anims.play("right", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
+  } else if (/*cursors.*/ down.isDown) {
+    char.setVelocityY(charSpeed);
+    char.setVelocityX(0);
+    char.anims.play("down", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
+  } else if (/*cursors.*/ left.isDown) {
+    char.setVelocityX(-charSpeed);
+    char.setVelocityY(0);
+    char.anims.play("left", true);
+    if (!charStepSound.isPlaying) charStepSound.play();
+  } else if (!(/*cursors.space*/ bombSet.isDown)) {
+    char.setVelocityX(0);
+    char.setVelocityY(0);
 
       thisChar.anims.play("turn", true);
       this.charStepSound.stop();
@@ -482,39 +491,40 @@ class GameScene extends Phaser.Scene {
     return [closestSquare.x, closestSquare.y];
   }
 
-  drawGameOver() {
-    let gameOverString: string;
-    const screenCenterX =
-      this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    const screenCenterY =
-      this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    if (model.lives) {
-      gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
-    } else {
-      gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
-    }
+function drawGameOver() {
+  let gameOverString: string;
+  const screenCenterX =
+  this.cameras.main.worldView.x + this.cameras.main.width / 2;
+const screenCenterY =
+  this.cameras.main.worldView.y + this.cameras.main.height / 2;
+  if (model.lives) {
 
-    this.add
-      .text(screenCenterX, screenCenterY, gameOverString, {
-        fontFamily: "Mayhem",
-        fontSize: "50px",
-        stroke: "#222",
-        strokeThickness: 5,
-        backgroundColor: "rgba(20, 20, 20, 0.75)",
-        align: "center",
-      })
-      .setOrigin(0.5);
+    gameOverString =
+      `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
+  } else {
+    gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
+
   }
 
-  drawLevelComplete() {
-    model.nextLvl();
-    this.stageMusic.stop();
-    this.charStepSound.stop();
-    this.putBombSound.stop();
-    this.stageClearSound.play();
+  this.add.text(screenCenterX, screenCenterY, gameOverString, {
+      fontFamily: 'Mayhem',
+      fontSize: "50px",
+      fill: "#fff",
+      stroke: "#222",
+      strokeThickness: 5,
+      backgroundColor: "rgba(20, 20, 20, 0.75)",
 
-    view.win.renderUI(this);
-  }
+    align: 'center',
+    })
+    .setOrigin(0.5);
+}
+
+function drawLevelComplete(context) {
+  //model.level ++ ;
+  gameOver = true;
+  //restartScene.apply(this);
+  view.win.renderUI(context);
+}
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
     const nextX = x + fieldSquareLength;
@@ -539,54 +549,53 @@ class GameScene extends Phaser.Scene {
 
       this.drawExplosion(x, y);
 
-      if (sqaureToCheck.object === "wood") {
-        const woodSquare = this.wood.children.entries.find((woodSquare) => {
-          return (
-            sqaureToCheck.x ===
-              (woodSquare as Phaser.Physics.Matter.Sprite).x &&
-            sqaureToCheck.y === (woodSquare as Phaser.Physics.Matter.Sprite).y
-          );
+    if (sqaureToCheck.object === "wood") {
+      const woodSquare = wood.children.entries.find((woodSquare) => {
+        return (
+          sqaureToCheck.x === woodSquare.x && sqaureToCheck.y === woodSquare.y
+        );
+      });
+      if (!woodSquare) throw Error("Wood square was not found");
+      woodSquare.destroy();
+      drawRandomBonus.apply(this, [sqaureToCheck.x, sqaureToCheck.y]);
+    } else if (sqaureToCheck.object === "char") {
+      charDie.apply(this);
+    } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
+      const enemyToDestroy = enemies.children.entries.find((enemy) => {
+        const [closestX, closestY] = findClosestSquare(enemy);
+        return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
+      });
+      enemyToDestroy?.on("destroy", () => {
+        model.score += 100;
+        score.setText(`SCORE: ${model.score}`);
+        enemyDeathSound.play();
+      });
+      if (enemyToDestroy) {
+        enemyToDestroy.setTint(0xff0000);
+        this.add.tween({
+          targets: enemyToDestroy,
+          ease: "Sine.easeInOut",
+          duration: 200,
+          delay: 0,
+          alpha: {
+            getStart: () => 1,
+            getEnd: () => 0,
+          },
         });
-        if (!woodSquare) throw Error("Wood square was not found");
-        woodSquare.destroy();
-        this.drawRandomBonus(x, y);
-      } else if (sqaureToCheck.object === "char") {
-        this.charDie();
-      } else if (enemiesAlive.some((enemy) => enemy === sqaureToCheck)) {
-        const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
-          const [closestX, closestY] = this.findClosestSquare(
-            enemy as Phaser.Physics.Matter.Sprite
-          );
-          return closestX === sqaureToCheck.x && closestY === sqaureToCheck.y;
-        });
-        enemyToDestroy?.on("destroy", () => {
-          model.curLvlScore += 100;
-          this.score.setText(`SCORE: ${model.score + model.curLvlScore}`);
-          this.enemyDeathSound.play();
-        });
-        if (enemyToDestroy) {
-          (enemyToDestroy as Phaser.Physics.Matter.Sprite).setTint(0xff0000);
-          this.add.tween({
-            targets: enemyToDestroy,
-            ease: "Sine.easeInOut",
-            duration: 200,
-            delay: 0,
-            alpha: {
-              getStart: () => 1,
-              getEnd: () => 0,
-            },
-          });
-          setTimeout(() => {
-            enemyToDestroy.destroy();
-            model.enemyCounter--;
-            if (model.enemyCounter === 0) {
-              this.drawLevelComplete();
-            }
-          }, 200);
-        }
+        setTimeout(() => {
+          enemyToDestroy.destroy();
+          curLvlEnemies--;
+          if (curLvlEnemies === 0 && model.lives > 0) {
+            drawLevelComplete(this);
+            //model.level ++ ;
+            //gameOver = true;
+            //restartScene.apply(this);
+          }
+        }, 200);
       }
-      sqaureToCheck.object = "grass";
-    };
+    }
+    sqaureToCheck.object = "grass";
+  };
 
     checkSquare(x, y);
     checkSquare(nextX, y);
@@ -595,53 +604,65 @@ class GameScene extends Phaser.Scene {
     checkSquare(x, prevY);
   }
 
-  drawExplosion(x: number, y: number) {
-    this.explosion = this.physics.add.sprite(x, y, "explosion");
-    const explosionAnim = this.explosion.anims.play("bombExplosion", false);
-    explosionAnim.once("animationcomplete", () => {
-      explosionAnim.destroy();
-    });
+function drawRandomBonus(x: number, y: number) {
+  const random = Math.random();
+  let group: typeof hearts | typeof superBombs | null = null;
+  let image: "heart" | "superBomb" | null = null;
+  if (random > 0.8) {
+    group = hearts;
+    image = "heart";
+  } else if (random > 0.6) {
+    group = superBombs;
+    image = "superBomb";
   }
 
-  dropBomb() {
-    if (model.activeBombs.length < model.maxBombs && !model.bombIsPlanting) {
-      const [bombX, bombY] = this.findClosestSquare(
-        this.char as Phaser.Physics.Matter.Sprite
-      );
-      const checkSquare = this.bombs.children.entries.find(
-        (bomb) =>
-          (bomb as Phaser.Physics.Matter.Sprite).x === bombX &&
-          (bomb as Phaser.Physics.Matter.Sprite).y === bombY
-      );
-      if (checkSquare) return;
-      const bomb = this.bombs.create(bombX, bombY, "bomb").setImmovable();
+  if (group && image) {
+    const item = group
+      .create(x, y, image)
+      .setSize(fieldSquareLength, fieldSquareLength)
+      .setDisplaySize(fieldSquareLength, fieldSquareLength)
+      .refreshBody();
 
-      model.bombIsPlanting = true;
-      this.putBombSound.play();
+    this.tweens.add({
+      targets: item,
+      scaleX: item.scaleX / 1.3,
+      scaleY: item.scaleY / 1.3,
+      yoyo: true,
+      repeat: -1,
+      duration: 300,
+      ease: "Sine.easeInOut",
+    });
+  }
+}
+function drawExplosion(x: number, y: number) {
+  explosion = this.physics.add.sprite(x, y, "explosion");
+  const explosionAnim = explosion.anims.play("bombExplosion", false);
+  explosionAnim.once("animationcomplete", () => {
+    explosionAnim.destroy();
+  });
+}
 
-      //const checkSquare =
+function dropBomb() {
+  if (!bombActive) {
+    const [bombX, bombY] = findClosestSquare(char);
+    bombActive = true;
+    const bomb = bombs.create(bombX, bombY, "bomb").setImmovable();
+    putBombSound.play();
+    bomb.on("destroy", () => {
+      let areMoreActiveBombs: boolean;
+      setTimeout(() => {
+        areMoreActiveBombs = this.children.list.find(
+          (item) => item.texture.key === "bomb"
+        );
+        if (!areMoreActiveBombs) putBombSound.stop();
+      }, 0);
 
-      setTimeout(() => (model.bombIsPlanting = false), 500);
-
-      const curBomb = setTimeout(() => {
-        this.explodeBomb(bomb, bombX, bombY);
-      }, model.bombSpeed);
-
-      model.activeBombs.push(curBomb);
-
-      bomb.on("destroy", () => {
-        const findCurBomb = model.activeBombs.find((bomb) => bomb === curBomb);
-        clearTimeout(findCurBomb);
-        model.activeBombs.shift();
-        this.explosionSound.play();
-
-        setTimeout(() => {
-          if (model.activeBombs.length === 0) this.putBombSound.stop();
-        }, 0);
-      });
-      const bombScaleX = (1 / 555) * fieldSquareLength;
-      const bombScaleY = (1 / 569) * fieldSquareLength;
-      bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
+      explosionSound.play();
+    });
+    const bombScaleX = (1 / 555) * fieldSquareLength;
+    const bombScaleY = (1 / 569) * fieldSquareLength;
+    bomb.setScale(bombScaleX / 1.3, bombScaleY / 1.3);
+    setTimeout(() => (bombActive = false), 1000);
 
       this.tweens.add({
         targets: bomb,
@@ -653,40 +674,57 @@ class GameScene extends Phaser.Scene {
         ease: "Sine.easeInOut",
       });
 
-      this.char.anims.play("placeBomb", true);
-    }
-  }
+    model.activeBombs.push(setTimeout(() => {
+      explodeBomb.apply(this, [bomb, bombX, bombY]);
 
-  charDie() {
-    model.gameOver = true;
-    model.lives--;
-    /*     this.char.setTint(0xff0000);
-    this.add.tween({
-      targets: this.char,
-      ease: "Sine.easeInOut",
-      duration: 200,
-      delay: 0,
-      alpha: {
-        getStart: () => 1,
-        getEnd: () => 0,
-      },
-    }); */
+    }, bombSpeed - (1000 * ( model.level - 1 ))));
 
-    /* setTimeout(() =>  */ this.char.destroy(); /* , 200); */
-    this.drawGameOver();
+    char.anims.play("placeBomb", true);
   }
-  restartGame() {
-    model.resetGame();
-    setTimeout(() => {
-      model.gameOver = false;
-    }, 0);
-    this.scene.restart();
-  }
-  restartScene() {
-    model.curLvlScore = 0;
-    model.enemyCounter = 0;
+}
 
-    setTimeout(() => (model.gameOver = false), 0);
+function charDie() {
+  gameOver = true;
+  model.lives--;
+  char.setTint(0xff0000);
+  this.add.tween({
+    targets: char,
+    ease: "Sine.easeInOut",
+    duration: 200,
+    delay: 0,
+    alpha: {
+      getStart: () => 1,
+      getEnd: () => 0,
+    },
+  });
+  setTimeout(() => char.destroy(), 200);
+  drawGameOver.apply(this);
+}
+
+function collectHeart(player, heart) {
+  heart.disableBody(true, true);
+  model.score += 50;
+  model.lives++;
+
+  // scoreText.setText('Score: ' + score);
+}
+function collectSuperBomb(player, superBomb) {
+  superBomb.disableBody(true, true);
+
+  // scoreText.setText('Score: ' + score);
+}
+
+function restartGame() {
+  model.lives = 3;
+  this.scene.restart();
+  setTimeout(() => {
+    gameOver = false;
+  }, 1);
+}
+export function restartScene() {
+  this.scene.restart();
+  model.score = 0;
+  setTimeout(() => gameOver = false, 1);
 
     while (model.activeBombs.length > 0) {
       window.clearTimeout(model.activeBombs.pop());
