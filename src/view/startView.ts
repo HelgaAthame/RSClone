@@ -23,6 +23,8 @@ export class StartView {
   }
 
   renderStartScreen() {
+    //alert('render start screen');
+    console.log(model.gameOver);
     const main = selectorChecker(document, "main");
     main.innerHTML = `
     <section class="logo"></section>
@@ -138,7 +140,11 @@ export class StartView {
               //model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
               phaser = await import("../phaser.js");
-              if (model.gameOver) phaser.gameScene.changeGameOver();
+              //if (model.gameOver) phaser.gameScene.changeGameOver();
+              if (phaser) {
+                model.resetGame();
+                phaser.gameScene.restartGame();
+              }
               pauseBGAudio();
               break;
             case "Continue":
