@@ -14,7 +14,7 @@ export class StartView {
     main.classList.add("main");
     main.innerHTML = `
       <section class="begin">
-        <article class="begin__text">start</article>
+        <article class="begin__text">START</article>
       </section>
     `;
     document.body.prepend(main);
