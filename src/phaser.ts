@@ -632,6 +632,7 @@ class GameScene extends Phaser.Scene {
       bomb.on("destroy", () => {
         const findCurBomb = model.activeBombs.find((bomb) => bomb === curBomb);
         clearTimeout(findCurBomb);
+        model.activeBombs.shift();
         this.explosionSound.play();
 
         setTimeout(() => {

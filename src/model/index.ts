@@ -37,7 +37,6 @@ export class Model {
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
     this.level = 1;
-    this.bombSpeed = 5000;
     this.lives = 3;
     this.score = 0;
     this._isMuted = false;
