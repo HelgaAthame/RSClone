@@ -688,19 +688,7 @@ class GameScene extends Phaser.Scene {
   charDie() {
     model.gameOver = true;
     model.lives--;
-    /*     this.char.setTint(0xff0000);
-    this.add.tween({
-      targets: this.char,
-      ease: "Sine.easeInOut",
-      duration: 200,
-      delay: 0,
-      alpha: {
-        getStart: () => 1,
-        getEnd: () => 0,
-      },
-    }); */
-
-    /* setTimeout(() =>  */ this.char.destroy(); /* , 200); */
+    this.char.destroy();
     this.drawGameOver();
   }
   restartGame() {
