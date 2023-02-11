@@ -1,5 +1,4 @@
-
-import { firebase } from '../firebase/firebase.js';
+import { firebase } from "../firebase/firebase.js";
 import { doc } from "firebase/firestore";
 import GithubLogo from "../assets/logos/github.png";
 import RsschoolLogo from "../assets/logos/logo-rs.svg";
@@ -28,9 +27,10 @@ export class StartView {
     main.innerHTML = `
     <section class="logo"></section>
     <nav class="nav">
-      <article class="start article active">start</article>
-      <article class="continue article">continue</article>
-      <article class="settings article">settings</article>
+      <article class="start article active">Start</article>
+      <article class="continue article">Continue</article>
+      <article class="settings article">Settings</article>
+      <article class="settings article">Leaderbord</article>
     </nav>
     <footer class="footer">
       <section class="github">
@@ -116,17 +116,21 @@ export class StartView {
           footerlinks[k].classList.add("active");
           break;
 
-        case 'Enter':
-          const selected = selectorChecker(document, '.active') as HTMLElement;
-           switch (selected.innerHTML) {
-            case 'start':
-
+        case "Enter":
+          const selected = selectorChecker(document, ".active") as HTMLElement;
+          switch (selected.innerHTML) {
+            case "start":
               //model.takeFromBD.call(model);
-              const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-              if (canvas) canvas.style.display = 'initial';
-              const phaser = await import('../phaser.js');
+              const canvas = document.querySelector(
+                "canvas"
+              ) as HTMLCanvasElement;
+              if (canvas) canvas.style.display = "initial";
+              const phaser = await import("../phaser.js");
               if (model.gameOver) phaser.gameScene.changeGameOver();
-              const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+              const bgAudio = selectorChecker(
+                document,
+                ".bgAudio"
+              ) as HTMLAudioElement;
 
               bgAudio.pause();
               break;

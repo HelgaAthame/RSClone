@@ -2,15 +2,15 @@ import { model } from "../model/index.js";
 import { view } from "./index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import "./settingsView.scss";
-import keyz from "../utils/keys.js";
+//import keyz from "../utils/keys.js";
 import keysObject from "../utils/keys.js";
-import { gameScene } from "../phaser.js";
+//import { gameScene } from "../phaser.js";
 
 export class SettingsView {
   async renderUI() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
-    if (canvas)  canvas.style.display = "none";
+    if (canvas) canvas.style.display = "none";
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
