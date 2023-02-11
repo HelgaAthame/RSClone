@@ -84,6 +84,8 @@ export class StartView {
     const footerlinks: NodeListOf<HTMLDivElement> =
       document.querySelectorAll(".footer-link");
 
+
+
     document.addEventListener("keyup", async function foo(e) {
       function clearStyles() {
         navs.forEach((article) => {
@@ -129,6 +131,7 @@ export class StartView {
               const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
 
               bgAudio.pause();
+              //document.removeEventListener("keyup", foo);
               break;
             case "continue":
               break;
