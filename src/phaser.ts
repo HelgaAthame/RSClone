@@ -38,6 +38,7 @@ class GameScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   score: Phaser.GameObjects.Text;
   lives: Phaser.GameObjects.Text;
+  timer: Phaser.GameObjects.Text;
   char: Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
   grass: Phaser.Physics.Arcade.StaticGroup;
@@ -313,6 +314,13 @@ class GameScene extends Phaser.Scene {
       style
     );
 
+    this.timer = this.add.text(
+      textStartX + 4 * fieldSquareLength,
+      textStartY + 10 * fieldSquareLength,
+      `TIME : ${model.curLvlTimer}`,
+      style
+    );
+
     //if there is field matrix in model - we take it
     //if no - we write it into model
     if (model.fieldMatrix) {
@@ -322,6 +330,26 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
+    model.curTimer -= 1 / 60;
+    if (model.curTimer <= 20) {
+      this.timer.setTint(0xff0000);
+      this.add.tween({
+        targets: this.timer,
+        ease: "Sine.easeInOut",
+        delay: 0,
+        alpha: {
+          getStart: () => 1,
+          getEnd: () => 0,
+        },
+      });
+    }
+    if (model.curTimer <= 0) {
+      this.char.destroy();
+      model.gameOver = true;
+      model.curTimer = 0;
+      this.drawGameOver();
+    }
+    this.timer.setText(`TIMER: ${model.curTimer.toFixed(0)}`);
     const bombSet = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
@@ -685,6 +713,7 @@ class GameScene extends Phaser.Scene {
   restartScene() {
     model.curLvlScore = 0;
     model.enemyCounter = 0;
+    model.curTimer = model.curLvlTimer;
 
     setTimeout(() => (model.gameOver = false), 0);
 
@@ -735,7 +764,11 @@ class GameScene extends Phaser.Scene {
   ) {
     heart.disableBody(true, true);
     model.curLvlScore += 50;
-    this.lives.setText(`LIVES : ${"❤️".repeat(++model.lives)}`);
+    const livesText =
+      ++model.lives <= 5
+        ? `LIVES :  ${"❤️".repeat(model.lives)}`
+        : `LIVES: ❤️ x${model.lives}`;
+    this.lives.setText(livesText);
 
     // scoreText.setText('Score: ' + score);
   }
