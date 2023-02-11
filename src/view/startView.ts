@@ -84,6 +84,8 @@ export class StartView {
     const footerlinks: NodeListOf<HTMLDivElement> =
       document.querySelectorAll(".footer-link");
 
+
+
     document.addEventListener("keyup", async function foo(e) {
 
       function clearStyles() {
