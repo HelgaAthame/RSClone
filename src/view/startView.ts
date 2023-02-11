@@ -9,10 +9,10 @@ import { gameScene } from "../phaser.js";
 import "./startView.scss";
 
 export class StartView {
-  constructor () {
+  constructor() {
     this.phaser;
   }
-  phaser: { gameScene: any; }
+  phaser: { gameScene: any };
   renderUI() {
     const main = document.createElement("main");
     main.classList.add("main");
@@ -90,10 +90,8 @@ export class StartView {
     const footerlinks: NodeListOf<HTMLDivElement> =
       document.querySelectorAll(".footer-link");
 
-
-
     document.addEventListener("keydown", async function foo(e) {
-      console.log('сработал event listener na key');
+      console.log("сработал event listener na key");
       function clearStyles() {
         navs.forEach((article) => {
           article.classList.remove("active");
@@ -145,11 +143,11 @@ export class StartView {
               if (canvas) canvas.style.display = "initial";
               if (!view.start.phaser) {
                 console.log(view.start.phaser);
-                console.log('нет  фазера');
+                console.log("нет  фазера");
                 view.start.phaser = await import("../phaser.js");
               } else {
                 console.log(view.start.phaser);
-                console.log('есть!  фазер');
+                console.log("есть!  фазер");
                 model.resetGame();
                 console.log(model.enemyCounter);
                 view.start.phaser.gameScene.restartGame();
@@ -171,6 +169,7 @@ export class StartView {
             case "Continue":
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
+              gameScene.scene.resume();
               model.gameOver = false;
               pauseBGAudio();
               break;
