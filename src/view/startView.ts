@@ -1,3 +1,5 @@
+
+import { firebase } from '../firebase/firebase.js';
 import { doc } from "firebase/firestore";
 import GithubLogo from "../assets/logos/github.png";
 import RsschoolLogo from "../assets/logos/logo-rs.svg";
@@ -17,6 +19,7 @@ export class StartView {
       </section>
     `;
     document.body.prepend(main);
+    firebase.googleAuth();
     this.addAudio();
   }
 
@@ -112,20 +115,19 @@ export class StartView {
           if (k < footerlinks.length - 1) k++;
           footerlinks[k].classList.add("active");
           break;
-        case "Enter":
-          const selected = selectorChecker(document, ".active") as HTMLElement;
-          switch (selected.innerHTML) {
-            case "start":
-              const canvas = document.querySelector(
-                "canvas"
-              ) as HTMLCanvasElement;
-              if (canvas) canvas.style.display = "initial";
-              const phaser = await import("../phaser.js");
-              if (model.gameOver) phaser.gameScene.changeGameOver();
-              const bgAudio = selectorChecker(
-                document,
-                ".bgAudio"
-              ) as HTMLAudioElement;
+
+        case 'Enter':
+          const selected = selectorChecker(document, '.active') as HTMLElement;
+           switch (selected.innerHTML) {
+            case 'start':
+
+              //model.takeFromBD.call(model);
+              const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+              if (canvas) canvas.style.display = 'initial';
+              const phaser = await import('../phaser.js');
+              if (phaser.gameOver) phaser.changeGameOver();
+              const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+
               bgAudio.pause();
               break;
             case "continue":

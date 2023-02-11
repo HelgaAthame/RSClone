@@ -1,7 +1,6 @@
 import selectorChecker from './../utils/selectorChecker.js';
 
-import { app } from './../firebase-config.js';
-
+import { firebaseConfig } from '../firebase-config.js';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -13,6 +12,7 @@ import {
   signInWithEmailAndPassword,
   signInWithRedirect,
   getRedirectResult,
+  Auth,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -36,16 +36,57 @@ import {
 } from 'firebase/storage';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { getPerformance } from 'firebase/performance';
+import { model } from '../model/index.js';
 
-/*const firebaseAppConfig = getFirebaseConfig();
-initializeApp(firebaseAppConfig);*/
 
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 auth.languageCode = 'it';
 
+export const db = getFirestore(app);
+
+class Firebase {
+  auth: Auth;
+  provider: GoogleAuthProvider;
+
+  constructor (auth: Auth, provider: GoogleAuthProvider) {
+    this.auth = auth;
+    this.provider = provider;
+  }
+
+  googleAuth () {
+    document.addEventListener('keyup', function func () {
+      signInWithPopup(auth, provider)
+      .then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      model.uid = user.uid;
+      console.log(model.uid);
+      // ...
+    }).catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+    }).then(()=> {
+      document.removeEventListener('keyup', func);
+    });
+    //alert('user created!');
+    });
+  }
+}
+
+export const firebase = new Firebase (auth, provider);
 /*signInWithPopup(auth, provider)
   .then((result) => {
     // This gives you a Google Access Token. You can use it to access the Google API.
@@ -116,8 +157,9 @@ auth.languageCode = 'it';
     // An error happened.
   });*/
 
-  const myTestDiv = selectorChecker(document, '.my-test-div') as HTMLElement;
-  myTestDiv.addEventListener('click', () => {
+  //const myTestDiv = selectorChecker(document, '.begin__text') as HTMLElement;
+  /*document.addEventListener('keyup', function func () {
+    alert('сработал нужный обработчик')
     signInWithPopup(auth, provider)
     .then((result) => {
     // This gives you a Google Access Token. You can use it to access the Google API.
@@ -125,6 +167,7 @@ auth.languageCode = 'it';
     const token = credential?.accessToken;
     // The signed-in user info.
     const user = result.user;
+    console.log(user);
     // ...
   }).catch((error) => {
     // Handle Errors here.
@@ -135,6 +178,8 @@ auth.languageCode = 'it';
     // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
     // ...
+  }).then(()=> {
+    document.removeEventListener('keyup', func);
   });
   alert('user created!');
-  });
+  });*/
