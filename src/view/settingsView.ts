@@ -133,6 +133,14 @@ export class SettingsView {
       view.start.renderStartScreen();
     })
   }*/
+  findKey(val: string) {
+    const entries = Object.entries(keysObject);
+    const ourEntry = entries.find(entry => entry[1] === val);
+    if (ourEntry) {
+      if (ourEntry[0].length === 1) return `Key${ourEntry[0]}`;
+      return ourEntry[0];
+    }
+  }
 
   moveMenu() {
     let i = 0; //number of the first element in nav menu to be selected
@@ -154,6 +162,8 @@ export class SettingsView {
         saveButton.classList.remove("active");
       }
 
+      console.log(view.settings.findKey(model.buttons.arrowUp))
+      console.log(e.code)
       switch (e.code) {
         case "Escape":
           if (model.isGamePaused) {
@@ -168,14 +178,17 @@ export class SettingsView {
             phaser.gameScene.stageMusic.resume();
           }
 
-        case "ArrowUp":
+        case view.settings.findKey(model.buttons.arrowUp):
+          console.log('arraow app is')
           clearStyles();
           if (i > 0) i--;
           signs[i].classList.add("active");
           keys[i].classList.add("blink");
           ourTarget = keys[i];
           break;
-        case "ArrowDown":
+        case view.settings.findKey(model.buttons.arrowDown):
+
+        console.log('arraow down is')
           clearStyles();
           if (i < signs.length) i++;
           if (i < signs.length) {
@@ -186,7 +199,7 @@ export class SettingsView {
             saveButton.classList.add("active");
           }
           break;
-        case "Enter":
+        case view.settings.findKey(model.buttons.start):
           if (saveButton.classList.contains("active")) {
             model.buttons = {
               arrowUp: keys[0].innerHTML as "UP",
@@ -198,13 +211,16 @@ export class SettingsView {
               select: keys[6].innerHTML as "SHIFT",
               start: keys[7].innerHTML as "ENTER",
             };
-            document.removeEventListener("keyup", f);
+            document.removeEventListener("keydown", f);
             view.start.renderStartScreen();
           }
         default:
           const val = e.code.startsWith("Key") ? e.code.slice(3) : e.code;
-          const comparedVal = keysObject[val];
+          if (val) {
+            const comparedVal = keysObject[val];
+
           if (ourTarget) ourTarget.textContent = comparedVal;
+          }
       }
     });
   }
