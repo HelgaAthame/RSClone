@@ -119,7 +119,7 @@ export class StartView {
         case "Enter":
           const selected = selectorChecker(document, ".active") as HTMLElement;
           switch (selected.innerHTML) {
-            case "start":
+            case "Start":
               //model.takeFromBD.call(model);
               const canvas = document.querySelector(
                 "canvas"
@@ -134,9 +134,9 @@ export class StartView {
 
               bgAudio.pause();
               break;
-            case "continue":
+            case "Continue":
               break;
-            case "settings":
+            case "Settings":
               view.settings.renderUI();
               break;
             case "Olga":
