@@ -36,6 +36,7 @@ import {
 } from 'firebase/storage';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { getPerformance } from 'firebase/performance';
+import { model } from '../model/index.js';
 
 
 const provider = new GoogleAuthProvider();
@@ -44,6 +45,8 @@ provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 auth.languageCode = 'it';
+
+export const db = getFirestore(app);
 
 class Firebase {
   auth: Auth;
@@ -56,7 +59,6 @@ class Firebase {
 
   googleAuth () {
     document.addEventListener('keyup', function func () {
-      alert('сработал нужный обработчик')
       signInWithPopup(auth, provider)
       .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
@@ -64,7 +66,8 @@ class Firebase {
       const token = credential?.accessToken;
       // The signed-in user info.
       const user = result.user;
-      console.log(user);
+      model.uid = user.uid;
+      console.log(model.uid);
       // ...
     }).catch((error) => {
       // Handle Errors here.
@@ -78,7 +81,7 @@ class Firebase {
     }).then(()=> {
       document.removeEventListener('keyup', func);
     });
-    alert('user created!');
+    //alert('user created!');
     });
   }
 }

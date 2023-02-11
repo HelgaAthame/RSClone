@@ -2,6 +2,7 @@ import { doc } from 'firebase/firestore';
 import GithubLogo from '../assets/logos/github.png';
 import RsschoolLogo from '../assets/logos/logo-rs.svg';
 import { firebase } from '../firebase/firebase.js';
+import { model } from '../model/index.js';
 import selectorChecker from '../utils/selectorChecker.js';
 import { view } from './index.js';
 import './startView.scss';
@@ -115,6 +116,8 @@ export class StartView {
           const selected = selectorChecker(document, '.active') as HTMLElement;
            switch (selected.innerHTML) {
             case 'start':
+
+              model.takeFromBD.call(model);
               const canvas = document.querySelector('canvas') as HTMLCanvasElement;
               if (canvas) canvas.style.display = 'initial';
               const phaser = await import('../phaser.js');
