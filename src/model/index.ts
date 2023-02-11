@@ -20,7 +20,7 @@ export class Model {
     this.curLvlEnemies = 3;
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
-    this.curLvlScore = 0;    
+    this.curLvlScore = 0;
     this.uid = '';
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
@@ -49,6 +49,7 @@ export class Model {
     this.escIsPressed = false;
   }
 
+  enemies: number;
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
   charSpeed: number;
@@ -102,6 +103,7 @@ export class Model {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
+  }
 
   resetGame() {
     this.score = 0;
