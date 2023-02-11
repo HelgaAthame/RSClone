@@ -2,9 +2,10 @@ import { model } from "../model/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import "./winview.scss";
+import { gameScene } from "../phaser.js";
 
 export class WinView {
-  renderUI(context: this) {
+  renderUI(context: typeof gameScene) {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     canvas.style.display = "none";
 
@@ -21,7 +22,7 @@ export class WinView {
     this.addListeners(context);
   }
 
-  addListeners(context: this) {
+  addListeners(context: typeof gameScene) {
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
         model.level++;
