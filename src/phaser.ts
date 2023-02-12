@@ -301,7 +301,7 @@ class GameScene extends Phaser.Scene {
       style
     );
     this.add.text(
-      textStartX + 9 * fieldSquareLength,
+      textStartX + 8.5 * fieldSquareLength,
       textStartY,
       `LEVEL : ${model.level}`,
       style
