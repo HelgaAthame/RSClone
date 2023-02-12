@@ -5,14 +5,16 @@ import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import { model } from "../model/index.js";
-import { gameScene } from "../phaser.js";
+//import { gameScene } from "../phaser.js";
 import "./startView.scss";
 
 export class StartView {
   constructor() {
     this.phaser;
+    this.gameScene;
   }
   phaser: { gameScene: any };
+  gameScene: any;
   renderUI() {
     const main = document.createElement("main");
     main.classList.add("main");
@@ -66,6 +68,8 @@ export class StartView {
     //this.addSettingsListener();
     this.moveMenu();
   }
+
+  // listeners to click bellow
 
   /*addStartListener () {
     const start = selectorChecker(document, '.start');
@@ -172,7 +176,10 @@ export class StartView {
             case "Continue":
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
-              gameScene.scene.resume();
+              if (view.start.phaser) {
+                view.start.gameScene = view.start.phaser.gameScene;
+              }
+              view.start.gameScene.scene.resume();
               model.gameOver = false;
               pauseBGAudio();
               break;
