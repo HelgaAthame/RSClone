@@ -301,7 +301,7 @@ class GameScene extends Phaser.Scene {
       style
     );
     this.add.text(
-      textStartX + 9 * fieldSquareLength,
+      textStartX + 8.5 * fieldSquareLength,
       textStartY,
       `LEVEL : ${model.level}`,
       style
@@ -369,7 +369,7 @@ class GameScene extends Phaser.Scene {
     const keyESC = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
     );
-    console.log(model.escIsPressed);
+
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       model.isGamePaused = true;
       model.escIsPressed = true;

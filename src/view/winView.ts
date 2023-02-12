@@ -12,7 +12,7 @@ export class WinView {
     const main = selectorChecker(document, "main");
     main.innerHTML = `
       <section class="welcome-meaasge">
-        LEVEL ${model.level} COMPLETED !
+        LEVEL ${model.level++} COMPLETED !
       </section>
       <section class="win-text">
         <article class="win-enter">press ENTER to continue</article>
@@ -24,19 +24,28 @@ export class WinView {
   }
 
   addListeners(/*context: typeof gameScene*/) {
-    alert('adding listeners');
+
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
-        model.level++;
+        //model.level++;
+        const main = selectorChecker(document, "main");
+        main.innerHTML = `
+          <div class="begin">LEVEL ${model.level}</div>
+        `;
         const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-        canvas.style.display = "initial";
-        document.removeEventListener("keydown", callback);
-        view.start.phaser.gameScene.restartScene();
+        setTimeout(async () => {
+          canvas.style.display = "initial";
+          document.removeEventListener("keydown", callback);
+          view.start.phaser.gameScene.restartScene();
+        }, 3000);
+
       }
       if (e.code === "Esc") {
+        document.removeEventListener("keydown", callback);
         view.start.renderUI();
       }
     };
+
     document.addEventListener("keydown", callback);
   }
 }
