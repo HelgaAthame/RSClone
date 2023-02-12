@@ -1,5 +1,5 @@
-import { firebase } from "../firebase/firebase.js";
-import { doc } from "firebase/firestore";
+import { db, firebase } from "../firebase/firebase.js";
+import { doc, getDoc } from "firebase/firestore";
 import GithubLogo from "../assets/logos/github.png";
 import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
@@ -63,17 +63,20 @@ export class StartView {
     this.addListeners();
   }
 
-  addListeners() {
+  async addListeners() {
     //this.addStartListener();
     //this.addSettingsListener();
-    this.continueButton();
+    await this.continueButton();
     this.moveMenu();
   }
 
 
-  continueButton() {
+  async continueButton() {
     const continueButton = selectorChecker(document, '.continue') as HTMLDivElement;
-    continueButton.style.display = model.fieldMatrix && model.uid? 'initial': 'none';
+    const docRef = doc(db, "users", model.uid);
+    const docSnap = await getDoc(docRef);
+    alert( docSnap.exists())
+    continueButton.style.display = docSnap.exists() && model.uid? 'initial': 'none';
   }
 
 
@@ -167,23 +170,13 @@ export class StartView {
                 console.log(model.enemyCounter);
                 view.start.phaser.gameScene.restartGame();
               }
-              //view.start.phaser = await import("../phaser.js");
-              //if (model.gameOver) phaser.gameScene.changeGameOver();
-              /*if (view.start.phaser && view.start.phaser.gameScene) {
-                console.log(view.start.phaser);
-                console.log('есть!  фазер');
-                model.resetGame();
-                //setTimeout(() => {phaser.gameScene.restartGame();}, 10);
-                console.log(model.enemyCounter);
-                //model.enemyCounter = 3;
-                //alert(model.enemyCounter);
-                view.start.phaser.gameScene.restartGame();
-              }*/
+
               pauseBGAudio();
               break;
             case "Continue":
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
+              if (!view.start.phaser) view.start.phaser = await import("../phaser.js");
               if (view.start.phaser) {
                 view.start.gameScene = view.start.phaser.gameScene;
               }

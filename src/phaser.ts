@@ -379,7 +379,8 @@ class GameScene extends Phaser.Scene {
         setTimeout(() => {
           this.charStepSound.stop();
         }, 0);
-        model.fieldMatrix = fieldMatrix; //save field state
+        model.fieldMatrix = fieldMatrix;
+        model.saveToBd();//save field state
       }
 
       setTimeout(() => (model.escIsPressed = false), 300);

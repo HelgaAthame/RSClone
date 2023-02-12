@@ -20,6 +20,7 @@ export class WinView {
       </section>
     `;
     this.addListeners(context);
+    model.saveToBd();
   }
 
   addListeners(context: typeof gameScene) {
