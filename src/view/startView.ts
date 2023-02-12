@@ -30,7 +30,7 @@ export class StartView {
       <article class="start article active">Start</article>
       <article class="continue article">Continue</article>
       <article class="settings article">Settings</article>
-      <article class="settings article">Leaderbord</article>
+      <article class="settings article">Leaderboard</article>
     </nav>
     <footer class="footer">
       <section class="github">
@@ -139,6 +139,9 @@ export class StartView {
             case "Settings":
               view.settings.renderUI();
               break;
+            case "Leaderboard":
+              view.scores.renderUI();
+              break;
             case "Olga":
               selected.click();
               break;
@@ -173,7 +176,7 @@ export class StartView {
       if (loaded === false && e.code === "Enter") {
         beginText.classList.remove("active");
         loaded = true;
-        bgAudio.play();
+        //bgAudio.play();
 
         this.renderStartScreen();
       }
