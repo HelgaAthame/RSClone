@@ -68,4 +68,6 @@ export class ScoresView {
         </table>
         `;
   }
+
+  async getScores() {}
 }
