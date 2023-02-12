@@ -125,7 +125,6 @@ class GameScene extends Phaser.Scene {
     this.putBombSound = this.sound.add("putBomb", { loop: false });
     this.stageClearSound = this.sound.add("stageClear", { loop: false });
     this.stageMusic = this.sound.add("stageMusic", { loop: true });
-
     this.stageMusic.play();
 
     for (let i = 1; i <= ceilsNum; i++) {
@@ -588,7 +587,6 @@ class GameScene extends Phaser.Scene {
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
-    const flatFieldMatrix = fieldMatrix.flat();
     const isSuperBomb = bomb.texture.key === Bombs.SUPERBOMB;
     const nextX = x + fieldSquareLength;
     const prevX = x - fieldSquareLength;
@@ -605,6 +603,7 @@ class GameScene extends Phaser.Scene {
       this.handleTileExplosion(x, nextY);
       this.handleTileExplosion(x, prevY);
     }
+    this.tiltCamera();
   }
 
   handleTileExplosion = (x: number, y: number) => {
@@ -750,8 +749,6 @@ class GameScene extends Phaser.Scene {
       model.bombIsPlanting = true;
       this.putBombSound.play();
 
-      //const checkSquare =
-
       setTimeout(() => (model.bombIsPlanting = false), 500);
 
       const curBomb = setTimeout(() => {
@@ -869,7 +866,7 @@ class GameScene extends Phaser.Scene {
   ) {
     shield.disableBody(true, true);
     model.shieldActive = true;
-    char.setTint(0x50796375);
+    char.setTint(0x00ff00);
     this.updateItemsText();
   }
   collectSuperBomb(
@@ -891,6 +888,17 @@ class GameScene extends Phaser.Scene {
     this.itemsText.setText(
       `${model.shieldActive ? "🛡 " : ""}${model.superBombActive ? "💥 " : ""}`
     );
+  }
+  tiltCamera() {
+    const cam = this.cameras.main;
+    const tilt = setInterval(() => {
+      const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
+      cam.rotation += random;
+    }, 50);
+    setTimeout(() => {
+      clearInterval(tilt);
+      cam.rotation = 0;
+    }, 250);
   }
 }
 export const gameScene = new GameScene();
