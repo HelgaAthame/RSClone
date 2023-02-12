@@ -32,8 +32,6 @@ export class StartView {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
     if (canvas) canvas.style.display = "none";
-    //alert('render start screen');
-    //console.log(model.gameOver);
     const main = selectorChecker(document, "main");
     main.innerHTML = `
     <section class="logo"></section>
@@ -78,7 +76,7 @@ export class StartView {
     const continueButton = selectorChecker(document, '.continue') as HTMLDivElement;
     const docRef = doc(db, "users", model.uid);
     const docSnap = await getDoc(docRef);
-    //alert( docSnap.exists())
+
     continueButton.style.display = docSnap.exists() && model.uid? 'initial': 'none';
   }
 
@@ -126,7 +124,6 @@ export class StartView {
           ".bgAudio"
         ) as HTMLAudioElement;
         bgAudio.pause();
-        alert('bg audio should be stopped');
       }
       //console.log(e.code);
       switch (e.code) {
