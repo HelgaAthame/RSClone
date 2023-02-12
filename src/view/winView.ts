@@ -28,7 +28,7 @@ export class WinView {
         model.level++;
         const canvas = document.querySelector("canvas") as HTMLCanvasElement;
         canvas.style.display = "initial";
-        document.removeEventListener("keyup", callback);
+        document.removeEventListener("keydown", callback);
 
         const phaser = await import("../phaser.js");
         phaser.gameScene.restartScene.call(context);
@@ -37,6 +37,6 @@ export class WinView {
         view.start.renderUI();
       }
     };
-    document.addEventListener("keyup", callback);
+    document.addEventListener("keydown", callback);
   }
 }

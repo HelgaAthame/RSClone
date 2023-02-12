@@ -5,10 +5,16 @@ import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import { model } from "../model/index.js";
-import { gameScene } from "../phaser.js";
+//import { gameScene } from "../phaser.js";
 import "./startView.scss";
 
 export class StartView {
+  constructor() {
+    this.phaser;
+    this.gameScene;
+  }
+  phaser: { gameScene: any };
+  gameScene: any;
   renderUI() {
     const main = document.createElement("main");
     main.classList.add("main");
@@ -23,6 +29,11 @@ export class StartView {
   }
 
   renderStartScreen() {
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
+    if (canvas) canvas.style.display = "none";
+    //alert('render start screen');
+    console.log(model.gameOver);
     const main = selectorChecker(document, "main");
     main.innerHTML = `
     <section class="logo"></section>
@@ -30,7 +41,7 @@ export class StartView {
       <article class="start article active">Start</article>
       <article class="continue article">Continue</article>
       <article class="settings article">Settings</article>
-      <article class="settings article">Leaderbord</article>
+      <article class="settings article">Leaderboard</article>
     </nav>
     <footer class="footer">
       <section class="github">
@@ -58,6 +69,8 @@ export class StartView {
     this.moveMenu();
   }
 
+  // listeners to click bellow
+
   /*addStartListener () {
     const start = selectorChecker(document, '.start');
     start.addEventListener('click', async () => {
@@ -84,7 +97,8 @@ export class StartView {
     const footerlinks: NodeListOf<HTMLDivElement> =
       document.querySelectorAll(".footer-link");
 
-    document.addEventListener("keyup", async function foo(e) {
+    document.addEventListener("keydown", async function foo(e) {
+      console.log("сработал event listener na key");
       function clearStyles() {
         navs.forEach((article) => {
           article.classList.remove("active");
@@ -94,6 +108,15 @@ export class StartView {
         });
       }
 
+      function pauseBGAudio() {
+        const bgAudio = selectorChecker(
+          document,
+          ".bgAudio"
+        ) as HTMLAudioElement;
+
+        bgAudio.pause();
+      }
+      //console.log(e.code);
       switch (e.code) {
         case "ArrowUp":
           clearStyles();
@@ -118,27 +141,57 @@ export class StartView {
 
         case "Enter":
           const selected = selectorChecker(document, ".active") as HTMLElement;
+          const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
+          //let phaser: { gameScene: any; };
           switch (selected.innerHTML) {
             case "Start":
               //model.takeFromBD.call(model);
-              const canvas = document.querySelector(
-                "canvas"
-              ) as HTMLCanvasElement;
               if (canvas) canvas.style.display = "initial";
-              const phaser = await import("../phaser.js");
-              if (model.gameOver) phaser.gameScene.changeGameOver();
-              const bgAudio = selectorChecker(
-                document,
-                ".bgAudio"
-              ) as HTMLAudioElement;
-
-              bgAudio.pause();
+              if (!view.start.phaser) {
+                console.log(view.start.phaser);
+                console.log("нет  фазера");
+                view.start.phaser = await import("../phaser.js");
+              } else {
+                console.log(view.start.phaser);
+                console.log("есть!  фазер");
+                model.resetGame();
+                console.log(model.enemyCounter);
+                view.start.phaser.gameScene.restartGame();
+              }
+              //view.start.phaser = await import("../phaser.js");
+              //if (model.gameOver) phaser.gameScene.changeGameOver();
+              /*if (view.start.phaser && view.start.phaser.gameScene) {
+                console.log(view.start.phaser);
+                console.log('есть!  фазер');
+                model.resetGame();
+                //setTimeout(() => {phaser.gameScene.restartGame();}, 10);
+                console.log(model.enemyCounter);
+                //model.enemyCounter = 3;
+                //alert(model.enemyCounter);
+                view.start.phaser.gameScene.restartGame();
+              }*/
+              pauseBGAudio();
               break;
             case "Continue":
+              model.takeFromBD.call(model);
+              if (canvas) canvas.style.display = "initial";
+              if (view.start.phaser) {
+                view.start.gameScene = view.start.phaser.gameScene;
+              }
+              view.start.gameScene.scene.resume();
+              model.gameOver = false;
+              pauseBGAudio();
               break;
+              
             case "Settings":
               view.settings.renderUI();
               break;
+              
+            case "Leaderboard":
+              view.settings.renderUI();
+              break;
+              
             case "Olga":
               selected.click();
               break;
@@ -152,7 +205,7 @@ export class StartView {
               selected.click();
               break;
           }
-          document.removeEventListener("keyup", foo);
+          document.removeEventListener("keydown", foo);
           break;
       }
     });
@@ -168,7 +221,7 @@ export class StartView {
 
     const beginText = selectorChecker(document, ".begin__text");
 
-    document.addEventListener("keyup", (e) => {
+    document.addEventListener("keydown", (e) => {
       beginText.classList.add("active");
       if (loaded === false && e.code === "Enter") {
         beginText.classList.remove("active");

@@ -58,7 +58,7 @@ class Firebase {
   }
 
   googleAuth () {
-    document.addEventListener('keyup', function func () {
+    document.addEventListener('keydown', function func () {
       signInWithPopup(auth, provider)
       .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
@@ -79,7 +79,7 @@ class Firebase {
       const credential = GoogleAuthProvider.credentialFromError(error);
       // ...
     }).then(()=> {
-      document.removeEventListener('keyup', func);
+      document.removeEventListener('keydown', func);
     });
     //alert('user created!');
     });
