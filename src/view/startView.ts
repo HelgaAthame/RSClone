@@ -27,6 +27,9 @@ export class StartView {
   }
 
   renderStartScreen() {
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
+    if (canvas) canvas.style.display = "none";
     //alert('render start screen');
     console.log(model.gameOver);
     const main = selectorChecker(document, "main");
@@ -111,7 +114,7 @@ export class StartView {
 
         bgAudio.pause();
       }
-      console.log(e.code);
+      //console.log(e.code);
       switch (e.code) {
         case "ArrowUp":
           clearStyles();

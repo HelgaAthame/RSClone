@@ -161,7 +161,7 @@ export class SettingsView {
         });
         saveButton.classList.remove("active");
       }
-      console.log(e.code);
+      //console.log(e.code);
       switch (e.code) {
         case "Escape":
           console.log('escape pressed');
