@@ -25,7 +25,7 @@ export class StartView {
     `;
     document.body.prepend(main);
     firebase.googleAuth();
-    this.addAudio();
+    //this.addAudio();
   }
 
   renderStartScreen() {
@@ -33,7 +33,7 @@ export class StartView {
 
     if (canvas) canvas.style.display = "none";
     //alert('render start screen');
-    console.log(model.gameOver);
+    //console.log(model.gameOver);
     const main = selectorChecker(document, "main");
     main.innerHTML = `
     <section class="logo"></section>
@@ -78,7 +78,6 @@ export class StartView {
     //alert( docSnap.exists())
     continueButton.style.display = docSnap.exists() && model.uid? 'initial': 'none';
   }
-
 
   // listeners to click bellow
 
@@ -158,29 +157,38 @@ export class StartView {
           switch (selected.innerHTML) {
             case "Start":
               //model.takeFromBD.call(model);
+
+            const main = selectorChecker(document, "main");
+            main.innerHTML = `
+              <div class="begin">LEVEL ${model.level}</div>
+            `;
+            setTimeout(async () => {
               if (canvas) canvas.style.display = "initial";
               if (!view.start.phaser) {
-                console.log(view.start.phaser);
-                console.log("нет  фазера");
                 view.start.phaser = await import("../phaser.js");
               } else {
-                console.log(view.start.phaser);
-                console.log("есть!  фазер");
                 model.resetGame();
-                console.log(model.enemyCounter);
                 view.start.phaser.gameScene.restartGame();
               }
-
               pauseBGAudio();
-              break;
+            }, 3000);
+            break;
+
             case "Continue":
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
-              if (!view.start.phaser) view.start.phaser = await import("../phaser.js");
               if (view.start.phaser) {
                 view.start.gameScene = view.start.phaser.gameScene;
+                view.start.gameScene.scene.resume();
               }
-              view.start.gameScene.scene.resume();
+              if (!view.start.phaser) {
+
+                model.enemyCounter = model.level +2;
+                view.start.phaser = await import("../phaser.js");
+              }
+
+              console.log(`model.enemyCounter = ${model.enemyCounter}`);
+              console.log(`model.curLvlEnemies = ${model.curLvlEnemies}`);
               model.escIsPressed = false;
               model.gameOver = false;
               pauseBGAudio();

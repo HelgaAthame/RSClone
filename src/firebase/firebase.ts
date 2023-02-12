@@ -37,6 +37,7 @@ import {
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { getPerformance } from "firebase/performance";
 import { model } from "../model/index.js";
+import { view } from "../view/index.js";
 
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
@@ -81,6 +82,7 @@ class Firebase {
         })
         .then(() => {
           document.removeEventListener("keydown", func);
+          view.start.addAudio();
         });
       //alert('user created!');
     });
