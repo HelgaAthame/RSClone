@@ -25,6 +25,8 @@ export class Model {
   userName: string;
   gameOver: boolean;
   bombActive: boolean;
+  superBombActive: boolean;
+  shieldActive: boolean;
   maxBombs: number;
   bombIsPlanting: boolean;
   isGamePaused: boolean;
@@ -59,6 +61,8 @@ export class Model {
     this.gameOver = false;
     this.maxBombs = 2;
     this.bombIsPlanting = false;
+    this.superBombActive = false;
+    this.shieldActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
   }
