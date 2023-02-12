@@ -61,6 +61,9 @@ export class StartView {
     </footer>
   `;
     this.addListeners();
+
+    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+    bgAudio.play();
   }
 
   async addListeners() {
@@ -108,7 +111,6 @@ export class StartView {
       document.querySelectorAll(".footer-link");
 
     document.addEventListener("keydown", async function foo(e) {
-      console.log("сработал event listener na key");
       function clearStyles() {
         navs.forEach((article) => {
           article.classList.remove("active");
@@ -123,8 +125,8 @@ export class StartView {
           document,
           ".bgAudio"
         ) as HTMLAudioElement;
-
         bgAudio.pause();
+        alert('bg audio should be stopped');
       }
       //console.log(e.code);
       switch (e.code) {
@@ -158,6 +160,8 @@ export class StartView {
             case "Start":
               //model.takeFromBD.call(model);
 
+            pauseBGAudio();
+
             const main = selectorChecker(document, "main");
             main.innerHTML = `
               <div class="begin">LEVEL ${model.level}</div>
@@ -170,11 +174,13 @@ export class StartView {
                 model.resetGame();
                 view.start.phaser.gameScene.restartGame();
               }
-              pauseBGAudio();
             }, 3000);
             break;
 
             case "Continue":
+
+            pauseBGAudio();
+
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
               if (view.start.phaser) {
@@ -191,7 +197,6 @@ export class StartView {
               console.log(`model.curLvlEnemies = ${model.curLvlEnemies}`);
               model.escIsPressed = false;
               model.gameOver = false;
-              pauseBGAudio();
               break;
 
             case "Settings":
@@ -220,12 +225,17 @@ export class StartView {
   }
 
   addAudio() {
-    let loaded = false;
-    const bgAudio = new Audio("../src/assets/sounds/title-screen.mp3");
-    bgAudio.classList.add("bgAudio");
-    bgAudio.loop = true;
-    bgAudio.volume = 0.5;
-    document.body.append(bgAudio);
+
+    const bgAudio = document.querySelector('.bgAudio');
+    let loaded: boolean;
+    if (!bgAudio) {
+      loaded = false;
+      const bgAudio = new Audio("../src/assets/sounds/title-screen.mp3");
+      bgAudio.classList.add("bgAudio");
+      bgAudio.loop = true;
+      bgAudio.volume = 0.5;
+      document.body.append(bgAudio);
+    }
 
     const beginText = selectorChecker(document, ".begin__text");
 
