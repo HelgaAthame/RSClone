@@ -1,21 +1,21 @@
-import selectorChecker from "./../utils/selectorChecker.js";
+//import selectorChecker from "./../utils/selectorChecker.js";
 
 import { firebaseConfig } from "../firebase-config.js";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
-  onAuthStateChanged,
+  /*onAuthStateChanged,*/
   GoogleAuthProvider,
   signInWithPopup,
-  signOut,
+  /*signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithRedirect,
-  getRedirectResult,
+  getRedirectResult,*/
   Auth,
 } from "firebase/auth";
 import {
-  getFirestore,
+  getFirestore/*,
   collection,
   addDoc,
   query,
@@ -26,16 +26,16 @@ import {
   updateDoc,
   doc,
   serverTimestamp,
-  documentId,
+  documentId,*/
 } from "firebase/firestore";
-import {
+/*import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
-import { getPerformance } from "firebase/performance";
+import { getPerformance } from "firebase/performance";*/
 import { model } from "../model/index.js";
 import { view } from "../view/index.js";
 
@@ -63,22 +63,22 @@ class Firebase {
       signInWithPopup(auth, provider)
         .then((result) => {
           // This gives you a Google Access Token. You can use it to access the Google API.
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          const token = credential?.accessToken;
+          //const credential = GoogleAuthProvider.credentialFromResult(result);
+          //const token = credential?.accessToken;
           // The signed-in user info.
           const user = result.user;
           model.uid = user.uid;
           model.userName = user.displayName as string;
           // ...
         })
-        .catch((error) => {
+        .catch((/*error*/) => {
           // Handle Errors here.
-          const errorCode = error.code;
-          const errorMessage = error.message;
+          //const errorCode = error.code;
+          //const errorMessage = error.message;
           // The email of the user's account used.
-          const email = error.customData.email;
+          //const email = error.customData.email;
           // The AuthCredential type that was used.
-          const credential = GoogleAuthProvider.credentialFromError(error);
+          //const credential = GoogleAuthProvider.credentialFromError(error);
           // ...
         })
         .then(() => {

@@ -1,6 +1,5 @@
-import { model } from "../model/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
-import { view } from "./index.js";
+//import { view } from "./index.js";
 import { db } from "../firebase-config.js";
 import { DocumentData, collection, getDocs } from "firebase/firestore";
 import "./scoresView.scss";
@@ -10,7 +9,7 @@ export class ScoresView {
     const main = selectorChecker(document, "main");
 
     const userDataRow = (await this.getUsers()).map((user, index) => {
-      return `            
+      return `
         <tr>
             <td>${index + 1}</td>
             <td>${user.userName}</td>

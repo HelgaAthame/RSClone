@@ -133,12 +133,14 @@ export class SettingsView {
       view.start.renderStartScreen();
     })
   }*/
-  findKey(val: string) {
+  findKey(val: string): string {
     const entries = Object.entries(keysObject);
     const ourEntry = entries.find(entry => entry[1] === val);
     if (ourEntry) {
       if (ourEntry[0].length === 1) return `Key${ourEntry[0]}`;
       return ourEntry[0];
+    } else {
+      return '';
     }
   }
 

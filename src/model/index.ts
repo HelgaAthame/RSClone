@@ -1,7 +1,7 @@
 import FieldSquare from "../utils/fieldSquare.js";
-import selectorChecker from "../utils/selectorChecker.js";
+//import selectorChecker from "../utils/selectorChecker.js";
 import { db } from "../firebase-config.js";
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 import { Buttons } from "../utils/buttons.js";
 
 export class Model {
