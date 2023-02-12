@@ -692,6 +692,7 @@ class GameScene extends Phaser.Scene {
     this.drawGameOver();
   }
   restartGame() {
+    model.saveToBd();
     model.resetGame();
     setTimeout(() => {
       model.gameOver = false;

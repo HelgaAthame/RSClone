@@ -67,7 +67,7 @@ export class Model {
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
-      score: this.score,
+      score: this.curLvlScore + this.score,
       isMuted: this.isMuted,
       volume: this.volume,
       buttons: this.buttons,

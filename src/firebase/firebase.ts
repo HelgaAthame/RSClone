@@ -1,7 +1,7 @@
-import selectorChecker from './../utils/selectorChecker.js';
+import selectorChecker from "./../utils/selectorChecker.js";
 
-import { firebaseConfig } from '../firebase-config.js';
-import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from "../firebase-config.js";
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   onAuthStateChanged,
@@ -13,7 +13,7 @@ import {
   signInWithRedirect,
   getRedirectResult,
   Auth,
-} from 'firebase/auth';
+} from "firebase/auth";
 import {
   getFirestore,
   collection,
@@ -27,24 +27,23 @@ import {
   doc,
   serverTimestamp,
   documentId,
-} from 'firebase/firestore';
+} from "firebase/firestore";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
-} from 'firebase/storage';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { getPerformance } from 'firebase/performance';
-import { model } from '../model/index.js';
-
+} from "firebase/storage";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getPerformance } from "firebase/performance";
+import { model } from "../model/index.js";
 
 const provider = new GoogleAuthProvider();
-provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-auth.languageCode = 'it';
+auth.languageCode = "it";
 
 export const db = getFirestore(app);
 
@@ -52,41 +51,43 @@ class Firebase {
   auth: Auth;
   provider: GoogleAuthProvider;
 
-  constructor (auth: Auth, provider: GoogleAuthProvider) {
+  constructor(auth: Auth, provider: GoogleAuthProvider) {
     this.auth = auth;
     this.provider = provider;
   }
 
-  googleAuth () {
-    document.addEventListener('keydown', function func () {
+  googleAuth() {
+    document.addEventListener("keydown", function func() {
       signInWithPopup(auth, provider)
-      .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential?.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      model.uid = user.uid;
-      console.log(model.uid);
-      // ...
-    }).catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-    }).then(()=> {
-      document.removeEventListener('keydown', func);
-    });
-    //alert('user created!');
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential?.accessToken;
+          // The signed-in user info.
+          const user = result.user;
+          model.uid = user.uid;
+          console.log(model.uid);
+          // ...
+        })
+        .catch((error) => {
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // The email of the user's account used.
+          const email = error.customData.email;
+          // The AuthCredential type that was used.
+          const credential = GoogleAuthProvider.credentialFromError(error);
+          // ...
+        })
+        .then(() => {
+          document.removeEventListener("keydown", func);
+        });
+      //alert('user created!');
     });
   }
 }
 
-export const firebase = new Firebase (auth, provider);
+export const firebase = new Firebase(auth, provider);
 /*signInWithPopup(auth, provider)
   .then((result) => {
     // This gives you a Google Access Token. You can use it to access the Google API.
@@ -157,8 +158,8 @@ export const firebase = new Firebase (auth, provider);
     // An error happened.
   });*/
 
-  //const myTestDiv = selectorChecker(document, '.begin__text') as HTMLElement;
-  /*document.addEventListener('keyup', function func () {
+//const myTestDiv = selectorChecker(document, '.begin__text') as HTMLElement;
+/*document.addEventListener('keyup', function func () {
     alert('сработал нужный обработчик')
     signInWithPopup(auth, provider)
     .then((result) => {
