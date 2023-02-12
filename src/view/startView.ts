@@ -66,8 +66,16 @@ export class StartView {
   addListeners() {
     //this.addStartListener();
     //this.addSettingsListener();
+    this.continueButton();
     this.moveMenu();
   }
+
+
+  continueButton() {
+    const continueButton = selectorChecker(document, '.continue') as HTMLDivElement;
+    continueButton.style.display = model.fieldMatrix && model.uid? 'initial': 'none';
+  }
+
 
   // listeners to click bellow
 
