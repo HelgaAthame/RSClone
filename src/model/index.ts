@@ -73,6 +73,20 @@ export class Model {
       volume: this.volume,
       buttons: this.buttons,
       fieldMatrix: JSON.stringify(this.fieldMatrix),
+      escIsPressed: this.escIsPressed,
+      bombIsPlanting: this.bombIsPlanting,
+      maxBombs: this.maxBombs,
+      activeBombs: this.activeBombs,
+      level: this.level,
+      enemySpeed: this.enemySpeed,
+      curTimer: this.curTimer,
+      curLvlTimer: this.curLvlTimer,
+      curLvlScore: this.curLvlScore,
+      bombSpeed: this.bombSpeed,
+      enemyCounter: this.enemyCounter,
+      curLvlEnemies: this.curLvlEnemies,
+      charSpeed: this.charSpeed,
+      gameOver: this.gameOver
     });
   }
 
@@ -90,6 +104,22 @@ export class Model {
       this.volume = data.volume;
       this.buttons = data.buttons;
       this.fieldMatrix = JSON.parse(data.fieldMatrix);
+
+      this.charSpeed = data.charSpeed;
+      this.curLvlEnemies = data.curLvlEnemies;
+      this.enemyCounter = data.enemyCounter;
+      this.bombSpeed = data.bombSpeed;
+      this.curLvlScore = data.curLvlScore;
+      this.curLvlTimer = data.curLvlTimer;
+      this.curTimer = data.curTimer;
+      this.uid = data.uid;
+      this.enemySpeed = data.enemySpeed;
+      this.level = data.level;
+      this.activeBombs = data.activeBombs;
+      this.gameOver = data.gameOver;
+      this.maxBombs = data.maxBombs;
+      this.bombIsPlanting = data.bombIsPlanting;
+      this.escIsPressed = data.escIsPressed;
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");

@@ -19,19 +19,19 @@ export class WinView {
         <article class="win-esc">press ESC to go to start menu</article>
       </section>
     `;
-    this.addListeners(context);
+    this.addListeners(/*context*/);
+    model.saveToBd();
   }
 
-  addListeners(context: typeof gameScene) {
+  addListeners(/*context: typeof gameScene*/) {
+    alert('adding listeners');
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
         model.level++;
         const canvas = document.querySelector("canvas") as HTMLCanvasElement;
         canvas.style.display = "initial";
         document.removeEventListener("keydown", callback);
-
-        const phaser = await import("../phaser.js");
-        phaser.gameScene.restartScene.call(context);
+        view.start.phaser.gameScene.restartScene();
       }
       if (e.code === "Esc") {
         view.start.renderUI();
