@@ -11,6 +11,8 @@ export class Model {
   enemySpeed: number;
   curLvlEnemies: number;
   enemyCounter: number;
+  curLvlTimer: number;
+  curTimer: number;
   bombSpeed: number;
   activeBombs: ReturnType<typeof setTimeout>[];
   lives: number;
@@ -33,6 +35,8 @@ export class Model {
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this.curLvlScore = 0;
+    this.curLvlTimer = 120;
+    this.curTimer = this.curLvlTimer;
     this.uid = "";
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
@@ -100,6 +104,7 @@ export class Model {
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this.enemySpeed = 80;
+    this.curTimer = this.curLvlTimer;
   }
 
   nextLvl() {
@@ -109,6 +114,8 @@ export class Model {
     if (this.bombSpeed > 1000) this.bombSpeed -= 100;
     if (this.enemySpeed < 200) this.enemySpeed += 20;
     if (this.level % 2 === 0) this.charSpeed += 5;
+    this.curLvlTimer += 20;
+    this.curTimer = this.curLvlTimer;
   }
 
   set isMuted(val: Boolean) {

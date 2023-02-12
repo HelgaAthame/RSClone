@@ -20,7 +20,7 @@ export class StartView {
     main.classList.add("main");
     main.innerHTML = `
       <section class="begin">
-        <article class="begin__text">START</article>
+        <p class="begin__text">START</p>
       </section>
     `;
     document.body.prepend(main);
@@ -183,12 +183,15 @@ export class StartView {
               model.gameOver = false;
               pauseBGAudio();
               break;
+              
             case "Settings":
               view.settings.renderUI();
               break;
+              
             case "Leaderboard":
               view.settings.renderUI();
               break;
+              
             case "Olga":
               selected.click();
               break;
