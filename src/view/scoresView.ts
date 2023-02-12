@@ -1,4 +1,3 @@
-import { model } from "../model/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import { db } from "../firebase-config.js";
@@ -24,10 +23,11 @@ export class ScoresView {
                 <th>Name</th>
                 <th>Score</th>
             </tr>
-            ${userDataRow.join("\n")}
+            ${userDataRow.join("")}
 
         </table>
         `;
+    this.backToMenu();
   }
 
   async getUsers() {
@@ -37,7 +37,17 @@ export class ScoresView {
       userData.push(doc.data());
     });
 
-    const userDataSortedByScore = userData.sort((a, b) => -(a.score - b.score));
-    return userDataSortedByScore;
+    const userDataSorted = userData.sort((a, b) => -(a.score - b.score));
+    const userDataCut = userDataSorted.slice(0, 10);
+    return userDataCut;
+  }
+
+  backToMenu() {
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Escape") {
+        view.start.renderStartScreen();
+        return;
+      }
+    });
   }
 }

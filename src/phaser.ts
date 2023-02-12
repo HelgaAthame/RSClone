@@ -519,6 +519,7 @@ class GameScene extends Phaser.Scene {
     if (model.lives) {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
+      model.saveToBd();
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
 
@@ -692,7 +693,6 @@ class GameScene extends Phaser.Scene {
     this.drawGameOver();
   }
   restartGame() {
-    model.saveToBd();
     model.resetGame();
     setTimeout(() => {
       model.gameOver = false;

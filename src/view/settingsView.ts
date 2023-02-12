@@ -135,7 +135,7 @@ export class SettingsView {
   }*/
   findKey(val: string) {
     const entries = Object.entries(keysObject);
-    const ourEntry = entries.find(entry => entry[1] === val);
+    const ourEntry = entries.find((entry) => entry[1] === val);
     if (ourEntry) {
       if (ourEntry[0].length === 1) return `Key${ourEntry[0]}`;
       return ourEntry[0];
@@ -161,10 +161,9 @@ export class SettingsView {
         });
         saveButton.classList.remove("active");
       }
-      //console.log(e.code);
       switch (e.code) {
         case "Escape":
-          console.log('escape pressed');
+          console.log("escape pressed");
           if (model.isGamePaused) {
             const canvas = document.querySelector(
               "canvas"
@@ -185,7 +184,6 @@ export class SettingsView {
           ourTarget = keys[i];
           break;
         case view.settings.findKey(model.buttons.arrowDown):
-
           clearStyles();
           if (i < signs.length) i++;
           if (i < signs.length) {
@@ -216,7 +214,7 @@ export class SettingsView {
           if (val) {
             const comparedVal = keysObject[val];
 
-          if (ourTarget) ourTarget.textContent = comparedVal;
+            if (ourTarget) ourTarget.textContent = comparedVal;
           }
       }
     });
