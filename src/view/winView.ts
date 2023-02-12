@@ -24,7 +24,7 @@ export class WinView {
   }
 
   addListeners(/*context: typeof gameScene*/) {
-    alert('adding listeners');
+
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
         model.level++;
