@@ -22,6 +22,7 @@ export class Model {
   _isMuted: Boolean;
   _volume: number;
   uid: string;
+  userName: string;
   gameOver: boolean;
   bombActive: boolean;
   maxBombs: number;
@@ -37,7 +38,6 @@ export class Model {
     this.curLvlScore = 0;
     this.curLvlTimer = 120;
     this.curTimer = this.curLvlTimer;
-    this.uid = "";
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
     this.level = 1;
@@ -67,6 +67,7 @@ export class Model {
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
+      userName: this.userName,
       score: this.curLvlScore + this.score,
       isMuted: this.isMuted,
       volume: this.volume,

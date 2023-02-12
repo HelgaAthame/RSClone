@@ -66,7 +66,7 @@ class Firebase {
           // The signed-in user info.
           const user = result.user;
           model.uid = user.uid;
-          console.log(model.uid);
+          model.userName = user.displayName as string;
           // ...
         })
         .catch((error) => {

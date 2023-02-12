@@ -2,14 +2,7 @@ import { model } from "../model/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import { db } from "../firebase-config.js";
-import {
-  DocumentData,
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-  getDocs,
-} from "firebase/firestore";
+import { DocumentData, collection, getDocs } from "firebase/firestore";
 import "./scoresView.scss";
 
 export class ScoresView {
@@ -20,7 +13,7 @@ export class ScoresView {
       return `            
         <tr>
             <td>${index + 1}</td>
-            <td>${user.uid}</td>
+            <td>${user.userName}</td>
             <td>${user.score}</td>
         </tr>`;
     });
