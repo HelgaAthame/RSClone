@@ -181,6 +181,7 @@ export class StartView {
                 view.start.gameScene = view.start.phaser.gameScene;
               }
               view.start.gameScene.scene.resume();
+              model.escIsPressed = false;
               model.gameOver = false;
               pauseBGAudio();
               break;

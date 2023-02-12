@@ -369,8 +369,8 @@ class GameScene extends Phaser.Scene {
     const keyESC = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
     );
-
-    if (keyESC.isDown && !model.escIsPressed) {
+    console.log(model.escIsPressed);
+    if (keyESC.isDown /*&& !model.escIsPressed*/) {
       model.isGamePaused = true;
       model.escIsPressed = true;
       if (model.isGamePaused) {
