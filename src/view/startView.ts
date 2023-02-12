@@ -75,7 +75,7 @@ export class StartView {
     const continueButton = selectorChecker(document, '.continue') as HTMLDivElement;
     const docRef = doc(db, "users", model.uid);
     const docSnap = await getDoc(docRef);
-    alert( docSnap.exists())
+    //alert( docSnap.exists())
     continueButton.style.display = docSnap.exists() && model.uid? 'initial': 'none';
   }
 

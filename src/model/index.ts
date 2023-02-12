@@ -73,7 +73,6 @@ export class Model {
       buttons: this.buttons,
       fieldMatrix: JSON.stringify(this.fieldMatrix),
       escIsPressed: this.escIsPressed,
-      isGamePaused: this.isGamePaused,
       bombIsPlanting: this.bombIsPlanting,
       maxBombs: this.maxBombs,
       activeBombs: this.activeBombs,
@@ -119,7 +118,6 @@ export class Model {
       this.gameOver = data.gameOver;
       this.maxBombs = data.maxBombs;
       this.bombIsPlanting = data.bombIsPlanting;
-      this.isGamePaused = data.gamePaused;
       this.escIsPressed = data.escIsPressed;
     } else {
       // doc.data() will be undefined in this case
