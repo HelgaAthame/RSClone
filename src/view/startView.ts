@@ -222,7 +222,7 @@ export class StartView {
   }
 
   addAudio() {
-
+    console.log('запускается аудио');
     const bgAudio = document.querySelector('.bgAudio');
     let loaded: boolean;
     if (!bgAudio) {

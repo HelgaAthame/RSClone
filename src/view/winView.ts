@@ -2,10 +2,10 @@ import { model } from "../model/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import "./winview.scss";
-import { gameScene } from "../phaser.js";
+//import { gameScene } from "../phaser.js";
 
 export class WinView {
-  renderUI(context: typeof gameScene) {
+  renderUI() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     canvas.style.display = "none";
 

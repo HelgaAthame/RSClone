@@ -542,7 +542,7 @@ class GameScene extends Phaser.Scene {
     this.putBombSound.stop();
     this.stageClearSound.play();
 
-    view.win.renderUI(this);
+    view.win.renderUI();
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
@@ -749,7 +749,7 @@ class GameScene extends Phaser.Scene {
   }
 
   collectHeart(
-    char: Phaser.Physics.Arcade.Sprite,
+    //char: Phaser.Physics.Arcade.Sprite,
     heart: Phaser.Physics.Arcade.Sprite
   ) {
     heart.disableBody(true, true);
@@ -763,7 +763,7 @@ class GameScene extends Phaser.Scene {
     // scoreText.setText('Score: ' + score);
   }
   collectSuperBomb(
-    char: Phaser.Physics.Arcade.Sprite,
+    //char: Phaser.Physics.Arcade.Sprite,
     superBomb: Phaser.Physics.Arcade.Sprite
   ) {
     superBomb.disableBody(true, true);
