@@ -12,4 +12,6 @@ class App {
 const app = new App(view, model);
 
 //рендер главного экрана
-app.view.start.renderUI();
+app.view.start.phaser = await import("./phaser.js");
+
+// app.view.start.renderUI();
