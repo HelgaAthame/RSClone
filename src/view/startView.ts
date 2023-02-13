@@ -11,9 +11,12 @@ import "./startView.scss";
 import titleScreenAudio from "../assets/sounds/title-screen.mp3";
 
 export class StartView {
+  uid: string | null;
+
   constructor() {
     this.phaser;
     this.gameScene;
+    this.uid = localStorage.getItem("uid");
   }
   phaser: { gameScene: any };
   gameScene: any;
@@ -21,6 +24,10 @@ export class StartView {
   renderUI() {
     const main = document.createElement("main");
     const localUserName = localStorage.getItem("userName");
+    const uid = this.uid;
+    const addListeners = this.addAudio.bind(this);
+    const startScreen = this.renderStartScreen.bind(this);
+
     main.classList.add("main");
     main.innerHTML = `
       <section class="begin">
@@ -28,15 +35,16 @@ export class StartView {
       </section>
     `;
     document.body.prepend(main);
+
     document.addEventListener("keydown", async function func() {
       document.removeEventListener("keydown", func);
-      firebase.googleAuth();
-      if (!localUserName) {
+      if (!uid) {
+        firebase.googleAuth();
         model.generateRandomUsername();
-      }
-      console.log("localUserName :", localUserName);
+      } else addListeners();
     });
-
+    console.log("localUserName :", localUserName);
+    console.log("localUID :", uid);
     //this.addAudio();
   }
 
@@ -84,16 +92,16 @@ export class StartView {
   }
 
   async continueButton() {
-    if (model.uid) {
+    if (this.uid) {
       const continueButton = selectorChecker(
         document,
         ".continue"
       ) as HTMLDivElement;
-      const docRef = doc(db, "users", model.uid);
+      const docRef = doc(db, "users", this.uid);
       const docSnap = await getDoc(docRef);
 
       continueButton.style.display =
-        docSnap.exists() && model.uid ? "initial" : "none";
+        docSnap.exists() && this.uid ? "initial" : "none";
     }
   }
 

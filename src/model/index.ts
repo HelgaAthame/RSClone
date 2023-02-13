@@ -194,6 +194,10 @@ export class Model {
 
   generateRandomUsername() {
     this.userName = `Player #${Date.now()}`;
+    this.saveUsernameToLocalStorage();
+  }
+
+  saveUsernameToLocalStorage() {
     localStorage.setItem("userName", this.userName);
   }
 }

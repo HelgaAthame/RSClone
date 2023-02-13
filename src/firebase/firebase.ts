@@ -67,6 +67,9 @@ class Firebase {
         const user = result.user;
         model.uid = user.uid;
         model.userName = user.displayName as string;
+        model.saveUsernameToLocalStorage();
+        localStorage.setItem("uid", user.uid);
+
         // ...
       })
       .catch((/*error*/) => {
