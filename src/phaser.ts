@@ -641,7 +641,7 @@ class GameScene extends Phaser.Scene {
     if (!squareToCheck) {
       throw new Error("Square to check was not found");
     } else {
-      console.log("squareToCheck.object :", squareToCheck.object);
+      //console.log("squareToCheck.object :", squareToCheck.object);
       if (squareToCheck.object === "stone") return;
 
       this.drawExplosion(x, y);

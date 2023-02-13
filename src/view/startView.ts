@@ -8,6 +8,8 @@ import { model } from "../model/index.js";
 //import { gameScene } from "../phaser.js";
 import "./startView.scss";
 
+import titleScreenAudio from "../assets/sounds/title-screen.mp3";
+
 export class StartView {
   constructor() {
     this.phaser;
@@ -222,12 +224,11 @@ export class StartView {
   }
 
   addAudio() {
-    console.log('запускается аудио');
     const bgAudio = document.querySelector('.bgAudio');
     let loaded: boolean;
     if (!bgAudio) {
       loaded = false;
-      const bgAudio = new Audio("../src/assets/sounds/title-screen.mp3");
+      const bgAudio = new Audio(titleScreenAudio);
       bgAudio.classList.add("bgAudio");
       bgAudio.loop = true;
       bgAudio.volume = 0.5;
