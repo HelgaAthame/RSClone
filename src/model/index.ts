@@ -84,6 +84,8 @@ export class Model {
       level: this.level,
       enemySpeed: this.enemySpeed,
       curTimer: this.curTimer,
+      shieldActive: this.shieldActive,
+      superBombActive: this.superBombActive,
       curLvlTimer: this.curLvlTimer,
       curLvlScore: this.curLvlScore,
       bombSpeed: this.bombSpeed,
@@ -121,6 +123,8 @@ export class Model {
       this.level = data.level;
       this.activeBombs = data.activeBombs;
       this.gameOver = data.gameOver;
+      this.shieldActive = data.shieldActive;
+      this.superBombActive = data.superBombActive;
       this.maxBombs = data.maxBombs;
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
@@ -139,6 +143,8 @@ export class Model {
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this.enemySpeed = 80;
+    this.shieldActive = false;
+    this.superBombActive = false;
     this.curTimer = this.curLvlTimer;
   }
 
