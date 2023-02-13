@@ -65,9 +65,19 @@ export class Model {
     this.shieldActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
+    if (localStorage.getItem("uid")) {
+      const uid = localStorage.getItem("uid");
+      this.uid = uid ? uid : "";
+    }
+    if (localStorage.getItem("userName")) {
+      const localUserName = localStorage.getItem("userName");
+      this.userName = localUserName ? localUserName : "";
+    }
   }
 
   async saveToBd() {
+    console.log("this.uid :", this.uid);
+    console.log("this.userName :", this.userName);
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
