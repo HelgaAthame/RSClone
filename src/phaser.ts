@@ -540,9 +540,9 @@ class GameScene extends Phaser.Scene {
 
     if (
       enemy.body.position.x ===
-        (enemy.body as Phaser.Physics.Arcade.Body).prev.x &&
+      (enemy.body as Phaser.Physics.Arcade.Body).prev.x &&
       enemy.body.position.y ===
-        (enemy.body as Phaser.Physics.Arcade.Body).prev.y
+      (enemy.body as Phaser.Physics.Arcade.Body).prev.y
     ) {
       const random = Math.random();
       if (random > 0.75) {
@@ -651,7 +651,7 @@ class GameScene extends Phaser.Scene {
         const woodSquare = this.wood.children.entries.find((woodSquare) => {
           return (
             squareToCheck.x ===
-              (woodSquare as Phaser.Physics.Matter.Sprite).x &&
+            (woodSquare as Phaser.Physics.Matter.Sprite).x &&
             squareToCheck.y === (woodSquare as Phaser.Physics.Matter.Sprite).y
           );
         });
@@ -887,7 +887,7 @@ class GameScene extends Phaser.Scene {
   ) {
     shield.disableBody(true, true);
     model.shieldActive = true;
-    char.setTint(0x00ff00);
+    _char.setTint(0x00ff00);
     this.updateItemsText();
   }
   collectSuperBomb(
