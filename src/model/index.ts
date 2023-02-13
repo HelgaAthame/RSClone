@@ -90,7 +90,7 @@ export class Model {
       enemyCounter: this.enemyCounter,
       curLvlEnemies: this.curLvlEnemies,
       charSpeed: this.charSpeed,
-      gameOver: this.gameOver
+      gameOver: this.gameOver,
     });
   }
 
@@ -190,6 +190,11 @@ export class Model {
   }
   get volume() {
     return this._volume;
+  }
+
+  generateRandomUsername() {
+    this.userName = `Player #${Date.now()}`;
+    localStorage.setItem("userName", this.userName);
   }
 }
 

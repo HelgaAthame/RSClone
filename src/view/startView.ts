@@ -17,8 +17,10 @@ export class StartView {
   }
   phaser: { gameScene: any };
   gameScene: any;
+
   renderUI() {
     const main = document.createElement("main");
+    const localUserName = localStorage.getItem("userName");
     main.classList.add("main");
     main.innerHTML = `
       <section class="begin">
@@ -26,9 +28,13 @@ export class StartView {
       </section>
     `;
     document.body.prepend(main);
-    document.addEventListener("keydown", function func() {
+    document.addEventListener("keydown", async function func() {
       document.removeEventListener("keydown", func);
       firebase.googleAuth();
+      if (!localUserName) {
+        model.generateRandomUsername();
+      }
+      console.log("localUserName :", localUserName);
     });
 
     //this.addAudio();
@@ -78,15 +84,17 @@ export class StartView {
   }
 
   async continueButton() {
-    const continueButton = selectorChecker(
-      document,
-      ".continue"
-    ) as HTMLDivElement;
-    const docRef = doc(db, "users", model.uid);
-    const docSnap = await getDoc(docRef);
+    if (model.uid) {
+      const continueButton = selectorChecker(
+        document,
+        ".continue"
+      ) as HTMLDivElement;
+      const docRef = doc(db, "users", model.uid);
+      const docSnap = await getDoc(docRef);
 
-    continueButton.style.display =
-      docSnap.exists() && model.uid ? "initial" : "none";
+      continueButton.style.display =
+        docSnap.exists() && model.uid ? "initial" : "none";
+    }
   }
 
   // listeners to click bellow
