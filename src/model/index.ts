@@ -210,6 +210,7 @@ export class Model {
 
   generateRandomUsername() {
     this.userName = `Player #${Date.now()}`;
+    this.uid = this.userName;
     this.saveUsernameToLocalStorage();
   }
 

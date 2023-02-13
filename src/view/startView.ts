@@ -22,13 +22,60 @@ export class StartView {
   gameScene: any;
 
   renderUI() {
-    const main = document.createElement("main");
-    const localUserName = localStorage.getItem("userName");
-    const uid = this.uid;
-    const addListeners = this.addAudio.bind(this);
-    const startScreen = this.renderStartScreen.bind(this);
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+    if (canvas) canvas.style.display = "none";
 
-    main.classList.add("main");
+    let main = document.querySelector(".main");
+    if (!main) {
+      main = document.createElement("main");
+      main.classList.add("main");
+      document.body.prepend(main);
+    }
+
+    main.innerHTML = `
+    <section class="logo"></section>
+    <nav class="nav">
+      <div class="instruction">Please, use arrow keys to navigate</div>
+      <article class="auth article">Authorization</article>
+      <article class="start article">Start</article>
+      <article class="continue article">Continue</article>
+      <article class="settings article">Settings</article>
+      <article class="settings article">Leaderboard</article>
+    </nav>
+    <footer class="footer">
+      <section class="github">
+        <div class="github__logo">
+          <img class="github__img" src="${GithubLogo}" alt="Github logo"/>
+        </div>
+        <a href="https://github.com/killthecreator" class="footer-link">Gleb</a>
+        <a href="https://github.com/HelgaAthame" class="footer-link">Olga</a>
+        <a href="https://github.com/alexmegadrive" class="footer-link">Alex</a>
+      </section>
+      <section class="year">2023</section>
+      <section class="rs footer-link">
+        <a href="https://rs.school/js/">
+          <img class="rs-school__img" src="${RsschoolLogo}" alt="RS School JS Front-end course"/>
+        </a>
+      </section>
+    </footer>
+    `;
+
+    document.addEventListener("keydown", async function aud() {
+      document.removeEventListener("keydown", aud);
+      view.start.addAudio();
+    });
+
+    view.start.addListeners();
+    /*const localUserName = localStorage.getItem("userName");
+    const uid = this.uid;
+
+
+
+
+    const addListeners = this.addAudio;
+    const startScreen = this.renderStartScreen;
+
+    /*main.classList.add("main");
     main.innerHTML = `
       <section class="begin">
         <p class="begin__text">START</p>
@@ -38,17 +85,35 @@ export class StartView {
 
     document.addEventListener("keydown", async function func() {
       document.removeEventListener("keydown", func);
+
       if (!uid) {
         firebase.googleAuth();
         model.generateRandomUsername();
       } else addListeners();
     });
+
+
+//model.generateRandomUsername();
     console.log("localUserName :", localUserName);
-    console.log("localUID :", uid);
+    console.log("localUID :", uid);*/
     //this.addAudio();
   }
 
-  renderStartScreen() {
+  addAudio() {
+    const bgAudio = document.querySelector(".bgAudio");
+    //let loaded: boolean;
+    if (!bgAudio) {
+      //loaded = false;
+      const bgAudio = new Audio(titleScreenAudio);
+      bgAudio.classList.add("bgAudio");
+      bgAudio.loop = true;
+      bgAudio.volume = 0.5;
+      document.body.append(bgAudio);
+      bgAudio.play();
+    }
+  }
+
+  /*renderStartScreen() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
     if (canvas) canvas.style.display = "none";
@@ -82,11 +147,9 @@ export class StartView {
 
     const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
     bgAudio.play();
-  }
+  }*/
 
   async addListeners() {
-    //this.addStartListener();
-    //this.addSettingsListener();
     await this.continueButton();
     this.moveMenu();
   }
@@ -104,26 +167,6 @@ export class StartView {
         docSnap.exists() && this.uid ? "initial" : "none";
     }
   }
-
-  // listeners to click bellow
-
-  /*addStartListener () {
-    const start = selectorChecker(document, '.start');
-    start.addEventListener('click', async () => {
-
-      const phaser = await import('../phaser.js');
-
-      const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
-      bgAudio.pause();
-    })
-  }  //this is navigation with mouse amd we needn't it*/
-
-  /*addSettingsListener () {
-    const settings = selectorChecker(document, '.settings');
-    settings.addEventListener('click', async () => {
-      view.settings.renderUI();
-    })
-  }*/
 
   moveMenu() {
     let i = 0; //number of the first element in nav menu to be selected
@@ -177,10 +220,17 @@ export class StartView {
           const selected = selectorChecker(document, ".active") as HTMLElement;
           const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
-          //let phaser: { gameScene: any; };
           switch (selected.innerHTML) {
+            case "Authorization":
+              firebase.googleAuth();
+              break;
+
             case "Start":
-              //model.takeFromBD.call(model);
+              if (!model.uid && !localStorage.getItem("userName")) {
+                model.generateRandomUsername();
+                console.log("uid :", model.uid);
+                console.log("username :", model.userName);
+              }
 
               pauseBGAudio();
 
@@ -200,6 +250,12 @@ export class StartView {
               break;
 
             case "Continue":
+              if (!model.uid && !localStorage.getItem("userName")) {
+                model.generateRandomUsername();
+                console.log("uid :", model.uid);
+                console.log("username :", model.userName);
+              }
+
               pauseBGAudio();
 
               model.takeFromBD.call(model);
@@ -244,34 +300,4 @@ export class StartView {
     });
   }
 
-  addAudio() {
-    const bgAudio = document.querySelector(".bgAudio");
-    let loaded: boolean;
-    if (!bgAudio) {
-      loaded = false;
-      const bgAudio = new Audio(titleScreenAudio);
-      bgAudio.classList.add("bgAudio");
-      bgAudio.loop = true;
-      bgAudio.volume = 0.5;
-      document.body.append(bgAudio);
-    }
-
-    const beginText = selectorChecker(document, ".begin__text");
-
-    document.addEventListener("keydown", (e) => {
-      beginText.classList.add("active");
-      if (loaded === false && e.code === "Enter") {
-        beginText.classList.remove("active");
-        loaded = true;
-        //bgAudio.play();
-
-        this.renderStartScreen();
-      }
-    });
-    /*beginText.addEventListener('click', () => {
-      loaded = true;
-      bgAudio.play();
-      this.renderStartScreen();
-    }, false);*/
-  }
 }

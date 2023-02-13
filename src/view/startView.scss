@@ -78,7 +78,7 @@ body {
     .nav {
       @include flexCol;
       align-items: center;
-      article {
+      article, div {
         padding: $basic-padding;
       }
       .active {

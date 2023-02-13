@@ -449,7 +449,7 @@ class GameScene extends Phaser.Scene {
 
       setTimeout(() => (model.escIsPressed = false), 300);
 
-      view.start.renderStartScreen();
+      view.start.renderUI();
     }
 
     this.charMovement();

@@ -209,7 +209,7 @@ export class SettingsView {
               start: keys[7].innerHTML as "ENTER",
             };
             document.removeEventListener("keydown", f);
-            view.start.renderStartScreen();
+            view.start.renderUI();
           }
         default:
           const val = e.code.startsWith("Key") ? e.code.slice(3) : e.code;

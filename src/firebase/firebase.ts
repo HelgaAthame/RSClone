@@ -84,7 +84,7 @@ class Firebase {
       })
       .then(() => {
         //document.removeEventListener("keydown", func);
-        view.start.addAudio();
+        //view.start.addAudio();
       });
     //alert('user created!');
   }
