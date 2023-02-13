@@ -106,6 +106,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    model.isGamePaused = false;
     /* Draw field */
     /* BIG WIDTH ONLY!!! */
     this.grass = this.physics.add.staticGroup();
@@ -372,7 +373,7 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
-    model.curTimer -= 1 / 60;
+    if (!model.isGamePaused) model.curTimer -= 1 / 60;
     if (model.curTimer <= 20) {
       this.timerText.setTint(0xff0000);
       this.add.tween({
@@ -422,7 +423,7 @@ class GameScene extends Phaser.Scene {
           this.charStepSound.stop();
         }, 0);
         model.fieldMatrix = fieldMatrix;
-        model.saveToBd();//save field state
+        model.saveToBd(); //save field state
       }
 
       setTimeout(() => (model.escIsPressed = false), 300);
@@ -637,12 +638,10 @@ class GameScene extends Phaser.Scene {
         woodSquare.destroy();
         this.drawRandomBonus(x, y);
       } else if (squareToCheck.object === "char") {
-        console.log("model.shieldActive :", model.shieldActive);
         if (model.shieldActive) {
           model.shieldActive = false;
           this.char.clearTint();
         } else {
-          console.log("ветка chardie");
           this.charDie();
         }
         this.updateItemsText();
@@ -673,7 +672,7 @@ class GameScene extends Phaser.Scene {
           setTimeout(() => {
             enemyToDestroy.destroy();
             model.enemyCounter--;
-            if (model.enemyCounter === 0) {
+            if (model.enemyCounter === 0 && !model.gameOver) {
               this.drawLevelComplete();
             }
           }, 200);
@@ -850,7 +849,7 @@ class GameScene extends Phaser.Scene {
   }
 
   collectHeart(
-    //char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     heart: Phaser.Physics.Arcade.Sprite
   ) {
     heart.disableBody(true, true);
@@ -862,7 +861,7 @@ class GameScene extends Phaser.Scene {
     this.livesText.setText(livesText);
   }
   collectShield(
-    char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     shield: Phaser.Physics.Arcade.Sprite
   ) {
     shield.disableBody(true, true);
@@ -871,7 +870,7 @@ class GameScene extends Phaser.Scene {
     this.updateItemsText();
   }
   collectSuperBomb(
-    //char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     superBomb: Phaser.Physics.Arcade.Sprite
   ) {
     superBomb.disableBody(true, true);
@@ -879,7 +878,7 @@ class GameScene extends Phaser.Scene {
     this.updateItemsText();
   }
   destroyOnCollideCallback(
-    subject: Phaser.Physics.Arcade.Sprite,
+    _subject: Phaser.Physics.Arcade.Sprite,
     object: Phaser.Physics.Arcade.Sprite
   ) {
     object.disableBody(true, true);
