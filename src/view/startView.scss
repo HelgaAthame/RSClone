@@ -81,6 +81,10 @@ body {
       article, div {
         padding: $basic-padding;
       }
+      .instruction {
+        color: plum;
+        text-shadow: 0 0 10px $ancor-color;
+      }
       .active {
         color: $ancor-color;
         text-shadow: 0 0 10px $ancor-color;
