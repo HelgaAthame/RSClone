@@ -78,7 +78,8 @@ body {
     .nav {
       @include flexCol;
       align-items: center;
-      article, div {
+      article,
+      div {
         padding: $basic-padding;
       }
       .instruction {
@@ -89,7 +90,10 @@ body {
         color: $ancor-color;
         text-shadow: 0 0 10px $ancor-color;
       }
-
+      &-item {
+        text-transform: uppercase;
+        font-size: 26px;
+      }
     }
     .footer {
       display: grid;

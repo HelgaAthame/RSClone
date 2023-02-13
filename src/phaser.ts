@@ -245,7 +245,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.char, this.enemies, () => {
       if (!model.gameOver) this.charDie();
     });
-    this.physics.add.collider(this.char, this.bombs);
+    // this.physics.add.collider(this.char, this.bombs);
 
     this.physics.add.collider(this.enemies, this.enemies);
     this.physics.add.collider(this.enemies, this.wood);
@@ -540,9 +540,9 @@ class GameScene extends Phaser.Scene {
 
     if (
       enemy.body.position.x ===
-      (enemy.body as Phaser.Physics.Arcade.Body).prev.x &&
+        (enemy.body as Phaser.Physics.Arcade.Body).prev.x &&
       enemy.body.position.y ===
-      (enemy.body as Phaser.Physics.Arcade.Body).prev.y
+        (enemy.body as Phaser.Physics.Arcade.Body).prev.y
     ) {
       const random = Math.random();
       if (random > 0.75) {
@@ -652,7 +652,7 @@ class GameScene extends Phaser.Scene {
         const woodSquare = this.wood.children.entries.find((woodSquare) => {
           return (
             squareToCheck.x ===
-            (woodSquare as Phaser.Physics.Matter.Sprite).x &&
+              (woodSquare as Phaser.Physics.Matter.Sprite).x &&
             squareToCheck.y === (woodSquare as Phaser.Physics.Matter.Sprite).y
           );
         });
@@ -916,9 +916,11 @@ class GameScene extends Phaser.Scene {
     }
 
     const cam: Camera = this.cameras.main;
+
+    // const cam = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      if (cam.rotation) cam.rotation += random;
+      cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);

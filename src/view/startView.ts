@@ -17,9 +17,11 @@ export class StartView {
     this.phaser;
     this.gameScene;
     this.uid = localStorage.getItem("uid");
+    this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
   }
   phaser: { gameScene: any };
   gameScene: any;
+  canvas: HTMLCanvasElement;
 
   renderUI() {
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
@@ -37,11 +39,11 @@ export class StartView {
     <nav class="nav">
 
       <div class="instruction">Please, use arrow keys to navigate</div>
-      <article data-content="start" class="start active article">Start</article>
-      <article data-content="continue" class="continue article">Continue</article>
-      <article data-content="settings" class="settings article">Settings</article>
-      <article data-content="authorization" class="auth article">Authorization</article>
-      <article data-content="leaderboard" class="settings article">Leaderboard</article>
+      <article data-content="start" class="nav-item start active article">Start</article>
+      <article data-content="continue" class="nav-item continue article">Continue</article>
+      <article data-content="settings" class="nav-item settings article">Settings</article>
+      <article data-content="authorization" class="nav-item auth article">Authorization</article>
+      <article data-content="leaderboard" class="nav-item settings article">Leaderboard</article>
     </nav>
     <footer class="footer">
       <section class="github">
@@ -63,14 +65,16 @@ export class StartView {
 
     document.addEventListener("keydown", async function aud() {
       document.removeEventListener("keydown", aud);
-      view.start.addAudio();
+      view.start.addBGAudio();
     });
 
-    view.start.addListeners();
-
+    this.setContinueButtonState();
+    this.navigateMenuListeners();
+    // this.addBGAudio();
   }
 
-  addAudio() {
+  addBGAudio() {
+    console.log("audio started");
     const bgAudio = document.querySelector(".bgAudio");
     //let loaded: boolean;
     if (!bgAudio) {
@@ -82,14 +86,10 @@ export class StartView {
       document.body.append(bgAudio);
       bgAudio.play();
     }
+    if (bgAudio instanceof HTMLAudioElement) bgAudio.play();
   }
 
-  async addListeners() {
-    await this.continueButton();
-    this.moveMenu();
-  }
-
-  async continueButton() {
+  async setContinueButtonState() {
     if (this.uid) {
       const continueButton = selectorChecker(
         document,
@@ -103,7 +103,7 @@ export class StartView {
     }
   }
 
-  moveMenu() {
+  navigateMenuListeners() {
     let i = 0; //number of the first element in nav menu to be selected
     let k = 2; //number of the first element in footer links to be selected
     const navs: NodeListOf<HTMLDivElement> =
@@ -121,14 +121,6 @@ export class StartView {
         });
       }
 
-      function pauseBGAudio() {
-        const bgAudio = selectorChecker(
-          document,
-          ".bgAudio"
-        ) as HTMLAudioElement;
-        bgAudio.pause();
-      }
-      //console.log(e.code);
       switch (e.code) {
         case "ArrowUp":
           clearStyles();
@@ -139,6 +131,7 @@ export class StartView {
           clearStyles();
           if (i < navs.length - 1) i++;
           navs[i].classList.add("active");
+          // ctx.pauseBGAudio();
           break;
         case "ArrowLeft":
           clearStyles();
@@ -150,10 +143,8 @@ export class StartView {
           if (k < footerlinks.length - 1) k++;
           footerlinks[k].classList.add("active");
           break;
-
         case "Enter":
           const selected = selectorChecker(document, ".active") as HTMLElement;
-          const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
           switch (selected.dataset.content) {
             case "authorization":
@@ -161,54 +152,12 @@ export class StartView {
               break;
 
             case "start":
-              if (!model.uid) {
-                model.generateRandomUsername();
-                console.log("uid :", model.uid);
-                console.log("username :", model.userName);
-              }
-
-              pauseBGAudio();
-
-              const main = selectorChecker(document, "main");
-              main.innerHTML = `
-              <div class="begin">LEVEL ${model.level}</div>
-            `;
-              setTimeout(async () => {
-                if (canvas) canvas.style.display = "initial";
-                if (!view.start.phaser) {
-                  view.start.phaser = await import("../phaser.js");
-                } else {
-                  model.resetGame();
-                  view.start.phaser.gameScene.restartGame();
-                }
-              }, 500);
+              view.start.handleStartGame();
               document.removeEventListener("keydown", foo);
               break;
 
             case "continue":
-              if (!model.uid) {
-                model.generateRandomUsername();
-                console.log("uid :", model.uid);
-                console.log("username :", model.userName);
-              }
-
-              pauseBGAudio();
-
-              model.takeFromBD.call(model);
-              if (canvas) canvas.style.display = "initial";
-              if (view.start.phaser) {
-                view.start.gameScene = view.start.phaser.gameScene;
-                view.start.gameScene.scene.resume();
-              }
-              if (!view.start.phaser) {
-                model.enemyCounter = model.level + 2;
-                view.start.phaser = await import("../phaser.js");
-              }
-
-              console.log(`model.enemyCounter = ${model.enemyCounter}`);
-              console.log(`model.curLvlEnemies = ${model.curLvlEnemies}`);
-              model.escIsPressed = false;
-              model.gameOver = false;
+              view.start.handleContinueGame();
               document.removeEventListener("keydown", foo);
               break;
 
@@ -239,4 +188,58 @@ export class StartView {
     });
   }
 
+  async handleContinueGame() {
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
+    if (!model.uid) {
+      model.generateRandomUsername();
+    }
+
+    this.pauseBGAudio();
+
+    model.takeFromBD.call(model);
+    if (canvas) canvas.style.display = "initial";
+    if (view.start.phaser) {
+      view.start.gameScene = view.start.phaser.gameScene;
+      view.start.gameScene.scene.resume();
+    }
+    if (!view.start.phaser) {
+      model.enemyCounter = model.level + 2;
+      view.start.phaser = await import("../phaser.js");
+    }
+
+    // console.log(`model.enemyCounter = ${model.enemyCounter}`);
+    // console.log(`model.curLvlEnemies = ${model.curLvlEnemies}`);
+    model.escIsPressed = false;
+    model.gameOver = false;
+  }
+
+  async handleStartGame() {
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
+    if (!model.uid) {
+      model.generateRandomUsername();
+    }
+
+    this.pauseBGAudio();
+
+    const main = selectorChecker(document, "main");
+    main.innerHTML = `
+    <div class="begin">LEVEL ${model.level}</div>
+  `;
+    setTimeout(async () => {
+      if (canvas) canvas.style.display = "initial";
+      if (!view.start.phaser) {
+        view.start.phaser = await import("../phaser.js");
+      } else {
+        model.resetGame();
+        view.start.phaser.gameScene.restartGame();
+      }
+    }, 500);
+  }
+
+  pauseBGAudio() {
+    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
+    bgAudio.pause();
+  }
 }
