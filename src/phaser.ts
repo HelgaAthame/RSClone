@@ -4,9 +4,30 @@ import { model } from "./model/index.js";
 import { view } from "./view/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
 
+import charSprite from "./assets/char__sprite.png";
+import explosionSprite from "./assets/explosion_sprite.png";
+import grassImg from "./assets/grass.jpg";
+import stoneImg from "./assets/stone.jpg";
+import woodImg from "./assets/wood.jpg";
+import bombImg from "./assets/bomb.png";
+import enemyImg from "./assets/enemy1.png";
+import explosionAudio from "./assets/sounds/bomb_explosion.ogg";
+import charStepAudio from "./assets/sounds/char_step.mp3";
+import charDeathAudio from "./assets/sounds/player_death.wav";
+import bonusSoundAudio from "./assets/sounds/bonus_sound_1.wav";
+import enemyDeathAudio from "./assets/sounds/enemy_death.ogg";
+import putBombAudio from "./assets/sounds/put_bomb.mp3";
+import stageClearAudio from "./assets/sounds/stage_clear.mp3";
+import stageMusicAudio from "./assets/sounds/stage_music.mp3";
+import superBombImg from "./assets/super_bomb.png";
+import superBombImgFired from "./assets/super_bomb_fired.png";
+import heartImg from "./assets/heart.png";
+import shieldImg from "./assets/shield.png";
+import mayhem from "./assets/fonts/retro-land-mayhem.ttf";
+
 //import keys from "./utils/keys.js;";
 
-loadFont("Mayhem", "./src/assets/fonts/retro-land-mayhem.ttf");
+loadFont("Mayhem", mayhem);
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -76,33 +97,33 @@ class GameScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.load.spritesheet("char", "./src/assets/char__sprite.png", {
+    this.load.spritesheet("char", charSprite, {
       frameWidth: 64,
       frameHeight: 99,
     });
-    this.load.spritesheet("explosion", "./src/assets/explosion_sprite.png", {
+    this.load.spritesheet("explosion", explosionSprite, {
       frameWidth: 64,
       frameHeight: 64,
     });
 
-    this.load.image("grass", "./src/assets/grass.jpg");
-    this.load.image("stone", "./src/assets/stone.jpg");
-    this.load.image("wood", "./src/assets/wood.jpg");
-    this.load.image(Bombs.BOMB, "./src/assets/bomb.png");
-    this.load.image("enemy", "./src/assets/enemy1.png");
+    this.load.image("grass", grassImg);
+    this.load.image("stone", stoneImg);
+    this.load.image("wood", woodImg);
+    this.load.image(Bombs.BOMB, bombImg);
+    this.load.image("enemy", enemyImg);
 
-    this.load.audio("explosion", "./src/assets/sounds/bomb_explosion.ogg");
-    this.load.audio("charStep", "./src/assets/sounds/char_step.mp3");
-    this.load.audio("charDeath", "./src/assets/sounds/player_death.wav");
-    this.load.audio("bonusSound", "./src/assets/sounds/bonus_sound_1.wav");
-    this.load.audio("enemyDeath", "./src/assets/sounds/enemy_death.ogg");
-    this.load.audio("putBomb", "./src/assets/sounds/put_bomb.mp3");
-    this.load.audio("stageClear", "./src/assets/sounds/stage_clear.mp3");
-    this.load.audio("stageMusic", "./src/assets/sounds/stage_music.mp3");
-    this.load.image(Items.SUPERBOMB, "./src/assets/super_bomb.png");
-    this.load.image(Bombs.SUPERBOMB, "./src/assets/super_bomb_fired.png");
-    this.load.image(Items.LIFE, "./src/assets/heart.png");
-    this.load.image(Items.SHIELD, "./src/assets/shield.png");
+    this.load.audio("explosion", explosionAudio);
+    this.load.audio("charStep", charStepAudio);
+    this.load.audio("charDeath", charDeathAudio);
+    this.load.audio("bonusSound", bonusSoundAudio);
+    this.load.audio("enemyDeath", enemyDeathAudio);
+    this.load.audio("putBomb", putBombAudio);
+    this.load.audio("stageClear", stageClearAudio);
+    this.load.audio("stageMusic", stageMusicAudio);
+    this.load.image(Items.SUPERBOMB, superBombImg);
+    this.load.image(Bombs.SUPERBOMB, superBombImgFired);
+    this.load.image(Items.LIFE, heartImg);
+    this.load.image(Items.SHIELD, shieldImg);
   }
 
   create() {
@@ -850,7 +871,7 @@ class GameScene extends Phaser.Scene {
   }
 
   collectHeart(
-    //char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     heart: Phaser.Physics.Arcade.Sprite
   ) {
     heart.disableBody(true, true);
@@ -871,7 +892,7 @@ class GameScene extends Phaser.Scene {
     this.updateItemsText();
   }
   collectSuperBomb(
-    //char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     superBomb: Phaser.Physics.Arcade.Sprite
   ) {
     superBomb.disableBody(true, true);
@@ -879,7 +900,7 @@ class GameScene extends Phaser.Scene {
     this.updateItemsText();
   }
   destroyOnCollideCallback(
-    //subject: Phaser.Physics.Arcade.Sprite,
+    _subject: Phaser.Physics.Arcade.Sprite,
     object: Phaser.Physics.Arcade.Sprite
   ) {
     object.disableBody(true, true);
