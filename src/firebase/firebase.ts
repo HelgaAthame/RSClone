@@ -15,7 +15,7 @@ import {
   Auth,
 } from "firebase/auth";
 import {
-  getFirestore/*,
+  getFirestore /*,
   collection,
   addDoc,
   query,
@@ -26,7 +26,7 @@ import {
   updateDoc,
   doc,
   serverTimestamp,
-  documentId,*/
+  documentId,*/,
 } from "firebase/firestore";
 /*import {
   getStorage,
@@ -58,35 +58,32 @@ class Firebase {
   }
 
   googleAuth() {
-    document.addEventListener("keydown", function func() {
-      document.removeEventListener("keydown", func);
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          //const credential = GoogleAuthProvider.credentialFromResult(result);
-          //const token = credential?.accessToken;
-          // The signed-in user info.
-          const user = result.user;
-          model.uid = user.uid;
-          model.userName = user.displayName as string;
-          // ...
-        })
-        .catch((/*error*/) => {
-          // Handle Errors here.
-          //const errorCode = error.code;
-          //const errorMessage = error.message;
-          // The email of the user's account used.
-          //const email = error.customData.email;
-          // The AuthCredential type that was used.
-          //const credential = GoogleAuthProvider.credentialFromError(error);
-          // ...
-        })
-        .then(() => {
-          //document.removeEventListener("keydown", func);
-          view.start.addAudio();
-        });
-      //alert('user created!');
-    });
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        //const credential = GoogleAuthProvider.credentialFromResult(result);
+        //const token = credential?.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        model.uid = user.uid;
+        model.userName = user.displayName as string;
+        // ...
+      })
+      .catch((/*error*/) => {
+        // Handle Errors here.
+        //const errorCode = error.code;
+        //const errorMessage = error.message;
+        // The email of the user's account used.
+        //const email = error.customData.email;
+        // The AuthCredential type that was used.
+        //const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      })
+      .then(() => {
+        //document.removeEventListener("keydown", func);
+        view.start.addAudio();
+      });
+    //alert('user created!');
   }
 }
 

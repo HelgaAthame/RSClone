@@ -26,7 +26,11 @@ export class StartView {
       </section>
     `;
     document.body.prepend(main);
-    firebase.googleAuth();
+    document.addEventListener("keydown", function func() {
+      document.removeEventListener("keydown", func);
+      firebase.googleAuth();
+    });
+
     //this.addAudio();
   }
 
@@ -62,7 +66,7 @@ export class StartView {
   `;
     this.addListeners();
 
-    const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
+    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
     bgAudio.play();
   }
 
@@ -73,13 +77,16 @@ export class StartView {
     this.moveMenu();
   }
 
-
   async continueButton() {
-    const continueButton = selectorChecker(document, '.continue') as HTMLDivElement;
+    const continueButton = selectorChecker(
+      document,
+      ".continue"
+    ) as HTMLDivElement;
     const docRef = doc(db, "users", model.uid);
     const docSnap = await getDoc(docRef);
 
-    continueButton.style.display = docSnap.exists() && model.uid? 'initial': 'none';
+    continueButton.style.display =
+      docSnap.exists() && model.uid ? "initial" : "none";
   }
 
   // listeners to click bellow
@@ -159,26 +166,25 @@ export class StartView {
             case "Start":
               //model.takeFromBD.call(model);
 
-            pauseBGAudio();
+              pauseBGAudio();
 
-            const main = selectorChecker(document, "main");
-            main.innerHTML = `
+              const main = selectorChecker(document, "main");
+              main.innerHTML = `
               <div class="begin">LEVEL ${model.level}</div>
             `;
-            setTimeout(async () => {
-              if (canvas) canvas.style.display = "initial";
-              if (!view.start.phaser) {
-                view.start.phaser = await import("../phaser.js");
-              } else {
-                model.resetGame();
-                view.start.phaser.gameScene.restartGame();
-              }
-            }, 3000);
-            break;
+              setTimeout(async () => {
+                if (canvas) canvas.style.display = "initial";
+                if (!view.start.phaser) {
+                  view.start.phaser = await import("../phaser.js");
+                } else {
+                  model.resetGame();
+                  view.start.phaser.gameScene.restartGame();
+                }
+              }, 3000);
+              break;
 
             case "Continue":
-
-            pauseBGAudio();
+              pauseBGAudio();
 
               model.takeFromBD.call(model);
               if (canvas) canvas.style.display = "initial";
@@ -187,8 +193,7 @@ export class StartView {
                 view.start.gameScene.scene.resume();
               }
               if (!view.start.phaser) {
-
-                model.enemyCounter = model.level +2;
+                model.enemyCounter = model.level + 2;
                 view.start.phaser = await import("../phaser.js");
               }
 
@@ -224,7 +229,7 @@ export class StartView {
   }
 
   addAudio() {
-    const bgAudio = document.querySelector('.bgAudio');
+    const bgAudio = document.querySelector(".bgAudio");
     let loaded: boolean;
     if (!bgAudio) {
       loaded = false;
