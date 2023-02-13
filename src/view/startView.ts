@@ -196,7 +196,7 @@ export class StartView {
                   model.resetGame();
                   view.start.phaser.gameScene.restartGame();
                 }
-              }, 3000);
+              }, 500);
               break;
 
             case "Continue":
