@@ -89,50 +89,6 @@ export class SettingsView {
     });
   }
 
-  /*editSettings () {
-    const settingSigns = document.querySelectorAll('.sign');
-    const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
-
-    let ourTarget: HTMLDivElement;
-
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      const val = e.code.startsWith('Key') ? e.code.slice(3) : e.code;
-      if (ourTarget) ourTarget.textContent = val;
-    });
-
-    /*settingSigns.forEach((sign: Element, i: number) => {
-
-      sign.addEventListener('click', () => {
-        settingSigns.forEach(sign => {
-          sign.classList.remove('active');
-        });
-        sign.classList.add('active');
-        keys.forEach(key => {
-          key.classList.remove('blink');
-        })
-        keys[i].classList.add('blink');
-        ourTarget = keys[i];
-      });
-    })
-  }*/
-
-  /*saveButtonConfig() {
-    const saveButton = selectorChecker(document, '.setting__save-button');
-    const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll('.key');
-    saveButton.addEventListener('click', () => {
-      model.buttons = {
-        arrowUp: keys[0].innerHTML,
-        arrowDown: keys[1].innerHTML,
-        arrowLeft: keys[2].innerHTML,
-        arrowRight: keys[3].innerHTML,
-        buttonA: keys[4].innerHTML,
-        buttonB: keys[5].innerHTML,
-        select: keys[6].innerHTML,
-        start: keys[7].innerHTML
-      }
-      view.start.renderStartScreen();
-    })
-  }*/
   findKey(val: string): string {
     const entries = Object.entries(keysObject);
     const ourEntry = entries.find((entry) => entry[1] === val);
@@ -166,7 +122,8 @@ export class SettingsView {
       switch (e.code) {
         case "Escape":
           console.log("escape pressed");
-          if (model.isGamePaused) {
+          view.start.renderUI();
+          /*if (model.isGamePaused) {
             const canvas = document.querySelector(
               "canvas"
             ) as HTMLCanvasElement;
@@ -176,7 +133,7 @@ export class SettingsView {
 
             phaser.gameScene.scene.resume();
             phaser.gameScene.stageMusic.resume();
-          }
+          }*/
 
         case view.settings.findKey(model.buttons.arrowUp):
           clearStyles();

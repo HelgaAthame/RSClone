@@ -35,21 +35,22 @@ export class StartView {
     main.innerHTML = `
     <section class="logo"></section>
     <nav class="nav">
+
       <div class="instruction">Please, use arrow keys to navigate</div>
-      <article class="auth article">Authorization</article>
-      <article class="start article">Start</article>
-      <article class="continue article">Continue</article>
-      <article class="settings article">Settings</article>
-      <article class="settings article">Leaderboard</article>
+      <article data-content="start" class="start active article">Start</article>
+      <article data-content="continue" class="continue article">Continue</article>
+      <article data-content="settings" class="settings article">Settings</article>
+      <article data-content="authorization" class="auth article">Authorization</article>
+      <article data-content="leaderboard" class="settings article">Leaderboard</article>
     </nav>
     <footer class="footer">
       <section class="github">
         <div class="github__logo">
           <img class="github__img" src="${GithubLogo}" alt="Github logo"/>
         </div>
-        <a href="https://github.com/killthecreator" class="footer-link">Gleb</a>
-        <a href="https://github.com/HelgaAthame" class="footer-link">Olga</a>
-        <a href="https://github.com/alexmegadrive" class="footer-link">Alex</a>
+        <a data-content="Gleb" href="https://github.com/killthecreator" class="footer-link">Gleb</a>
+        <a data-content="Olga" href="https://github.com/HelgaAthame" class="footer-link">Olga</a>
+        <a data-content="Alex" href="https://github.com/alexmegadrive" class="footer-link">Alex</a>
       </section>
       <section class="year">2023</section>
       <section class="rs footer-link">
@@ -66,37 +67,7 @@ export class StartView {
     });
 
     view.start.addListeners();
-    /*const localUserName = localStorage.getItem("userName");
-    const uid = this.uid;
 
-
-
-
-    const addListeners = this.addAudio;
-    const startScreen = this.renderStartScreen;
-
-    /*main.classList.add("main");
-    main.innerHTML = `
-      <section class="begin">
-        <p class="begin__text">START</p>
-      </section>
-    `;
-    document.body.prepend(main);
-
-    document.addEventListener("keydown", async function func() {
-      document.removeEventListener("keydown", func);
-
-      if (!uid) {
-        firebase.googleAuth();
-        model.generateRandomUsername();
-      } else addListeners();
-    });
-
-
-//model.generateRandomUsername();
-    console.log("localUserName :", localUserName);
-    console.log("localUID :", uid);*/
-    //this.addAudio();
   }
 
   addAudio() {
@@ -112,42 +83,6 @@ export class StartView {
       bgAudio.play();
     }
   }
-
-  /*renderStartScreen() {
-    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-
-    if (canvas) canvas.style.display = "none";
-    const main = selectorChecker(document, "main");
-    main.innerHTML = `
-    <section class="logo"></section>
-    <nav class="nav">
-      <article class="start article active">Start</article>
-      <article class="continue article">Continue</article>
-      <article class="settings article">Settings</article>
-      <article class="settings article">Leaderboard</article>
-    </nav>
-    <footer class="footer">
-      <section class="github">
-        <div class="github__logo">
-          <img class="github__img" src="${GithubLogo}" alt="Github logo"/>
-        </div>
-        <a href="https://github.com/killthecreator" class="footer-link">Gleb</a>
-        <a href="https://github.com/HelgaAthame" class="footer-link">Olga</a>
-        <a href="https://github.com/alexmegadrive" class="footer-link">Alex</a>
-      </section>
-      <section class="year">2023</section>
-      <section class="rs footer-link">
-        <a href="https://rs.school/js/">
-          <img class="rs-school__img" src="${RsschoolLogo}" alt="RS School JS Front-end course"/>
-        </a>
-      </section>
-    </footer>
-  `;
-    this.addListeners();
-
-    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
-    bgAudio.play();
-  }*/
 
   async addListeners() {
     await this.continueButton();
@@ -220,12 +155,12 @@ export class StartView {
           const selected = selectorChecker(document, ".active") as HTMLElement;
           const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 
-          switch (selected.innerHTML) {
-            case "Authorization":
+          switch (selected.dataset.content) {
+            case "authorization":
               firebase.googleAuth();
               break;
 
-            case "Start":
+            case "start":
               if (!model.uid && !localStorage.getItem("userName")) {
                 model.generateRandomUsername();
                 console.log("uid :", model.uid);
@@ -247,9 +182,10 @@ export class StartView {
                   view.start.phaser.gameScene.restartGame();
                 }
               }, 500);
+              document.removeEventListener("keydown", foo);
               break;
 
-            case "Continue":
+            case "continue":
               if (!model.uid && !localStorage.getItem("userName")) {
                 model.generateRandomUsername();
                 console.log("uid :", model.uid);
@@ -273,13 +209,16 @@ export class StartView {
               console.log(`model.curLvlEnemies = ${model.curLvlEnemies}`);
               model.escIsPressed = false;
               model.gameOver = false;
+              document.removeEventListener("keydown", foo);
               break;
 
-            case "Settings":
+            case "settings":
               view.settings.renderUI();
+              document.removeEventListener("keydown", foo);
               break;
-            case "Leaderboard":
+            case "leaderboard":
               view.scores.renderUI();
+              document.removeEventListener("keydown", foo);
               break;
             case "Olga":
               selected.click();
@@ -294,7 +233,7 @@ export class StartView {
               selected.click();
               break;
           }
-          document.removeEventListener("keydown", foo);
+          //document.removeEventListener("keydown", foo);
           break;
       }
     });
