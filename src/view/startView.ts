@@ -161,7 +161,7 @@ export class StartView {
               break;
 
             case "start":
-              if (!model.uid && !localStorage.getItem("userName")) {
+              if (!model.uid) {
                 model.generateRandomUsername();
                 console.log("uid :", model.uid);
                 console.log("username :", model.userName);
@@ -186,7 +186,7 @@ export class StartView {
               break;
 
             case "continue":
-              if (!model.uid && !localStorage.getItem("userName")) {
+              if (!model.uid) {
                 model.generateRandomUsername();
                 console.log("uid :", model.uid);
                 console.log("username :", model.userName);
