@@ -4,7 +4,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "./",
+    "public": "./dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -13,5 +13,11 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "host": "localhost",
+      "port": "2304"
+    }
   }
 }

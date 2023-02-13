@@ -37,7 +37,7 @@ export class WinView {
           canvas.style.display = "initial";
           document.removeEventListener("keydown", callback);
           view.start.phaser.gameScene.restartScene();
-        }, 3000);
+        }, 500);
 
       }
       if (e.code === "Esc") {
