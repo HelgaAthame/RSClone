@@ -1,4 +1,8 @@
-const keysObject = {
+interface KeyObj {
+  [index: string]: string;
+}
+
+const keysObject: KeyObj = {
   'A': 'A',
   'AltRight': 'ALT',
   'AltLeft': 'ALT',

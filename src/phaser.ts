@@ -233,7 +233,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.char,
       this.hearts,
-      this.collectHeart as ArcadePhysicsCallback,
+      this.collectHeart as unknown as ArcadePhysicsCallback,
       undefined,
       this
     );
@@ -247,28 +247,28 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.char,
       this.superBombs,
-      this.collectSuperBomb as ArcadePhysicsCallback,
+      this.collectSuperBomb as unknown as ArcadePhysicsCallback,
       undefined,
       this
     );
     this.physics.add.overlap(
       this.enemies,
       this.superBombs,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
       undefined,
       this
     );
     this.physics.add.overlap(
       this.enemies,
       this.hearts,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
       undefined,
       this
     );
     this.physics.add.overlap(
       this.enemies,
       this.shields,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
       undefined,
       this
     );
@@ -879,7 +879,7 @@ class GameScene extends Phaser.Scene {
     this.updateItemsText();
   }
   destroyOnCollideCallback(
-    subject: Phaser.Physics.Arcade.Sprite,
+    //subject: Phaser.Physics.Arcade.Sprite,
     object: Phaser.Physics.Arcade.Sprite
   ) {
     object.disableBody(true, true);
