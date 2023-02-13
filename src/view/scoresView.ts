@@ -1,5 +1,5 @@
 import selectorChecker from "../utils/selectorChecker.js";
-//import { view } from "./index.js";
+import { view } from "./index.js";
 import { db } from "../firebase-config.js";
 import { DocumentData, collection, getDocs } from "firebase/firestore";
 import "./scoresView.scss";
