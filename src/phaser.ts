@@ -891,10 +891,14 @@ class GameScene extends Phaser.Scene {
     );
   }
   tiltCamera() {
-    const cam = this.cameras.main;
+    interface Camera extends Phaser.Cameras.Scene2D.Camera {
+      rotation?: number | undefined;
+    }
+
+    const cam: Camera = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      cam.rotation += random;
+      if (cam.rotation) cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);
