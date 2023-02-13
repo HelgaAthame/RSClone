@@ -1,5 +1,5 @@
 interface FFS extends FontFaceSet {
-  add?: ((loaded: FontFace) => any) | undefined;
+  add?: ((loaded: FontFace) => void);
 }
 
 export default function loadFont(name: string, url: string) {
