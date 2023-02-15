@@ -405,7 +405,7 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.bonusesText = this.add.text(
-      textStartX,
+      textStartX - 15,
       textStartY + 30,
       "",
       bonusTextStyle
