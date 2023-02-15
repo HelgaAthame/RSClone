@@ -23,6 +23,7 @@ import superBombImg from "./assets/super_bomb.png";
 import superBombImgFired from "./assets/super_bomb_fired.png";
 import heartImg from "./assets/heart.png";
 import shieldImg from "./assets/shield.png";
+import bombIncreaser from "./assets/plus_bomb.png";
 import mayhem from "./assets/fonts/retro-land-mayhem.ttf";
 
 //import keys from "./utils/keys.js;";
@@ -41,12 +42,21 @@ const charStartY = height - 1.5 * fieldSquareLength;
 
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
-const style: Partial<Phaser.GameObjects.TextStyle> = {
+const gameUITextStyle: Partial<Phaser.GameObjects.TextStyle> = {
   fontFamily: "Mayhem",
   fontSize: "1.3rem",
   color: "#000",
   wordWrapWidth: 2,
   align: "center",
+  stroke: "#fff",
+  strokeThickness: 3,
+};
+const bonusTextStyle = {
+  fontFamily: "Mayhem",
+  fontSize: "2rem",
+  color: "#000",
+  wordWrapWidth: 2,
+  align: "left",
   stroke: "#fff",
   strokeThickness: 3,
 };
@@ -59,16 +69,18 @@ enum Items {
   SUPERBOMB = "superbomb_item",
   LIFE = "heart",
   SHIELD = "shield",
+  BOMB_ICREASER = "bomb_increaser",
 }
 enum Bombs {
   BOMB = "bomb",
   SUPERBOMB = "superbomb",
 }
+
 class GameScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   scoreText: Phaser.GameObjects.Text;
   livesText: Phaser.GameObjects.Text;
-  itemsText: Phaser.GameObjects.Text;
+  bonusesText: Phaser.GameObjects.Text;
   timerText: Phaser.GameObjects.Text;
   char: Phaser.GameObjects.Sprite;
   enemies: Phaser.GameObjects.Group;
@@ -79,8 +91,8 @@ class GameScene extends Phaser.Scene {
   explosion: Phaser.GameObjects.Sprite;
   hearts: Phaser.Physics.Arcade.StaticGroup;
   shields: Phaser.Physics.Arcade.StaticGroup;
+  bombIncreasers: Phaser.Physics.Arcade.StaticGroup;
   superBombs: Phaser.Physics.Arcade.StaticGroup;
-
   explosionSound: Phaser.Sound.BaseSound;
   charStepSound: Phaser.Sound.BaseSound;
   charDeathSound: Phaser.Sound.BaseSound;
@@ -124,6 +136,7 @@ class GameScene extends Phaser.Scene {
     this.load.image(Bombs.SUPERBOMB, superBombImgFired);
     this.load.image(Items.LIFE, heartImg);
     this.load.image(Items.SHIELD, shieldImg);
+    this.load.image(Items.BOMB_ICREASER, bombIncreaser);
   }
 
   create() {
@@ -136,6 +149,7 @@ class GameScene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
     this.bombs = this.physics.add.group();
     this.hearts = this.physics.add.staticGroup();
+    this.bombIncreasers = this.physics.add.staticGroup();
     this.shields = this.physics.add.staticGroup();
     this.superBombs = this.physics.add.staticGroup();
 
@@ -255,45 +269,59 @@ class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.char,
       this.hearts,
-      this.collectHeart as unknown as ArcadePhysicsCallback,
-      undefined,
+      this.collectHeart as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
       this
     );
     this.physics.add.overlap(
       this.char,
       this.shields,
       this.collectShield as ArcadePhysicsCallback,
-      undefined,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
       this
     );
     this.physics.add.overlap(
       this.char,
       this.superBombs,
-      this.collectSuperBomb as unknown as ArcadePhysicsCallback,
-      undefined,
+      this.collectSuperBomb as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
       this
     );
     this.physics.add.overlap(
-      this.enemies,
-      this.superBombs,
-      this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-      undefined,
+      this.char,
+      this.bombIncreasers,
+      this.collectBombIncrease as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
       this
     );
-    this.physics.add.overlap(
-      this.enemies,
-      this.hearts,
-      this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.shields,
-      this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
+    // this.physics.add.overlap(
+    //   this.enemies,
+    //   this.superBombs,
+    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.enemies,
+    //   this.hearts,
+    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.enemies,
+    //   this.shields,
+    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.enemies,
+    //   this.bombIncreasers,
+    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
 
     /*Draw explosion */
     this.anims.create({
@@ -361,28 +389,33 @@ class GameScene extends Phaser.Scene {
       textStartX + 4 * fieldSquareLength,
       textStartY,
       `LIVES : ${"❤️".repeat(model.lives)}`,
-      style
+      gameUITextStyle
     );
     this.add.text(
       textStartX + 8.5 * fieldSquareLength,
       textStartY,
       `LEVEL : ${model.level}`,
-      style
+      gameUITextStyle
     );
 
     this.scoreText = this.add.text(
       textStartX,
       textStartY,
       `SCORE : ${model.score}`,
-      style
+      gameUITextStyle
     );
-    this.itemsText = this.add.text(textStartX, textStartY + 30, "");
+    this.bonusesText = this.add.text(
+      textStartX,
+      textStartY + 30,
+      "",
+      bonusTextStyle
+    );
 
     this.timerText = this.add.text(
       textStartX + 4 * fieldSquareLength,
       textStartY + 10 * fieldSquareLength,
       `TIME : ${model.curLvlTimer}`,
-      style
+      gameUITextStyle
     );
 
     //if there is field matrix in model - we take it
@@ -392,6 +425,7 @@ class GameScene extends Phaser.Scene {
     } else {
       model.fieldMatrix = fieldMatrix;
     }
+    this.updateBonusesText();
   }
   update() {
     if (!model.isGamePaused) model.curTimer -= 1 / 60;
@@ -666,7 +700,7 @@ class GameScene extends Phaser.Scene {
         } else {
           this.charDie();
         }
-        this.updateItemsText();
+        this.updateBonusesText();
       } else if (enemiesAlive.some((enemy) => enemy === squareToCheck)) {
         const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
           const [closestX, closestY] = this.findClosestSquare(
@@ -736,7 +770,7 @@ class GameScene extends Phaser.Scene {
       this.handleTileExplosion(x, fieldMatrix[yDown][index_X].y);
       yDown++;
     }
-    this.updateItemsText();
+    this.updateBonusesText();
   }
 
   drawExplosion(x: number, y: number) {
@@ -837,7 +871,7 @@ class GameScene extends Phaser.Scene {
 
   drawRandomBonus(x: number, y: number) {
     const random = Math.random();
-    let group: typeof this.hearts | typeof this.superBombs | null = null;
+    let group: Phaser.Physics.Arcade.StaticGroup | null = null;
     let item: string = "";
     if (random > 0.8) {
       group = this.hearts;
@@ -848,19 +882,22 @@ class GameScene extends Phaser.Scene {
     } else if (random > 0.4) {
       group = this.shields;
       item = Items.SHIELD;
+    } else if (random > 0.2) {
+      group = this.bombIncreasers;
+      item = Items.BOMB_ICREASER;
     }
 
     if (group && item) {
-      const random = group
+      const bonus = group
         .create(x, y, item)
         .setSize(fieldSquareLength, fieldSquareLength)
         .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
         .refreshBody();
 
       this.tweens.add({
-        targets: random,
-        scaleX: random.scaleX / 1.3,
-        scaleY: random.scaleY / 1.3,
+        targets: bonus,
+        scaleX: bonus.scaleX / 1.3,
+        scaleY: bonus.scaleY / 1.3,
         yoyo: true,
         repeat: -1,
         duration: 300,
@@ -870,7 +907,7 @@ class GameScene extends Phaser.Scene {
   }
 
   collectHeart(
-    _char: Phaser.Physics.Arcade.Sprite,
+    char: Phaser.Physics.Arcade.Sprite,
     heart: Phaser.Physics.Arcade.Sprite
   ) {
     heart.disableBody(true, true);
@@ -880,23 +917,33 @@ class GameScene extends Phaser.Scene {
         ? `LIVES :  ${"❤️".repeat(model.lives)}`
         : `LIVES: ❤️ x${model.lives}`;
     this.livesText.setText(livesText);
+    // this.destroyOnCollideCallback(char, heart);
   }
   collectShield(
-    _char: Phaser.Physics.Arcade.Sprite,
+    char: Phaser.Physics.Arcade.Sprite,
     shield: Phaser.Physics.Arcade.Sprite
   ) {
     shield.disableBody(true, true);
     model.shieldActive = true;
-    _char.setTint(0x00ff00);
-    this.updateItemsText();
+    char.setTint(0x00ff00);
+    this.updateBonusesText();
+    // this.destroyOnCollideCallback(char, shield);
   }
   collectSuperBomb(
-    _char: Phaser.Physics.Arcade.Sprite,
+    char: Phaser.Physics.Arcade.Sprite,
     superBomb: Phaser.Physics.Arcade.Sprite
   ) {
     superBomb.disableBody(true, true);
     model.superBombActive = true;
-    this.updateItemsText();
+    this.updateBonusesText();
+    // this.destroyOnCollideCallback(char, superBomb);
+  }
+  collectBombIncrease(
+    char: Phaser.Physics.Arcade.Sprite,
+    bonus: Phaser.Physics.Arcade.Sprite
+  ) {
+    model.maxBombs++;
+    this.updateBonusesText();
   }
   destroyOnCollideCallback(
     _subject: Phaser.Physics.Arcade.Sprite,
@@ -905,10 +952,11 @@ class GameScene extends Phaser.Scene {
     object.disableBody(true, true);
   }
 
-  updateItemsText() {
-    this.itemsText.setText(
-      `${model.shieldActive ? "🛡 " : ""}${model.superBombActive ? "💥 " : ""}`
-    );
+  updateBonusesText() {
+    const text = `💣х${model.maxBombs}${model.shieldActive ? "\n⛨" : ""}${
+      model.superBombActive ? "\n💥" : ""
+    }`;
+    this.bonusesText.setText(text);
   }
   tiltCamera() {
     interface Camera extends Phaser.Cameras.Scene2D.Camera {

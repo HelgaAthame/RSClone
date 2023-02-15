@@ -59,7 +59,7 @@ export class Model {
     };
     this.activeBombs = [];
     this.gameOver = false;
-    this.maxBombs = 2;
+    this.maxBombs = 1;
     this.bombIsPlanting = false;
     this.superBombActive = false;
     this.shieldActive = false;
@@ -155,6 +155,7 @@ export class Model {
     this.enemySpeed = 80;
     this.shieldActive = false;
     this.superBombActive = false;
+    this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;
   }
 
