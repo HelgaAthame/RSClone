@@ -45,7 +45,7 @@ export class ScoresView {
   backToMenu() {
     document.addEventListener("keydown", (e) => {
       if (e.code === "Escape") {
-        view.start.renderStartScreen();
+        view.start.renderUI();
         return;
       }
     });
