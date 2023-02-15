@@ -76,8 +76,9 @@ export class Model {
   }
 
   async saveToBd() {
-    console.log("this.uid :", this.uid);
-    console.log("this.userName :", this.userName);
+    console.log('we are saving info to DB')
+    //console.log("this.uid :", this.uid);
+    //console.log("this.userName :", this.userName);
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -107,6 +108,7 @@ export class Model {
   }
 
   async takeFromBD() {
+    alert('we are taking info from bd');
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 

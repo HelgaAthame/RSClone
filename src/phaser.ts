@@ -907,7 +907,7 @@ class GameScene extends Phaser.Scene {
   }
 
   collectHeart(
-    char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     heart: Phaser.Physics.Arcade.Sprite
   ) {
     heart.disableBody(true, true);
@@ -930,7 +930,7 @@ class GameScene extends Phaser.Scene {
     // this.destroyOnCollideCallback(char, shield);
   }
   collectSuperBomb(
-    char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     superBomb: Phaser.Physics.Arcade.Sprite
   ) {
     superBomb.disableBody(true, true);
@@ -939,8 +939,8 @@ class GameScene extends Phaser.Scene {
     // this.destroyOnCollideCallback(char, superBomb);
   }
   collectBombIncrease(
-    char: Phaser.Physics.Arcade.Sprite,
-    bonus: Phaser.Physics.Arcade.Sprite
+    _char: Phaser.Physics.Arcade.Sprite,
+    _bonus: Phaser.Physics.Arcade.Sprite
   ) {
     model.maxBombs++;
     this.updateBonusesText();
@@ -968,7 +968,7 @@ class GameScene extends Phaser.Scene {
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      cam.rotation += random;
+      if (cam.rotation) cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);
