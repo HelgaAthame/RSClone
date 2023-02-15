@@ -162,6 +162,7 @@ class GameScene extends Phaser.Scene {
     this.stageClearSound = this.sound.add("stageClear", { loop: false });
     this.stageMusic = this.sound.add("stageMusic", { loop: true });
     this.stageMusic.play();
+    this.events.on("resume", () => this.stageMusic.resume());
 
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
@@ -472,8 +473,9 @@ class GameScene extends Phaser.Scene {
       model.isGamePaused = true;
       model.escIsPressed = true;
       if (model.isGamePaused) {
-        this.scene.pause();
         this.stageMusic.pause();
+        this.scene.pause();
+
         setTimeout(() => {
           this.charStepSound.stop();
         }, 0);
