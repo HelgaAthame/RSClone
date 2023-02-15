@@ -121,7 +121,6 @@ export class SettingsView {
       }
       switch (e.code) {
         case "Escape":
-          console.log("escape pressed");
           view.start.renderUI();
           /*if (model.isGamePaused) {
             const canvas = document.querySelector(

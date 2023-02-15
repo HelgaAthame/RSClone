@@ -1,43 +1,16 @@
-//import selectorChecker from "./../utils/selectorChecker.js";
-
 import { firebaseConfig } from "../firebase-config.js";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
-  /*onAuthStateChanged,*/
   GoogleAuthProvider,
   signInWithPopup,
-  /*signOut,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,*/
   Auth,
 } from "firebase/auth";
 import {
-  getFirestore /*,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  documentId,*/,
+  getFirestore
 } from "firebase/firestore";
-/*import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
-import { getPerformance } from "firebase/performance";*/
+
 import { model } from "../model/index.js";
-import { view } from "../view/index.js";
 
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
