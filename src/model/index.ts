@@ -108,13 +108,11 @@ export class Model {
   }
 
   async takeFromBD() {
-    alert('we are taking info from bd');
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      //
-      console.log("Document data:", docSnap.data());
+
       const data = docSnap.data();
       this.lives = data.lives;
       this.score = data.score;
@@ -141,8 +139,8 @@ export class Model {
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
     } else {
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
+
+      //console.log("No such document!");
     }
   }
 

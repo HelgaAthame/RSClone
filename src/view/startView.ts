@@ -74,7 +74,6 @@ export class StartView {
   }
 
   addBGAudio() {
-    console.log("audio started");
     const bgAudio = document.querySelector(".bgAudio");
     //let loaded: boolean;
     if (!bgAudio) {
