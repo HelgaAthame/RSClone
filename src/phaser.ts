@@ -205,20 +205,40 @@ class GameScene extends Phaser.Scene {
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
 
-        if (i === ceilsNum - 1 && j === 2) {
-          fieldMatrix[i - 1][j - 1].object = "char";
-          continue;
+        if (model.fieldMatrix) {
+
+              if (model.fieldMatrix[i-1][j-1].object === "wood") {
+                fieldMatrix[i-1][j-1].object = "wood";
+                this.wood
+                  .create(curSquareXCenter, curSquareYCenter, "wood")
+                  .setScale((1 / fieldImgSize) * fieldSquareLength)
+                  .refreshBody();
+                continue;
+              }
+              if (model.fieldMatrix[i-1][j-1].object === 'char') {
+                fieldMatrix[i-1][j-1].object = "char";
+                continue;
+              }
+
+
+        } else {
+          if (i === ceilsNum - 1 && j === 2) {
+            fieldMatrix[i - 1][j - 1].object = "char";
+            continue;
+          }
+          if (randomWoodSquare && !emptyStartLocations) {
+            fieldMatrix[i - 1][j - 1].object = "wood";
+            this.wood
+              .create(curSquareXCenter, curSquareYCenter, "wood")
+              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .refreshBody();
+            continue;
+          }
         }
-        if (randomWoodSquare && !emptyStartLocations) {
-          fieldMatrix[i - 1][j - 1].object = "wood";
-          this.wood
-            .create(curSquareXCenter, curSquareYCenter, "wood")
-            .setScale((1 / fieldImgSize) * fieldSquareLength)
-            .refreshBody();
-          continue;
-        }
+
       }
     }
+
 
     this.char = this.physics.add
       .sprite(charStartX, charStartY, "char")
@@ -421,8 +441,17 @@ class GameScene extends Phaser.Scene {
 
     //if there is field matrix in model - we take it
     //if no - we write it into model
+    console.log('here is current fieldmatrix')
+    console.log(fieldMatrix);
+
     if (model.fieldMatrix) {
+
+    console.log(`fieldMatrix is in model. here is model.fieldmatrix`);
+    console.log(model.fieldMatrix);
       fieldMatrix = model.fieldMatrix;
+      console.log('fieldmatrix after updating');
+
+      console.log(fieldMatrix);
     } else {
       model.fieldMatrix = fieldMatrix;
     }
@@ -634,6 +663,8 @@ class GameScene extends Phaser.Scene {
         align: "center",
       })
       .setOrigin(0.5);
+
+    model.fieldMatrix = undefined;
   }
 
   drawLevelComplete() {
@@ -642,7 +673,7 @@ class GameScene extends Phaser.Scene {
     this.charStepSound.stop();
     this.putBombSound.stop();
     this.stageClearSound.play();
-
+    model.fieldMatrix = undefined;
     view.win.renderUI();
   }
 
