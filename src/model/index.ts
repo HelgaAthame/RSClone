@@ -82,7 +82,7 @@ export class Model {
 
   async saveToBd() {
     console.log("we are saving info to DB");
-    console.log('field matrix is');
+    console.log("field matrix is");
     console.log(model.fieldMatrix);
 
     await setDoc(doc(db, "users", this.uid), {
@@ -114,19 +114,19 @@ export class Model {
   }
 
   async takeFromBD() {
-    console.log("take from DB");
-    console.log(model.fieldMatrix);
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const data = docSnap.data();
+      console.log("data from takedb :", data);
       this.lives = data.lives;
       this.score = data.score;
       this.isMuted = data.isMuted;
       this.volume = data.volume;
       this.buttons = data.buttons;
       this.fieldMatrix = JSON.parse(data.fieldMatrix);
+      console.log("this.fieldMatrix :", this.fieldMatrix);
 
       this.charSpeed = data.charSpeed;
       this.curLvlEnemies = data.curLvlEnemies;
