@@ -41,7 +41,7 @@ export class Model {
     this.charSpeed = 160;
     this.curLvlEnemies = 3;
     this.enemyCounter = 0;
-    this.bombSpeed = 2000;
+    this.bombSpeed = 1600;
     this.curLvlScore = 0;
     this.curLvlTimer = 120;
     this.curTimer = this.curLvlTimer;
@@ -64,7 +64,7 @@ export class Model {
     };
     this.activeBombs = [];
     this.gameOver = false;
-    this.maxBombs = 2;
+    this.maxBombs = 1;
     this.bombIsPlanting = false;
     this.superBombActive = false;
     this.shieldActive = false;
