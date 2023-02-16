@@ -500,6 +500,7 @@ class GameScene extends Phaser.Scene {
         model.activeBombs.forEach((bomb) => {
           window.clearTimeout(bomb.curBomb);
         });
+        model.bombIsPlanting = false;
 
         setTimeout(() => {
           this.charStepSound.stop();
@@ -717,7 +718,7 @@ class GameScene extends Phaser.Scene {
             squareToCheck.y === (woodSquare as Phaser.Physics.Matter.Sprite).y
           );
         });
-        if (!woodSquare) throw Error("Wood square was not found");
+        if (!woodSquare) return;
         woodSquare.destroy();
         this.drawRandomBonus(x, y);
       } else if (squareToCheck.object === "char") {
@@ -761,7 +762,7 @@ class GameScene extends Phaser.Scene {
           }, 200);
         }
       }
-      // squareToCheck.object = "grass";
+      squareToCheck.object = "grass";
     }
   };
 
@@ -809,7 +810,11 @@ class GameScene extends Phaser.Scene {
   }
 
   dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
-    if (model.activeBombs.length < model.maxBombs && !model.bombIsPlanting) {
+    if (
+      (model.activeBombs.length < model.maxBombs ||
+        bombTimer !== model.bombSpeed) &&
+      !model.bombIsPlanting
+    ) {
       const checkSquare = this.bombs.children.entries.find(
         (bomb) =>
           (bomb as Phaser.Physics.Matter.Sprite).x === bombX &&
@@ -833,10 +838,12 @@ class GameScene extends Phaser.Scene {
         .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setImmovable();
 
-      model.bombIsPlanting = true;
-      this.putBombSound.play();
+      if (bombTimer === model.bombSpeed) {
+        model.bombIsPlanting = true;
+        setTimeout(() => (model.bombIsPlanting = false), 500);
+      }
 
-      setTimeout(() => (model.bombIsPlanting = false), 500);
+      this.putBombSound.play();
 
       const curBomb = {
         curBomb: setTimeout(() => {
@@ -900,9 +907,10 @@ class GameScene extends Phaser.Scene {
 
     setTimeout(() => (model.gameOver = false), 0);
 
-    while (model.activeBombs.length > 0) {
-      window.clearTimeout(model.activeBombs.pop()?.bombTimer);
-    }
+    model.activeBombs.forEach((bomb) => {
+      window.clearTimeout(bomb.curBomb);
+    });
+    model.activeBombs = [];
     this.bombs.destroy();
     this.scene.restart();
   }
