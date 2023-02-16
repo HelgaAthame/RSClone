@@ -81,6 +81,8 @@ export class Model {
   }
 
   async saveToBd() {
+    console.log("we are saving info to DB");
+
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -217,7 +219,6 @@ export class Model {
 
   generateRandomUsername() {
     this.userName = `Player #${Date.now()}`;
-    this.uid = this.userName;
     this.saveUsernameToLocalStorage();
   }
 
