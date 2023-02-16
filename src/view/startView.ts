@@ -196,7 +196,8 @@ export class StartView {
 
     this.pauseBGAudio();
 
-    model.takeFromBD.call(model);
+    await model.takeFromBD.call(model);
+
     if (canvas) canvas.style.display = "initial";
     if (view.start.phaser) {
       view.start.gameScene = view.start.phaser.gameScene;

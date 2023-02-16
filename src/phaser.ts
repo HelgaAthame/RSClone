@@ -452,6 +452,12 @@ class GameScene extends Phaser.Scene {
       model.fieldMatrix = fieldMatrix;
     }
     this.updateBonusesText();
+
+    if (model.activeBombs.length !== 0) {
+      model.activeBombs.forEach((bomb) => {
+        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
+      });
+    }
   }
   update() {
     model.activeBombs.map((bomb) => {
