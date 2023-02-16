@@ -112,6 +112,8 @@ export class Model {
   }
 
   async takeFromBD() {
+    console.log("take from DB");
+    console.log(model.fieldMatrix);
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
@@ -145,6 +147,8 @@ export class Model {
     } else {
       //console.log("No such document!");
     }
+
+    console.log(model.fieldMatrix);
   }
 
   resetGame() {
@@ -161,6 +165,7 @@ export class Model {
     this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
+    this.fieldMatrix = undefined;
   }
 
   nextLvl() {
