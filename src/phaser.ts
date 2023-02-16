@@ -89,6 +89,7 @@ class GameScene extends Phaser.Scene {
   wood: Phaser.Physics.Arcade.StaticGroup;
   bombs: Phaser.Physics.Arcade.Group;
   explosion: Phaser.GameObjects.Sprite;
+  explosions: Phaser.Physics.Arcade.StaticGroup;
   hearts: Phaser.Physics.Arcade.StaticGroup;
   shields: Phaser.Physics.Arcade.StaticGroup;
   bombIncreasers: Phaser.Physics.Arcade.StaticGroup;
@@ -152,6 +153,7 @@ class GameScene extends Phaser.Scene {
     this.bombIncreasers = this.physics.add.staticGroup();
     this.shields = this.physics.add.staticGroup();
     this.superBombs = this.physics.add.staticGroup();
+    this.explosions = this.physics.add.staticGroup();
 
     this.explosionSound = this.sound.add("explosion", { loop: false });
     this.charStepSound = this.sound.add("charStep", { loop: true });
@@ -319,31 +321,59 @@ class GameScene extends Phaser.Scene {
       this.destroyOnCollideCallback as ArcadePhysicsCallback,
       this
     );
+    this.physics.add.overlap(
+      this.enemies,
+      this.superBombs,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.hearts,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.shields,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.bombIncreasers,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
     // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.superBombs,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.hearts,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.shields,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.enemies,
+    //   this.explosion,
     //   this.bombIncreasers,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.hearts,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.superBombs,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.shields,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
     //   undefined,
     //   this
     // );
@@ -745,7 +775,7 @@ class GameScene extends Phaser.Scene {
         });
         if (!woodSquare) return;
         woodSquare.destroy();
-        this.drawRandomBonus(x, y);
+        this.dropRandomBonus(x, y);
       } else if (squareToCheck.object === "char" && !model.gameOver) {
         if (model.shieldActive) {
           model.shieldActive = false;
@@ -828,10 +858,43 @@ class GameScene extends Phaser.Scene {
 
   drawExplosion(x: number, y: number) {
     this.explosion = this.physics.add.sprite(x, y, "explosion");
+    // const explosion = this.physics.add.sprite(x, y, "explosion");
+    // const newXplosn = this.explosions.create(x, y, "");
     const explosionAnim = this.explosion.anims.play("bombExplosion", false);
     explosionAnim.once("animationcomplete", () => {
       explosionAnim.destroy();
+      this.explosion.destroy();
+      // this.dropRandomBonus(x, y);
     });
+
+    this.physics.add.overlap(
+      this.explosion,
+      this.bombIncreasers,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.explosion,
+      this.hearts,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.explosion,
+      this.superBombs,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.explosion,
+      this.shields,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
   }
 
   dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
@@ -945,10 +1008,34 @@ class GameScene extends Phaser.Scene {
     model.gameOver = !model.gameOver;
   }
 
-  drawRandomBonus(x: number, y: number) {
+  dropRandomBonus(x: number, y: number) {
     const random = Math.random();
     let group: Phaser.Physics.Arcade.StaticGroup | null = null;
     let item: string = "";
+
+    const createItem = (
+      group: Phaser.Physics.Arcade.StaticGroup | null = null,
+      item: string = ""
+    ) => {
+      if (group) {
+        const bonus = group
+          .create(x, y, item)
+          .setSize(fieldSquareLength, fieldSquareLength)
+          .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
+          .refreshBody();
+
+        this.tweens.add({
+          targets: bonus,
+          scaleX: bonus.scaleX / 1.3,
+          scaleY: bonus.scaleY / 1.3,
+          yoyo: true,
+          repeat: -1,
+          duration: 300,
+          ease: "Sine.easeInOut",
+        });
+      }
+    };
+
     if (random > 0.8) {
       group = this.hearts;
       item = Items.LIFE;
@@ -962,23 +1049,10 @@ class GameScene extends Phaser.Scene {
       group = this.bombIncreasers;
       item = Items.BOMB_ICREASER;
     }
-
     if (group && item) {
-      const bonus = group
-        .create(x, y, item)
-        .setSize(fieldSquareLength, fieldSquareLength)
-        .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
-        .refreshBody();
-
-      this.tweens.add({
-        targets: bonus,
-        scaleX: bonus.scaleX / 1.3,
-        scaleY: bonus.scaleY / 1.3,
-        yoyo: true,
-        repeat: -1,
-        duration: 300,
-        ease: "Sine.easeInOut",
-      });
+      setTimeout(() => {
+        createItem(group, item);
+      }, 1000);
     }
   }
 

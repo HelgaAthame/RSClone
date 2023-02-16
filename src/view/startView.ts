@@ -16,7 +16,7 @@ export class StartView {
   constructor() {
     this.phaser;
     this.gameScene;
-    this.uid = localStorage.getItem("uid");
+    this.uid = model.uid;
     this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
   }
   phaser: { gameScene: any };
@@ -89,17 +89,15 @@ export class StartView {
   }
 
   async setContinueButtonState() {
-    if (this.uid) {
-      const continueButton = selectorChecker(
-        document,
-        ".continue"
-      ) as HTMLDivElement;
-      const docRef = doc(db, "users", this.uid);
-      const docSnap = await getDoc(docRef);
+    const continueButton = selectorChecker(
+      document,
+      ".continue"
+    ) as HTMLDivElement;
+    const docRef = doc(db, "users", this.uid);
+    const docSnap = await getDoc(docRef);
 
-      continueButton.style.display =
-        docSnap.exists() && this.uid ? "initial" : "none";
-    }
+    continueButton.style.display =
+      docSnap.exists() && this.uid ? "initial" : "none";
   }
 
   navigateMenuListeners() {
