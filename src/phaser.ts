@@ -294,34 +294,34 @@ class GameScene extends Phaser.Scene {
       this.destroyOnCollideCallback as ArcadePhysicsCallback,
       this
     );
-    // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.superBombs,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.hearts,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.shields,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.enemies,
-    //   this.bombIncreasers,
-    //   this.destroyOnCollideCallback as unknown as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
+    this.physics.add.overlap(
+      this.enemies,
+      this.superBombs,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.hearts,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.shields,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.bombIncreasers,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
 
     /*Draw explosion */
     this.anims.create({

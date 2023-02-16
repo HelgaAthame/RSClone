@@ -76,9 +76,7 @@ export class Model {
   }
 
   async saveToBd() {
-    console.log('we are saving info to DB')
-    //console.log("this.uid :", this.uid);
-    //console.log("this.userName :", this.userName);
+    console.log("we are saving info to DB");
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -112,7 +110,6 @@ export class Model {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-
       const data = docSnap.data();
       this.lives = data.lives;
       this.score = data.score;
@@ -139,7 +136,6 @@ export class Model {
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
     } else {
-
       //console.log("No such document!");
     }
   }
@@ -211,7 +207,6 @@ export class Model {
 
   generateRandomUsername() {
     this.userName = `Player #${Date.now()}`;
-    this.uid = this.userName;
     this.saveUsernameToLocalStorage();
   }
 
