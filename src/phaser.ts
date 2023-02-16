@@ -162,7 +162,16 @@ class GameScene extends Phaser.Scene {
     this.stageClearSound = this.sound.add("stageClear", { loop: false });
     this.stageMusic = this.sound.add("stageMusic", { loop: true });
     this.stageMusic.play();
-    this.events.on("resume", () => this.stageMusic.resume());
+
+    this.events.on("resume", () => {
+      this.stageMusic.resume();
+
+      if (model.activeBombs.length !== 0) {
+        model.activeBombs.forEach((bomb) => {
+          this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
+        });
+      }
+    });
 
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
@@ -429,6 +438,13 @@ class GameScene extends Phaser.Scene {
     this.updateBonusesText();
   }
   update() {
+    model.activeBombs.map((bomb) => {
+      if (bomb.bombTimer > 0) {
+        bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
+      } else {
+        model.activeBombs = model.activeBombs.filter((cur) => cur !== bomb);
+      }
+    });
     if (!model.isGamePaused) model.curTimer -= 1 / 60;
     if (model.curTimer <= 20) {
       this.timerText.setTint(0xff0000);
@@ -462,7 +478,10 @@ class GameScene extends Phaser.Scene {
     }
 
     if (!model.gameOver && bombSet.isDown) {
-      this.dropBomb();
+      const [bombX, bombY] = this.findClosestSquare(
+        this.char as Phaser.Physics.Matter.Sprite
+      ) as number[];
+      this.dropBomb(bombX, bombY);
     }
 
     const keyESC = this.input.keyboard.addKey(
@@ -472,9 +491,15 @@ class GameScene extends Phaser.Scene {
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       model.isGamePaused = true;
       model.escIsPressed = true;
+
       if (model.isGamePaused) {
+        this.putBombSound.stop();
         this.stageMusic.pause();
         this.scene.pause();
+
+        model.activeBombs.forEach((bomb) => {
+          window.clearTimeout(bomb.curBomb);
+        });
 
         setTimeout(() => {
           this.charStepSound.stop();
@@ -783,17 +808,21 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  dropBomb() {
+  dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
     if (model.activeBombs.length < model.maxBombs && !model.bombIsPlanting) {
-      const [bombX, bombY] = this.findClosestSquare(
-        this.char as Phaser.Physics.Matter.Sprite
-      );
       const checkSquare = this.bombs.children.entries.find(
         (bomb) =>
           (bomb as Phaser.Physics.Matter.Sprite).x === bombX &&
           (bomb as Phaser.Physics.Matter.Sprite).y === bombY
       );
-      if (checkSquare) return;
+      if (checkSquare) {
+        if (bombTimer === model.bombSpeed) return;
+        else {
+          checkSquare.destroy();
+          this.explosionSound.stop();
+        }
+      }
+
       const bomb = this.bombs
         .create(
           bombX,
@@ -809,16 +838,19 @@ class GameScene extends Phaser.Scene {
 
       setTimeout(() => (model.bombIsPlanting = false), 500);
 
-      const curBomb = setTimeout(() => {
-        this.explodeBomb(bomb, bombX, bombY);
-      }, model.bombSpeed);
-
-      model.activeBombs.push(curBomb);
+      const curBomb = {
+        curBomb: setTimeout(() => {
+          this.explodeBomb(bomb, bombX, bombY);
+        }, bombTimer),
+        bombTimer: bombTimer,
+        bombX: bombX,
+        bombY: bombY,
+      };
 
       bomb.on("destroy", () => {
-        const findCurBomb = model.activeBombs.find((bomb) => bomb === curBomb);
-        clearTimeout(findCurBomb);
-        model.activeBombs.shift();
+        model.activeBombs = model.activeBombs.filter(
+          (bomb) => bomb !== curBomb
+        );
         this.explosionSound.play();
 
         setTimeout(() => {
@@ -836,7 +868,10 @@ class GameScene extends Phaser.Scene {
         ease: "Sine.easeInOut",
       });
 
-      this.char.anims.play("placeBomb", true);
+      if (bombTimer === model.bombSpeed) {
+        model.activeBombs.push(curBomb);
+        this.char.anims.play("placeBomb", true);
+      }
     }
     model.superBombActive = false;
   }
@@ -866,7 +901,7 @@ class GameScene extends Phaser.Scene {
     setTimeout(() => (model.gameOver = false), 0);
 
     while (model.activeBombs.length > 0) {
-      window.clearTimeout(model.activeBombs.pop());
+      window.clearTimeout(model.activeBombs.pop()?.bombTimer);
     }
     this.bombs.destroy();
     this.scene.restart();

@@ -14,7 +14,12 @@ export class Model {
   curLvlTimer: number;
   curTimer: number;
   bombSpeed: number;
-  activeBombs: ReturnType<typeof setTimeout>[];
+  activeBombs: {
+    curBomb: ReturnType<typeof setTimeout>;
+    bombTimer: number;
+    bombX: number;
+    bombY: number;
+  }[];
   lives: number;
   curLvlScore: number;
   score: number;
@@ -59,7 +64,7 @@ export class Model {
     };
     this.activeBombs = [];
     this.gameOver = false;
-    this.maxBombs = 1;
+    this.maxBombs = 2;
     this.bombIsPlanting = false;
     this.superBombActive = false;
     this.shieldActive = false;
@@ -156,6 +161,7 @@ export class Model {
     this.superBombActive = false;
     this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;
+    this.activeBombs = [];
   }
 
   nextLvl() {
@@ -167,6 +173,7 @@ export class Model {
     if (this.level % 2 === 0) this.charSpeed += 5;
     this.curLvlTimer += 20;
     this.curTimer = this.curLvlTimer;
+    this.activeBombs = [];
   }
 
   set isMuted(val: Boolean) {
