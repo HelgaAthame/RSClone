@@ -165,6 +165,16 @@ class GameScene extends Phaser.Scene {
     this.stageMusic = this.sound.add("stageMusic", { loop: true });
     this.stageMusic.play();
 
+    this.events.on("resume", () => {
+      this.stageMusic.resume();
+
+      if (model.activeBombs.length !== 0) {
+        model.activeBombs.forEach((bomb) => {
+          this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
+        });
+      }
+    });
+
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
         const curSquareXCenter =
@@ -206,17 +216,32 @@ class GameScene extends Phaser.Scene {
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
 
-        if (i === ceilsNum - 1 && j === 2) {
-          fieldMatrix[i - 1][j - 1].object = "char";
-          continue;
-        }
-        if (randomWoodSquare && !emptyStartLocations) {
-          fieldMatrix[i - 1][j - 1].object = "wood";
-          this.wood
-            .create(curSquareXCenter, curSquareYCenter, "wood")
-            .setScale((1 / fieldImgSize) * fieldSquareLength)
-            .refreshBody();
-          continue;
+        if (model.fieldMatrix) {
+          if (model.fieldMatrix[i - 1][j - 1].object === "wood") {
+            fieldMatrix[i - 1][j - 1].object = "wood";
+            this.wood
+              .create(curSquareXCenter, curSquareYCenter, "wood")
+              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .refreshBody();
+            continue;
+          }
+          if (model.fieldMatrix[i - 1][j - 1].object === "char") {
+            fieldMatrix[i - 1][j - 1].object = "char";
+            continue;
+          }
+        } else {
+          if (i === ceilsNum - 1 && j === 2) {
+            fieldMatrix[i - 1][j - 1].object = "char";
+            continue;
+          }
+          if (randomWoodSquare && !emptyStartLocations) {
+            fieldMatrix[i - 1][j - 1].object = "wood";
+            this.wood
+              .create(curSquareXCenter, curSquareYCenter, "wood")
+              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .refreshBody();
+            continue;
+          }
         }
       }
     }
@@ -435,8 +460,8 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.bonusesText = this.add.text(
-      textStartX - 15,
-      textStartY + 30,
+      textStartX,
+      textStartY + 9.85 * fieldSquareLength,
       "",
       bonusTextStyle
     );
@@ -450,6 +475,7 @@ class GameScene extends Phaser.Scene {
 
     //if there is field matrix in model - we take it
     //if no - we write it into model
+
     if (model.fieldMatrix) {
       fieldMatrix = model.fieldMatrix;
     } else {
@@ -458,7 +484,14 @@ class GameScene extends Phaser.Scene {
     this.updateBonusesText();
   }
   update() {
-    if (!model.isGamePaused) model.curTimer -= 1 / 60;
+    model.activeBombs.map((bomb) => {
+      if (bomb.bombTimer > 0) {
+        bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
+      } else {
+        model.activeBombs = model.activeBombs.filter((cur) => cur !== bomb);
+      }
+    });
+    model.curTimer -= 1 / 60;
     if (model.curTimer <= 20) {
       this.timerText.setTint(0xff0000);
       this.add.tween({
@@ -491,7 +524,10 @@ class GameScene extends Phaser.Scene {
     }
 
     if (!model.gameOver && bombSet.isDown) {
-      this.dropBomb();
+      const [bombX, bombY] = this.findClosestSquare(
+        this.char as Phaser.Physics.Matter.Sprite
+      ) as number[];
+      this.dropBomb(bombX, bombY);
     }
 
     const keyESC = this.input.keyboard.addKey(
@@ -501,9 +537,17 @@ class GameScene extends Phaser.Scene {
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       model.isGamePaused = true;
       model.escIsPressed = true;
+
       if (model.isGamePaused) {
-        this.scene.pause();
+        this.putBombSound.stop();
         this.stageMusic.pause();
+        this.scene.pause();
+
+        model.activeBombs.forEach((bomb) => {
+          window.clearTimeout(bomb.curBomb);
+        });
+        model.bombIsPlanting = false;
+
         setTimeout(() => {
           this.charStepSound.stop();
         }, 0);
@@ -661,7 +705,10 @@ class GameScene extends Phaser.Scene {
         backgroundColor: "rgba(20, 20, 20, 0.75)",
         align: "center",
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(10);
+
+    model.fieldMatrix = undefined;
   }
 
   drawLevelComplete() {
@@ -670,7 +717,7 @@ class GameScene extends Phaser.Scene {
     this.charStepSound.stop();
     this.putBombSound.stop();
     this.stageClearSound.play();
-
+    model.fieldMatrix = undefined;
     view.win.renderUI();
   }
 
@@ -720,10 +767,10 @@ class GameScene extends Phaser.Scene {
             squareToCheck.y === (woodSquare as Phaser.Physics.Matter.Sprite).y
           );
         });
-        if (!woodSquare) throw Error("Wood square was not found");
+        if (!woodSquare) return;
         woodSquare.destroy();
         this.dropRandomBonus(x, y);
-      } else if (squareToCheck.object === "char") {
+      } else if (squareToCheck.object === "char" && !model.gameOver) {
         if (model.shieldActive) {
           model.shieldActive = false;
           this.char.clearTint();
@@ -764,7 +811,7 @@ class GameScene extends Phaser.Scene {
           }, 200);
         }
       }
-      // squareToCheck.object = "grass";
+      squareToCheck.object = "grass";
     }
   };
 
@@ -844,17 +891,25 @@ class GameScene extends Phaser.Scene {
     );
   }
 
-  dropBomb() {
-    if (model.activeBombs.length < model.maxBombs && !model.bombIsPlanting) {
-      const [bombX, bombY] = this.findClosestSquare(
-        this.char as Phaser.Physics.Matter.Sprite
-      );
+  dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
+    if (
+      (model.activeBombs.length < model.maxBombs ||
+        bombTimer !== model.bombSpeed) &&
+      !model.bombIsPlanting
+    ) {
       const checkSquare = this.bombs.children.entries.find(
         (bomb) =>
           (bomb as Phaser.Physics.Matter.Sprite).x === bombX &&
           (bomb as Phaser.Physics.Matter.Sprite).y === bombY
       );
-      if (checkSquare) return;
+      if (checkSquare) {
+        if (bombTimer === model.bombSpeed) return;
+        else {
+          checkSquare.destroy();
+          this.explosionSound.stop();
+        }
+      }
+
       const bomb = this.bombs
         .create(
           bombX,
@@ -865,21 +920,26 @@ class GameScene extends Phaser.Scene {
         .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setImmovable();
 
-      model.bombIsPlanting = true;
+      if (bombTimer === model.bombSpeed) {
+        model.bombIsPlanting = true;
+        setTimeout(() => (model.bombIsPlanting = false), 500);
+      }
+
       this.putBombSound.play();
 
-      setTimeout(() => (model.bombIsPlanting = false), 500);
-
-      const curBomb = setTimeout(() => {
-        this.explodeBomb(bomb, bombX, bombY);
-      }, model.bombSpeed);
-
-      model.activeBombs.push(curBomb);
+      const curBomb = {
+        curBomb: setTimeout(() => {
+          this.explodeBomb(bomb, bombX, bombY);
+        }, bombTimer),
+        bombTimer: bombTimer,
+        bombX: bombX,
+        bombY: bombY,
+      };
 
       bomb.on("destroy", () => {
-        const findCurBomb = model.activeBombs.find((bomb) => bomb === curBomb);
-        clearTimeout(findCurBomb);
-        model.activeBombs.shift();
+        model.activeBombs = model.activeBombs.filter(
+          (bomb) => bomb !== curBomb
+        );
         this.explosionSound.play();
 
         setTimeout(() => {
@@ -897,7 +957,10 @@ class GameScene extends Phaser.Scene {
         ease: "Sine.easeInOut",
       });
 
-      this.char.anims.play("placeBomb", true);
+      if (bombTimer === model.bombSpeed) {
+        model.activeBombs.push(curBomb);
+        this.char.anims.play("placeBomb", true);
+      }
     }
     model.superBombActive = false;
   }
@@ -905,10 +968,17 @@ class GameScene extends Phaser.Scene {
   charDie() {
     model.gameOver = true;
     model.lives--;
+    model.maxBombs = 1;
+    model.shieldActive = false;
+    model.superBombActive = false;
+    this.updateBonusesText();
     this.char.destroy();
     this.drawGameOver();
   }
   restartGame() {
+    model.activeBombs.forEach((bomb) => {
+      window.clearTimeout(bomb.curBomb);
+    });
     model.resetGame();
     setTimeout(() => {
       model.gameOver = false;
@@ -922,9 +992,9 @@ class GameScene extends Phaser.Scene {
 
     setTimeout(() => (model.gameOver = false), 0);
 
-    while (model.activeBombs.length > 0) {
-      window.clearTimeout(model.activeBombs.pop());
-    }
+    model.activeBombs.forEach((bomb) => {
+      window.clearTimeout(bomb.curBomb);
+    });
     this.bombs.destroy();
     this.scene.restart();
   }
@@ -1025,8 +1095,8 @@ class GameScene extends Phaser.Scene {
   }
 
   updateBonusesText() {
-    const text = `💣х${model.maxBombs}${model.shieldActive ? "\n⛨" : ""}${
-      model.superBombActive ? "\n💥" : ""
+    const text = `💣х${model.maxBombs}${model.shieldActive ? " ⛨" : ""}${
+      model.superBombActive ? " 💥" : ""
     }`;
     this.bonusesText.setText(text);
   }

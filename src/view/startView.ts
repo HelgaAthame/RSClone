@@ -200,12 +200,10 @@ export class StartView {
       view.start.gameScene.scene.resume();
     }
     if (!view.start.phaser) {
-      model.enemyCounter = model.level + 2;
       view.start.phaser = await import("../phaser.js");
+      return;
     }
 
-    // console.log(`model.enemyCounter = ${model.enemyCounter}`);
-    // console.log(`model.curLvlEnemies = ${model.curLvlEnemies}`);
     model.escIsPressed = false;
     model.gameOver = false;
   }
@@ -229,6 +227,7 @@ export class StartView {
         view.start.phaser = await import("../phaser.js");
       } else {
         model.resetGame();
+        model.saveToBd();
         view.start.phaser.gameScene.restartGame();
       }
     }, 500);

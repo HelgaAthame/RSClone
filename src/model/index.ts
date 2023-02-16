@@ -14,7 +14,12 @@ export class Model {
   curLvlTimer: number;
   curTimer: number;
   bombSpeed: number;
-  activeBombs: ReturnType<typeof setTimeout>[];
+  activeBombs: {
+    curBomb: ReturnType<typeof setTimeout>;
+    bombTimer: number;
+    bombX: number;
+    bombY: number;
+  }[];
   lives: number;
   curLvlScore: number;
   score: number;
@@ -77,6 +82,7 @@ export class Model {
 
   async saveToBd() {
     console.log("we are saving info to DB");
+
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -106,6 +112,8 @@ export class Model {
   }
 
   async takeFromBD() {
+    console.log("take from DB");
+    console.log(model.fieldMatrix);
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
@@ -120,7 +128,8 @@ export class Model {
 
       this.charSpeed = data.charSpeed;
       this.curLvlEnemies = data.curLvlEnemies;
-      this.enemyCounter = data.enemyCounter;
+      //this.enemyCounter = data.enemyCounter;
+
       this.bombSpeed = data.bombSpeed;
       this.curLvlScore = data.curLvlScore;
       this.curLvlTimer = data.curLvlTimer;
@@ -153,6 +162,8 @@ export class Model {
     this.superBombActive = false;
     this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;
+    this.activeBombs = [];
+    this.fieldMatrix = undefined;
   }
 
   nextLvl() {
@@ -164,6 +175,7 @@ export class Model {
     if (this.level % 2 === 0) this.charSpeed += 5;
     this.curLvlTimer += 20;
     this.curTimer = this.curLvlTimer;
+    this.activeBombs = [];
   }
 
   set isMuted(val: Boolean) {
