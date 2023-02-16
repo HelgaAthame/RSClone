@@ -661,6 +661,8 @@ class GameScene extends Phaser.Scene {
     }
   }
   enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
+    const testSquare = this.findClosestSquare(enemy);
+    // console.log("testSquare :", testSquare);
     const [closestX, closestY] = this.findClosestSquare(enemy);
     const flatFieldMatrix = fieldMatrix.flat();
 
@@ -770,6 +772,8 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
+    // this.drawExplosion(x, y);
+
     const flatFieldMatrix = fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
@@ -918,6 +922,82 @@ class GameScene extends Phaser.Scene {
       undefined,
       this
     );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.wood,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.enemies,
+    //   this.destroyEnemy as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.char,
+    //   this.destroyEnemy as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+  }
+
+  destroyEnemy(
+    _explosion: Phaser.Physics.Arcade.Sprite,
+    enemy: Phaser.Physics.Arcade.Sprite
+  ) {
+    console.log("enemy to destroy :", enemy);
+    // enemy.deathTriggered = true
+    Object.defineProperty(enemy, "isDeathTriggered", { value: true });
+
+    // enemy.disableBody(true, true);
+
+    // const squareToCheck = flatFieldMatrix.find(
+    //   //   (square) =>
+    //   //     Math.floor(square.x) === Math.floor(x) &&
+    //   //     Math.floor(square.y) === Math.floor(y)
+    //   );
+    // const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
+    //         const [closestX, closestY] = this.findClosestSquare( enemy as Phaser.Physics.Matter.Sprite
+    //         );
+    //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
+    //       });
+    enemy.once("destroy", () => {
+      const { isDeathTriggered } = enemy;
+      console.log("isDeathTriggered :", isDeathTriggered);
+      // console.log("test", enemy.deathTriggered);
+      console.log("model.curLvlScore :", model.curLvlScore);
+      console.log("model.curLvlScore :", model.curLvlScore);
+      if (!isDeathTriggered) {
+        model.curLvlScore += 100;
+        this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
+        this.enemyDeathSound.play();
+        model.enemyCounter--;
+
+        enemy.setTint(0xff0000);
+        this.add.tween({
+          targets: enemy,
+          ease: "Sine.easeInOut",
+          duration: 200,
+          delay: 0,
+          alpha: {
+            getStart: () => 1,
+            getEnd: () => 0,
+          },
+        });
+        if (model.enemyCounter === 0 && !model.gameOver) {
+          this.drawLevelComplete();
+        }
+      }
+    });
+
+    setTimeout(() => {
+      console.log("model.enemyCounter :", model.enemyCounter);
+      enemy.destroy();
+    }, 200);
   }
 
   dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
