@@ -230,6 +230,7 @@ export class StartView {
         view.start.phaser = await import("../phaser.js");
       } else {
         model.resetGame();
+        model.saveToBd();
         view.start.phaser.gameScene.restartGame();
       }
     }, 500);
