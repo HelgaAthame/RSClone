@@ -204,7 +204,8 @@ class GameScene extends Phaser.Scene {
           .create(curSquareXCenter, curSquareYCenter, "grass")
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
-
+        console.log('let\'s look at model.fieldMatrix')
+        console.log(model.fieldMatrix)
         if (model.fieldMatrix) {
 
               if (model.fieldMatrix[i-1][j-1].object === "wood") {
