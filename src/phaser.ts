@@ -215,21 +215,18 @@ class GameScene extends Phaser.Scene {
           .refreshBody();
 
         if (model.fieldMatrix) {
-
-              if (model.fieldMatrix[i-1][j-1].object === "wood") {
-                fieldMatrix[i-1][j-1].object = "wood";
-                this.wood
-                  .create(curSquareXCenter, curSquareYCenter, "wood")
-                  .setScale((1 / fieldImgSize) * fieldSquareLength)
-                  .refreshBody();
-                continue;
-              }
-              if (model.fieldMatrix[i-1][j-1].object === 'char') {
-                fieldMatrix[i-1][j-1].object = "char";
-                continue;
-              }
-
-
+          if (model.fieldMatrix[i - 1][j - 1].object === "wood") {
+            fieldMatrix[i - 1][j - 1].object = "wood";
+            this.wood
+              .create(curSquareXCenter, curSquareYCenter, "wood")
+              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .refreshBody();
+            continue;
+          }
+          if (model.fieldMatrix[i - 1][j - 1].object === "char") {
+            fieldMatrix[i - 1][j - 1].object = "char";
+            continue;
+          }
         } else {
           if (i === ceilsNum - 1 && j === 2) {
             fieldMatrix[i - 1][j - 1].object = "char";
@@ -244,10 +241,8 @@ class GameScene extends Phaser.Scene {
             continue;
           }
         }
-
       }
     }
-
 
     this.char = this.physics.add
       .sprite(charStartX, charStartY, "char")
@@ -744,7 +739,7 @@ class GameScene extends Phaser.Scene {
         if (!woodSquare) return;
         woodSquare.destroy();
         this.drawRandomBonus(x, y);
-      } else if (squareToCheck.object === "char") {
+      } else if (squareToCheck.object === "char" && !model.gameOver) {
         if (model.shieldActive) {
           model.shieldActive = false;
           this.char.clearTint();

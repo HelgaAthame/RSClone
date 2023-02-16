@@ -81,8 +81,6 @@ export class Model {
   }
 
   async saveToBd() {
-    //console.log("this.uid :", this.uid);
-    //console.log("this.userName :", this.userName);
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -147,8 +145,6 @@ export class Model {
     } else {
       //console.log("No such document!");
     }
-
-    console.log(model.fieldMatrix);
   }
 
   resetGame() {
