@@ -81,9 +81,6 @@ export class Model {
   }
 
   async saveToBd() {
-    console.log("we are saving info to DB");
-    console.log('field matrix is');
-    console.log(model.fieldMatrix);
 
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
