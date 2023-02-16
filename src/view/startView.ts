@@ -63,9 +63,11 @@ export class StartView {
     </footer>
     `;
 
-    document.addEventListener("keydown", async function aud() {
+    document.addEventListener("keydown", async function aud(e) {
       document.removeEventListener("keydown", aud);
-      view.start.addBGAudio();
+      if (e.code !== 'Enter') {
+        view.start.addBGAudio();
+      }
     });
 
     this.setContinueButtonState();
@@ -242,7 +244,7 @@ export class StartView {
   }
 
   pauseBGAudio() {
-    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
-    bgAudio.pause();
+    const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
+    if (bgAudio) bgAudio.pause();
   }
 }
