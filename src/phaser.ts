@@ -89,6 +89,7 @@ class GameScene extends Phaser.Scene {
   wood: Phaser.Physics.Arcade.StaticGroup;
   bombs: Phaser.Physics.Arcade.Group;
   explosion: Phaser.GameObjects.Sprite;
+  explosions: Phaser.Physics.Arcade.StaticGroup;
   hearts: Phaser.Physics.Arcade.StaticGroup;
   shields: Phaser.Physics.Arcade.StaticGroup;
   bombIncreasers: Phaser.Physics.Arcade.StaticGroup;
@@ -152,6 +153,7 @@ class GameScene extends Phaser.Scene {
     this.bombIncreasers = this.physics.add.staticGroup();
     this.shields = this.physics.add.staticGroup();
     this.superBombs = this.physics.add.staticGroup();
+    this.explosions = this.physics.add.staticGroup();
 
     this.explosionSound = this.sound.add("explosion", { loop: false });
     this.charStepSound = this.sound.add("charStep", { loop: true });
@@ -322,6 +324,34 @@ class GameScene extends Phaser.Scene {
       undefined,
       this
     );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.bombIncreasers,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.hearts,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.superBombs,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.shields,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
 
     /*Draw explosion */
     this.anims.create({
@@ -692,7 +722,7 @@ class GameScene extends Phaser.Scene {
         });
         if (!woodSquare) throw Error("Wood square was not found");
         woodSquare.destroy();
-        this.drawRandomBonus(x, y);
+        this.dropRandomBonus(x, y);
       } else if (squareToCheck.object === "char") {
         if (model.shieldActive) {
           model.shieldActive = false;
@@ -775,10 +805,43 @@ class GameScene extends Phaser.Scene {
 
   drawExplosion(x: number, y: number) {
     this.explosion = this.physics.add.sprite(x, y, "explosion");
+    // const explosion = this.physics.add.sprite(x, y, "explosion");
+    // const newXplosn = this.explosions.create(x, y, "");
     const explosionAnim = this.explosion.anims.play("bombExplosion", false);
     explosionAnim.once("animationcomplete", () => {
       explosionAnim.destroy();
+      this.explosion.destroy();
+      // this.dropRandomBonus(x, y);
     });
+
+    this.physics.add.overlap(
+      this.explosion,
+      this.bombIncreasers,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.explosion,
+      this.hearts,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.explosion,
+      this.superBombs,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.explosion,
+      this.shields,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
   }
 
   dropBomb() {
@@ -869,25 +932,15 @@ class GameScene extends Phaser.Scene {
     model.gameOver = !model.gameOver;
   }
 
-  drawRandomBonus(x: number, y: number) {
+  dropRandomBonus(x: number, y: number) {
     const random = Math.random();
     let group: Phaser.Physics.Arcade.StaticGroup | null = null;
     let item: string = "";
-    if (random > 0.8) {
-      group = this.hearts;
-      item = Items.LIFE;
-    } else if (random > 0.6) {
-      group = this.superBombs;
-      item = Items.SUPERBOMB;
-    } else if (random > 0.4) {
-      group = this.shields;
-      item = Items.SHIELD;
-    } else if (random > 0.2) {
-      group = this.bombIncreasers;
-      item = Items.BOMB_ICREASER;
-    }
 
-    if (group && item) {
+    const createItem = (
+      group: Phaser.Physics.Arcade.StaticGroup | null = null,
+      item: string = ""
+    ) => {
       const bonus = group
         .create(x, y, item)
         .setSize(fieldSquareLength, fieldSquareLength)
@@ -903,6 +956,25 @@ class GameScene extends Phaser.Scene {
         duration: 300,
         ease: "Sine.easeInOut",
       });
+    };
+
+    if (random > 0.8) {
+      group = this.hearts;
+      item = Items.LIFE;
+    } else if (random > 0.6) {
+      group = this.superBombs;
+      item = Items.SUPERBOMB;
+    } else if (random > 0.4) {
+      group = this.shields;
+      item = Items.SHIELD;
+    } else if (random > 0.2) {
+      group = this.bombIncreasers;
+      item = Items.BOMB_ICREASER;
+    }
+    if (group && item) {
+      setTimeout(() => {
+        createItem(group, item);
+      }, 1000);
     }
   }
 
