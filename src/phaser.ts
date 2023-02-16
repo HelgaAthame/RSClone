@@ -204,6 +204,7 @@ class GameScene extends Phaser.Scene {
           .create(curSquareXCenter, curSquareYCenter, "grass")
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
+
         console.log('let\'s look at model.fieldMatrix')
         console.log(model.fieldMatrix)
         if (model.fieldMatrix) {
@@ -223,11 +224,14 @@ class GameScene extends Phaser.Scene {
 
 
         } else {
+          console.log('there should not be fieldmatrix in model');
+          console.log(model.fieldMatrix);
           if (i === ceilsNum - 1 && j === 2) {
             fieldMatrix[i - 1][j - 1].object = "char";
             continue;
           }
           if (randomWoodSquare && !emptyStartLocations) {
+            console.log('create new wooooood');
             fieldMatrix[i - 1][j - 1].object = "wood";
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")

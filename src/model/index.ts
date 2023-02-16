@@ -159,6 +159,7 @@ export class Model {
     this.superBombActive = false;
     this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;
+    this.fieldMatrix = undefined;
   }
 
   nextLvl() {
