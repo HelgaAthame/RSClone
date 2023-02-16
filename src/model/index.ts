@@ -76,7 +76,6 @@ export class Model {
   }
 
   async saveToBd() {
-    console.log('we are saving info to DB')
     //console.log("this.uid :", this.uid);
     //console.log("this.userName :", this.userName);
     await setDoc(doc(db, "users", this.uid), {
@@ -112,7 +111,6 @@ export class Model {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-
       const data = docSnap.data();
       this.lives = data.lives;
       this.score = data.score;
@@ -123,7 +121,8 @@ export class Model {
 
       this.charSpeed = data.charSpeed;
       this.curLvlEnemies = data.curLvlEnemies;
-      this.enemyCounter = data.enemyCounter;
+      //this.enemyCounter = data.enemyCounter;
+
       this.bombSpeed = data.bombSpeed;
       this.curLvlScore = data.curLvlScore;
       this.curLvlTimer = data.curLvlTimer;
@@ -139,7 +138,6 @@ export class Model {
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
     } else {
-
       //console.log("No such document!");
     }
   }

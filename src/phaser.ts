@@ -162,6 +162,7 @@ class GameScene extends Phaser.Scene {
     this.stageClearSound = this.sound.add("stageClear", { loop: false });
     this.stageMusic = this.sound.add("stageMusic", { loop: true });
     this.stageMusic.play();
+    this.events.on("resume", () => this.stageMusic.resume());
 
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
@@ -405,8 +406,8 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.bonusesText = this.add.text(
-      textStartX - 15,
-      textStartY + 30,
+      textStartX,
+      textStartY + 9.85 * fieldSquareLength,
       "",
       bonusTextStyle
     );
@@ -472,8 +473,9 @@ class GameScene extends Phaser.Scene {
       model.isGamePaused = true;
       model.escIsPressed = true;
       if (model.isGamePaused) {
-        this.scene.pause();
         this.stageMusic.pause();
+        this.scene.pause();
+
         setTimeout(() => {
           this.charStepSound.stop();
         }, 0);
@@ -842,6 +844,10 @@ class GameScene extends Phaser.Scene {
   charDie() {
     model.gameOver = true;
     model.lives--;
+    model.maxBombs = 1;
+    model.shieldActive = false;
+    model.superBombActive = false;
+    this.updateBonusesText();
     this.char.destroy();
     this.drawGameOver();
   }
@@ -953,8 +959,8 @@ class GameScene extends Phaser.Scene {
   }
 
   updateBonusesText() {
-    const text = `💣х${model.maxBombs}${model.shieldActive ? "\n⛨" : ""}${
-      model.superBombActive ? "\n💥" : ""
+    const text = `💣х${model.maxBombs}${model.shieldActive ? " ⛨" : ""}${
+      model.superBombActive ? " 💥" : ""
     }`;
     this.bonusesText.setText(text);
   }
