@@ -21,6 +21,7 @@ export class WinView {
     `;
     this.addListeners(/*context*/);
     model.saveToBd();
+    model.fieldMatrix = undefined;
   }
 
   addListeners(/*context: typeof gameScene*/) {

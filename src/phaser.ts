@@ -723,7 +723,7 @@ class GameScene extends Phaser.Scene {
     this.charStepSound.stop();
     this.putBombSound.stop();
     this.stageClearSound.play();
-    model.fieldMatrix = undefined;
+    //model.fieldMatrix = undefined;
     view.win.renderUI();
   }
 

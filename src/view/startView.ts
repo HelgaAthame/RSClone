@@ -93,10 +93,16 @@ export class StartView {
       document,
       ".continue"
     ) as HTMLDivElement;
-    const docRef = doc(db, "users", this.uid);
-    const docSnap = await getDoc(docRef);
+    let docRef;
+    if (this.uid) {
+      docRef = doc(db, "users", this.uid);
+    }
+    let docSnap;
+    if (docRef) {
+      docSnap = await getDoc(docRef);
+    }
 
-    continueButton.style.display =
+    if (docSnap) continueButton.style.display =
       docSnap.exists() && this.uid ? "initial" : "none";
   }
 
