@@ -913,6 +913,9 @@ class GameScene extends Phaser.Scene {
     this.drawGameOver();
   }
   restartGame() {
+    model.activeBombs.forEach((bomb) => {
+      window.clearTimeout(bomb.curBomb);
+    });
     model.resetGame();
     setTimeout(() => {
       model.gameOver = false;
@@ -929,7 +932,6 @@ class GameScene extends Phaser.Scene {
     model.activeBombs.forEach((bomb) => {
       window.clearTimeout(bomb.curBomb);
     });
-    model.activeBombs = [];
     this.bombs.destroy();
     this.scene.restart();
   }
