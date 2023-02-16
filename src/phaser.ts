@@ -482,6 +482,12 @@ class GameScene extends Phaser.Scene {
       model.fieldMatrix = fieldMatrix;
     }
     this.updateBonusesText();
+
+    if (model.activeBombs.length !== 0) {
+      model.activeBombs.forEach((bomb) => {
+        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
+      });
+    }
   }
   update() {
     model.activeBombs.map((bomb) => {
@@ -717,7 +723,7 @@ class GameScene extends Phaser.Scene {
     this.charStepSound.stop();
     this.putBombSound.stop();
     this.stageClearSound.play();
-    model.fieldMatrix = undefined;
+    //model.fieldMatrix = undefined;
     view.win.renderUI();
   }
 
@@ -1011,21 +1017,23 @@ class GameScene extends Phaser.Scene {
       group: Phaser.Physics.Arcade.StaticGroup | null = null,
       item: string = ""
     ) => {
-      const bonus = group
-        .create(x, y, item)
-        .setSize(fieldSquareLength, fieldSquareLength)
-        .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
-        .refreshBody();
+      if (group) {
+        const bonus = group
+          .create(x, y, item)
+          .setSize(fieldSquareLength, fieldSquareLength)
+          .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
+          .refreshBody();
 
-      this.tweens.add({
-        targets: bonus,
-        scaleX: bonus.scaleX / 1.3,
-        scaleY: bonus.scaleY / 1.3,
-        yoyo: true,
-        repeat: -1,
-        duration: 300,
-        ease: "Sine.easeInOut",
-      });
+        this.tweens.add({
+          targets: bonus,
+          scaleX: bonus.scaleX / 1.3,
+          scaleY: bonus.scaleY / 1.3,
+          yoyo: true,
+          repeat: -1,
+          duration: 300,
+          ease: "Sine.easeInOut",
+        });
+      }
     };
 
     if (random > 0.8) {

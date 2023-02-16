@@ -63,9 +63,11 @@ export class StartView {
     </footer>
     `;
 
-    document.addEventListener("keydown", async function aud() {
+    document.addEventListener("keydown", async function aud(e) {
       document.removeEventListener("keydown", aud);
-      view.start.addBGAudio();
+      if (e.code !== 'Enter') {
+        view.start.addBGAudio();
+      }
     });
 
     this.setContinueButtonState();
@@ -93,10 +95,16 @@ export class StartView {
       document,
       ".continue"
     ) as HTMLDivElement;
-    const docRef = doc(db, "users", this.uid);
-    const docSnap = await getDoc(docRef);
+    let docRef;
+    if (this.uid) {
+      docRef = doc(db, "users", this.uid);
+    }
+    let docSnap;
+    if (docRef) {
+      docSnap = await getDoc(docRef);
+    }
 
-    continueButton.style.display =
+    if (docSnap) continueButton.style.display =
       docSnap.exists() && this.uid ? "initial" : "none";
   }
 
@@ -194,6 +202,8 @@ export class StartView {
 
     this.pauseBGAudio();
 
+    await model.takeFromBD.call(model);
+
     if (canvas) canvas.style.display = "initial";
     if (view.start.phaser) {
       view.start.gameScene = view.start.phaser.gameScene;
@@ -234,7 +244,7 @@ export class StartView {
   }
 
   pauseBGAudio() {
-    const bgAudio = selectorChecker(document, ".bgAudio") as HTMLAudioElement;
-    bgAudio.pause();
+    const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
+    if (bgAudio) bgAudio.pause();
   }
 }
