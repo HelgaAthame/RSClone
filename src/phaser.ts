@@ -675,7 +675,8 @@ class GameScene extends Phaser.Scene {
         backgroundColor: "rgba(20, 20, 20, 0.75)",
         align: "center",
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(10);
 
     model.fieldMatrix = undefined;
   }
