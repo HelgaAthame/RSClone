@@ -461,7 +461,7 @@ class GameScene extends Phaser.Scene {
         model.activeBombs = model.activeBombs.filter((cur) => cur !== bomb);
       }
     });
-    if (!model.isGamePaused) model.curTimer -= 1 / 60;
+    model.curTimer -= 1 / 60;
     if (model.curTimer <= 20) {
       this.timerText.setTint(0xff0000);
       this.add.tween({
