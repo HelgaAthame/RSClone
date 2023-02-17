@@ -19,6 +19,7 @@ export class Model {
     bombTimer: number;
     bombX: number;
     bombY: number;
+    isSuperBomb: boolean;
   }[];
   lives: number;
   curLvlScore: number;

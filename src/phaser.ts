@@ -37,9 +37,6 @@ const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
 const fieldImgSize = 512;
 
-const charStartX = fieldStartX + 1.5 * fieldSquareLength;
-const charStartY = height - 1.5 * fieldSquareLength;
-
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
 const gameUITextStyle: Partial<Phaser.GameObjects.TextStyle> = {
@@ -167,15 +164,18 @@ class GameScene extends Phaser.Scene {
 
     this.events.on("resume", () => {
       this.stageMusic.resume();
-
       if (model.activeBombs.length !== 0) {
         model.activeBombs.forEach((bomb) => {
-          this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
+          this.dropBomb(
+            bomb.bombX,
+            bomb.bombY,
+            bomb.bombTimer,
+            bomb.isSuperBomb
+          );
         });
       }
     });
 
-    console.log("model.fieldMatrix", model.fieldMatrix);
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
         const curSquareXCenter =
@@ -513,7 +513,7 @@ class GameScene extends Phaser.Scene {
 
     if (model.activeBombs.length !== 0) {
       model.activeBombs.forEach((bomb) => {
-        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
+        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer, bomb.isSuperBomb);
       });
     }
   }
@@ -668,8 +668,6 @@ class GameScene extends Phaser.Scene {
     }
   }
   enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
-    const testSquare = this.findClosestSquare(enemy);
-    // console.log("testSquare :", testSquare);
     const [closestX, closestY] = this.findClosestSquare(enemy);
     const flatFieldMatrix = fieldMatrix.flat();
 
@@ -1016,7 +1014,12 @@ class GameScene extends Phaser.Scene {
     }, 200);
   }
 
-  dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
+  dropBomb(
+    bombX: number,
+    bombY: number,
+    bombTimer = model.bombSpeed,
+    isSuperBomb = model.superBombActive
+  ) {
     if (
       (model.activeBombs.length < model.maxBombs ||
         bombTimer !== model.bombSpeed) &&
@@ -1036,11 +1039,7 @@ class GameScene extends Phaser.Scene {
       }
 
       const bomb = this.bombs
-        .create(
-          bombX,
-          bombY,
-          model.superBombActive ? Bombs.SUPERBOMB : Bombs.BOMB
-        )
+        .create(bombX, bombY, isSuperBomb ? Bombs.SUPERBOMB : Bombs.BOMB)
         .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setImmovable();
@@ -1059,6 +1058,7 @@ class GameScene extends Phaser.Scene {
         bombTimer: bombTimer,
         bombX: bombX,
         bombY: bombY,
+        isSuperBomb: model.superBombActive ? true : false,
       };
 
       bomb.on("destroy", () => {
