@@ -172,7 +172,6 @@ class GameScene extends Phaser.Scene {
       this.charDeathSound.stop();
     });
 
-    console.log("model.fieldMatrix", model.fieldMatrix);
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
         const curSquareXCenter =
@@ -214,10 +213,8 @@ class GameScene extends Phaser.Scene {
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
 
-        // load from saved game
         if (model.fieldMatrix) {
           const current = model.fieldMatrix[i - 1][j - 1].object;
-          // console.log("model.fieldMatrix :", model.fieldMatrix);
           if (current === "wood") {
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")
@@ -291,8 +288,8 @@ class GameScene extends Phaser.Scene {
 
     this.char = this.physics.add
       .sprite(
-        charField.x ? charField.x : charStartX,
-        charField.y ? charField.y : charStartY,
+        charField.x !== undefined ? charField.x : charStartX,
+        charField.y !== undefined ? charField.y : charStartY,
         "char"
       )
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
@@ -570,8 +567,7 @@ class GameScene extends Phaser.Scene {
       this.dropBomb(bombX, bombY);
     }
 
-    if (keyESC.isDown /*&& !model.escIsPressed*/) {
-      console.log("matrix on esc", fieldMatrix);
+    if (keyESC.isDown) {
       model.isGamePaused = true;
       model.escIsPressed = true;
 
@@ -679,9 +675,6 @@ class GameScene extends Phaser.Scene {
         Math.floor(square.y) === Math.floor(closestY)
     );
 
-    console.log(
-      flatFieldMatrix.filter((square) => square.object?.startsWith("enemy"))
-    );
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
 
@@ -968,7 +961,6 @@ class GameScene extends Phaser.Scene {
     _explosion: Phaser.Physics.Arcade.Sprite,
     enemy: Phaser.Physics.Arcade.Sprite
   ) {
-    console.log("enemy to destroy :", enemy);
     // enemy.deathTriggered = true
     Object.defineProperty(enemy, "isDeathTriggered", { value: true });
 
@@ -1014,7 +1006,6 @@ class GameScene extends Phaser.Scene {
     });
 
     setTimeout(() => {
-      console.log("model.enemyCounter :", model.enemyCounter);
       enemy.destroy();
     }, 200);
   }
