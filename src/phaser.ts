@@ -881,12 +881,6 @@ class GameScene extends Phaser.Scene {
     if (keyESC.isDown) {
       model.fieldMatrix = fieldMatrix;
 
-      model.highScore =
-        model.curLvlScore + model.score > model.highScore
-          ? model.curLvlScore + model.score
-          : model.highScore;
-
-      console.log(model.highScore);
       model.saveToBd();
       model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
       model.isGamePaused = true;
@@ -903,6 +897,11 @@ class GameScene extends Phaser.Scene {
     }
 
     if (model.gameOver) {
+      model.highScore =
+        model.curLvlScore + model.score > model.highScore
+          ? model.curLvlScore + model.score
+          : model.highScore;
+
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
