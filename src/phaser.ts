@@ -782,8 +782,6 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
-    // this.drawExplosion(x, y);
-
     const flatFieldMatrix = fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
@@ -809,6 +807,7 @@ class GameScene extends Phaser.Scene {
           );
         });
         if (!woodSquare) return;
+        squareToCheck.object = "grass";
         woodSquare.destroy();
         this.dropRandomBonus(x, y);
       } else if (squareToCheck.object === "char" && !model.gameOver) {
@@ -816,6 +815,7 @@ class GameScene extends Phaser.Scene {
           model.shieldActive = false;
           this.char.clearTint();
         } else {
+          squareToCheck.object = "grass";
           this.charDie();
         }
         this.updateBonusesText();
@@ -827,7 +827,7 @@ class GameScene extends Phaser.Scene {
           return closestX === squareToCheck.x && closestY === squareToCheck.y;
         });
         enemyToDestroy?.on("destroy", () => {
-          squareToCheck.object = "";
+          squareToCheck.object = "grass";
           model.curLvlScore += 100;
           this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
           this.enemyDeathSound.play();
@@ -853,7 +853,6 @@ class GameScene extends Phaser.Scene {
           }, 200);
         }
       }
-      squareToCheck.object = "grass";
     }
   };
 
