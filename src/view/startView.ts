@@ -11,7 +11,7 @@ import "./startView.scss";
 import titleScreenAudio from "../assets/sounds/title-screen.mp3";
 
 export class StartView {
-  uid: string | null;
+  uid: string;
 
   constructor() {
     this.phaser;
@@ -76,7 +76,7 @@ export class StartView {
 
     document.addEventListener("keydown", async function aud(e) {
       document.removeEventListener("keydown", aud);
-      if (e.code !== 'Enter') {
+      if (e.code !== "Enter") {
         view.start.addBGAudio();
       }
     });
@@ -115,8 +115,9 @@ export class StartView {
       docSnap = await getDoc(docRef);
     }
 
-    if (docSnap) continueButton.style.display =
-      docSnap.exists() && this.uid ? "initial" : "none";
+    if (docSnap)
+      continueButton.style.display =
+        docSnap.exists() && this.uid ? "initial" : "none";
   }
 
   navigateMenuListeners() {

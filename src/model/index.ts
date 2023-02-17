@@ -83,7 +83,9 @@ export class Model {
   }
 
   async saveToBd() {
-    if (model.fieldMatrix) {
+    console.log("we are saving info to DB");
+
+
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -110,8 +112,6 @@ export class Model {
       charSpeed: this.charSpeed,
       gameOver: this.gameOver,
     });
-
-    }
   }
 
   async takeFromBD() {
@@ -120,12 +120,14 @@ export class Model {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
+      console.log("data from takedb :", data);
       this.lives = data.lives;
       this.score = data.score;
       this.isMuted = data.isMuted;
       this.volume = data.volume;
       this.buttons = data.buttons;
       this.fieldMatrix = JSON.parse(data.fieldMatrix);
+      console.log("this.fieldMatrix :", this.fieldMatrix);
 
       this.charSpeed = data.charSpeed;
       this.curLvlEnemies = data.curLvlEnemies;
