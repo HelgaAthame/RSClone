@@ -296,8 +296,6 @@ class GameScene extends Phaser.Scene {
       .setScale(0.9, 0.9)
       .refreshBody();
 
-    if (model.shieldActive) this.char.setTint(0x00ff00);
-
     this.char.on("destroy", () => {
       this.charStepSound.stop();
       this.charDeathSound.play();
@@ -551,7 +549,6 @@ class GameScene extends Phaser.Scene {
     if (model.gameOver) {
       if (keyESC.isDown) {
         view.start.renderUI();
-        this.restartScene();
       }
       this.stageMusic.stop();
       this.putBombSound.stop();
