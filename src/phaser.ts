@@ -1248,7 +1248,7 @@ class GameScene extends Phaser.Scene {
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      if (cam.rotation) cam.rotation += random;
+      cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);
