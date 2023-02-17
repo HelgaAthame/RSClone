@@ -291,13 +291,18 @@ class GameScene extends Phaser.Scene {
           .refreshBody();
       }
     }
-    console.log("fieldMatrix", fieldMatrix);
+
+    const charField = fieldMatrix
+      .flat()
+      .find((square) => square.object === "char") as FieldSquare;
 
     this.char = this.physics.add
-      .sprite(charStartX, charStartY, "char")
+      .sprite(charField.x, charField.y, "char")
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
       .refreshBody();
+
+    if (model.shieldActive) this.char.setTint(0x00ff00);
 
     this.char.on("destroy", () => {
       this.charStepSound.stop();
