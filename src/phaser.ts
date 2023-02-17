@@ -293,8 +293,6 @@ class GameScene extends Phaser.Scene {
       .setScale(0.9, 0.9)
       .refreshBody();
 
-    if (model.shieldActive) this.char.setTint(0x00ff00);
-
     this.char.on("destroy", () => {
       this.charStepSound.stop();
       this.charDeathSound.play();
@@ -500,8 +498,10 @@ class GameScene extends Phaser.Scene {
     } else {
       model.fieldMatrix = fieldMatrix;
     }
-    this.updateBonusesText();
+
     this.bombCheck();
+    this.shieldCheck();
+    this.updateBonusesText();
   }
   update() {
     model.activeBombs.map((bomb) => {
@@ -1074,6 +1074,7 @@ class GameScene extends Phaser.Scene {
       }
     }
     model.superBombActive = false;
+    this.updateBonusesText();
   }
 
   charDie() {
@@ -1180,7 +1181,7 @@ class GameScene extends Phaser.Scene {
   ) {
     shield.disableBody(true, true);
     model.shieldActive = true;
-    char.setTint(0x00ff00);
+    this.shieldCheck();
     this.updateBonusesText();
     // this.destroyOnCollideCallback(char, shield);
   }
@@ -1236,6 +1237,9 @@ class GameScene extends Phaser.Scene {
         this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer, bomb.isSuperBomb);
       });
     }
+  }
+  shieldCheck() {
+    if (model.shieldActive) this.char.setTint(0x00ff00);
   }
 }
 export const gameScene = new GameScene();
