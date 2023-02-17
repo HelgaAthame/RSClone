@@ -36,6 +36,8 @@ const ceilsNum = 11;
 const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
 const fieldImgSize = 512;
+const charStartX = fieldStartX + 1.5 * fieldSquareLength;
+const charStartY = height - 1.5 * fieldSquareLength;
 
 const textStartX = fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
@@ -222,10 +224,6 @@ class GameScene extends Phaser.Scene {
             fieldMatrix[i - 1][j - 1].object = "char";
           }
           if (current?.includes("enemy")) {
-            console.log(
-              "model.fieldMatrix[i - 1][j - 1].object :",
-              model.fieldMatrix[i - 1][j - 1].object
-            );
             fieldMatrix[i - 1][j - 1].object = "enemy";
             this.enemies
               .create(
@@ -288,7 +286,11 @@ class GameScene extends Phaser.Scene {
       .find((square) => square.object === "char") as FieldSquare;
 
     this.char = this.physics.add
-      .sprite(charField.x, charField.y, "char")
+      .sprite(
+        charField.x ? charField.x : charStartX,
+        charField.y ? charField.y : charStartY,
+        "char"
+      )
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
       .refreshBody();
@@ -1177,7 +1179,7 @@ class GameScene extends Phaser.Scene {
     // this.destroyOnCollideCallback(char, heart);
   }
   collectShield(
-    char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     shield: Phaser.Physics.Arcade.Sprite
   ) {
     shield.disableBody(true, true);
