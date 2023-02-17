@@ -78,9 +78,22 @@ body {
     .nav {
       @include flexCol;
       align-items: center;
-      article,
+      row-gap: 20px;
+
       div {
         padding: $basic-padding;
+      }
+
+      button {
+        font: inherit;
+        background-color: transparent;
+        border: none;
+        font-size: 26px;
+        color: $text-color;
+
+        &:disabled {
+          opacity: 0.5;
+        }
       }
       .instruction {
         color: plum;

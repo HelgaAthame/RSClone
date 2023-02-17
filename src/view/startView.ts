@@ -24,10 +24,6 @@ export class StartView {
   canvas: HTMLCanvasElement;
 
   renderUI() {
-    console.log('вызван start view render UI');
-    console.log('fieldMatrix = ');
-    console.log(model.fieldMatrix);
-
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     if (canvas) canvas.style.display = "none";
 
@@ -43,18 +39,11 @@ export class StartView {
     <nav class="nav">
 
       <div class="instruction">Please, use arrow keys to navigate</div>
-      <article data-content="start" class="nav-item start active article">Start</article>
-      <article data-content="continue" class="nav-item continue article">Continue</article>
-      <article data-content="settings" class="nav-item settings article">Settings</article>
-      <article data-content=${model.auth} class="nav-item auth article">${
-        model.auth
-      }${
-        model.auth === 'authorized'
-        ? `: ${model.userName}`
-        : ''
-      }
-        </article>
-      <article data-content="leaderboard" class="nav-item settings article">Leaderboard</article>
+      <button data-content="start" class="nav-item start active article">Start</button>
+      <button data-content="continue" class="nav-item continue article">Continue</button>
+      <button data-content="settings" class="nav-item settings article">Settings</button>
+      <button data-content="authorization" class="nav-item auth article">Authorization</button>
+      <button data-content="leaderboard" class="nav-item settings article">Leaderboard</button>
     </nav>
     <footer class="footer">
       <section class="github">
@@ -105,7 +94,7 @@ export class StartView {
     const continueButton = selectorChecker(
       document,
       ".continue"
-    ) as HTMLDivElement;
+    ) as HTMLButtonElement;
     let docRef;
     if (this.uid) {
       docRef = doc(db, "users", this.uid);
@@ -116,8 +105,8 @@ export class StartView {
     }
 
     if (docSnap)
-      continueButton.style.display =
-        docSnap.exists() && this.uid ? "initial" : "none";
+      continueButton.disabled = docSnap.exists() && this.uid ? false : true;
+    console.log(continueButton.disabled);
   }
 
   navigateMenuListeners() {
@@ -161,47 +150,44 @@ export class StartView {
           footerlinks[k].classList.add("active");
           break;
         case "Enter":
-          const selected = document.querySelector(".active") as HTMLElement;
-          if (selected) {
-            switch (selected.dataset.content) {
-              case "authorization":
-                firebase.googleAuth();
+          const selected = selectorChecker(document, ".active") as HTMLElement;
 
-                break;
+          switch (selected.dataset.content) {
+            case "authorization":
+              firebase.googleAuth();
+              break;
 
-              case "start":
-                view.start.handleStartGame();
-                document.removeEventListener("keydown", foo);
-                break;
+            case "start":
+              view.start.handleStartGame();
+              document.removeEventListener("keydown", foo);
+              break;
 
-              case "continue":
-                view.start.handleContinueGame();
-                document.removeEventListener("keydown", foo);
-                break;
+            case "continue":
+              view.start.handleContinueGame();
+              document.removeEventListener("keydown", foo);
+              break;
 
-              case "settings":
-                view.settings.renderUI();
-                document.removeEventListener("keydown", foo);
-                break;
-              case "leaderboard":
-                view.scores.renderUI();
-                document.removeEventListener("keydown", foo);
-                break;
-              case "Olga":
-                selected.click();
-                break;
-              case "Gleb":
-                selected.click();
-                break;
-              case "Alex":
-                selected.click();
-                break;
-              default:
-                selected.click();
-                break;
-            }
+            case "settings":
+              view.settings.renderUI();
+              document.removeEventListener("keydown", foo);
+              break;
+            case "leaderboard":
+              view.scores.renderUI();
+              document.removeEventListener("keydown", foo);
+              break;
+            case "Olga":
+              selected.click();
+              break;
+            case "Gleb":
+              selected.click();
+              break;
+            case "Alex":
+              selected.click();
+              break;
+            default:
+              selected.click();
+              break;
           }
-
           //document.removeEventListener("keydown", foo);
           break;
       }
@@ -217,9 +203,7 @@ export class StartView {
 
     this.pauseBGAudio();
 
-    await model.takeFromBD().catch((e) => {
-      console.log(`error catched while taking from DB ${e}`);
-    });
+    await model.takeFromBD.call(model);
 
     if (canvas) canvas.style.display = "initial";
     if (view.start.phaser) {
@@ -246,7 +230,7 @@ export class StartView {
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
-    <div class="begin">LEVEL 1</div>
+    <div class="begin">LEVEL ${model.level}</div>
   `;
     setTimeout(async () => {
       if (canvas) canvas.style.display = "initial";
@@ -254,9 +238,7 @@ export class StartView {
         view.start.phaser = await import("../phaser.js");
       } else {
         model.resetGame();
-        model.saveToBd().catch((e)=> {
-          console.log(`error while saving to DB ${e}`)
-        });
+        model.saveToBd();
         view.start.phaser.gameScene.restartGame();
       }
     }, 500);
