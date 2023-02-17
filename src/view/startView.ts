@@ -5,7 +5,6 @@ import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import { model } from "../model/index.js";
-//import { gameScene } from "../phaser.js";
 import "./startView.scss";
 
 import titleScreenAudio from "../assets/sounds/title-screen.mp3";
@@ -91,11 +90,13 @@ export class StartView {
   }
 
   async setContinueButtonState() {
+    const canvas = document.querySelector("canvas");
     const continueButton = selectorChecker(
       document,
       ".continue"
     ) as HTMLButtonElement;
     let docRef;
+
     if (this.uid) {
       docRef = doc(db, "users", this.uid);
 
@@ -105,8 +106,7 @@ export class StartView {
       }
 
       if (docSnap) {
-        continueButton.disabled = docSnap.exists() ? false : true;
-        continueButton.classList.add("disabled");
+        continueButton.disabled = docSnap.exists() || canvas ? false : true;
       }
     } else {
       continueButton.disabled = true;
