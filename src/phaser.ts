@@ -648,8 +648,17 @@ class GameScene extends Phaser.Scene {
         Math.floor(square.y) === Math.floor(closestY)
     );
 
+    console.log(
+      flatFieldMatrix.filter((square) => square.object?.startsWith("enemy"))
+    );
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
+    for (let i = 1; i <= ceilsNum; i++) {
+      for (let j = 1; j <= ceilsNum; j++) {
+        if (fieldMatrix[i - 1][j - 1].object === `enemy_${curEnemyID}`)
+          fieldMatrix[i - 1][j - 1].object = "grass";
+      }
+    }
     newEnemySquare.object = `enemy_${curEnemyID}`;
 
     if (
