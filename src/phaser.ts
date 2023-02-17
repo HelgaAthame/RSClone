@@ -1027,34 +1027,37 @@ class GameScene extends Phaser.Scene {
       this.physics.add.collider(this.enemies, object);
     });
 
-    this.physics.add.overlap(
-      this.char,
-      this.hearts,
-      this.collectHeart as ArcadePhysicsCallback,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      this
+    [this.hearts, this.shields, this.superBombs, this.bombIncreasers].forEach(
+      (bonus) => {
+        let curCallback: ArcadePhysicsCallback | undefined;
+        switch (bonus) {
+          case this.hearts:
+            curCallback = this.collectHeart as ArcadePhysicsCallback;
+            break;
+          case this.shields:
+            curCallback = this.collectShield as ArcadePhysicsCallback;
+            break;
+          case this.superBombs:
+            curCallback = this.collectSuperBomb as ArcadePhysicsCallback;
+            break;
+          case this.bombIncreasers:
+            curCallback = this.collectBombIncrease as ArcadePhysicsCallback;
+            break;
+
+          default:
+            curCallback = undefined;
+        }
+
+        this.physics.add.overlap(
+          this.char,
+          bonus,
+          curCallback,
+          this.destroyOnCollideCallback as ArcadePhysicsCallback,
+          this
+        );
+      }
     );
-    this.physics.add.overlap(
-      this.char,
-      this.shields,
-      this.collectShield as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.char,
-      this.superBombs,
-      this.collectSuperBomb as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.char,
-      this.bombIncreasers,
-      this.collectBombIncrease as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
+
     [this.superBombs, this.hearts, this.shields, this.bombIncreasers].forEach(
       (bonus) => {
         this.physics.add.overlap(
