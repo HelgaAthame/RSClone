@@ -215,7 +215,6 @@ class GameScene extends Phaser.Scene {
         this.grass
           .create(curSquareXCenter, curSquareYCenter, "grass")
           .setScale((1 / fieldImgSize) * fieldSquareLength)
-          .setDepth(1)
           .refreshBody();
 
         // load from saved game
@@ -226,7 +225,6 @@ class GameScene extends Phaser.Scene {
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")
               .setScale((1 / fieldImgSize) * fieldSquareLength)
-              .setDepth(2)
               .refreshBody();
           }
           if (current === "char") {
@@ -246,7 +244,7 @@ class GameScene extends Phaser.Scene {
               )
               .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
               .setScale(0.9)
-              .setDepth(9)
+              .seеDepth(2)
               .refreshBody();
           }
         } else {
@@ -259,7 +257,6 @@ class GameScene extends Phaser.Scene {
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")
               .setScale((1 / fieldImgSize) * fieldSquareLength)
-              .setDepth(3)
               .refreshBody();
             continue;
           }
@@ -290,7 +287,7 @@ class GameScene extends Phaser.Scene {
           )
           .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
           .setScale(0.9)
-          .setDepth(9)
+          .setDepth(2)
           .refreshBody();
       }
     }
@@ -300,7 +297,6 @@ class GameScene extends Phaser.Scene {
       .sprite(charStartX, charStartY, "char")
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
-      .setDepth(9)
       .refreshBody();
 
     this.char.on("destroy", () => {
@@ -899,7 +895,7 @@ class GameScene extends Phaser.Scene {
   }
 
   drawExplosion(x: number, y: number) {
-    this.explosion = this.physics.add.sprite(x, y, "explosion").setDepth(9);
+    this.explosion = this.physics.add.sprite(x, y, "explosion");
     // const explosion = this.physics.add.sprite(x, y, "explosion");
     // const newXplosn = this.explosions.create(x, y, "");
     const explosionAnim = this.explosion.anims.play("bombExplosion", false);
@@ -1042,7 +1038,6 @@ class GameScene extends Phaser.Scene {
         )
         .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-        .setDepth(9)
         .setImmovable();
 
       if (bombTimer === model.bombSpeed) {
