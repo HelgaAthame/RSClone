@@ -570,10 +570,6 @@ class GameScene extends Phaser.Scene {
       this.dropBomb(bombX, bombY);
     }
 
-    const keyESC = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC
-    );
-
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       console.log("matrix on esc", fieldMatrix);
       model.isGamePaused = true;
