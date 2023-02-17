@@ -164,16 +164,7 @@ class GameScene extends Phaser.Scene {
 
     this.events.on("resume", () => {
       this.stageMusic.resume();
-      if (model.activeBombs.length !== 0) {
-        model.activeBombs.forEach((bomb) => {
-          this.dropBomb(
-            bomb.bombX,
-            bomb.bombY,
-            bomb.bombTimer,
-            bomb.isSuperBomb
-          );
-        });
-      }
+      this.bombCheck();
     });
 
     for (let i = 1; i <= ceilsNum; i++) {
@@ -510,12 +501,7 @@ class GameScene extends Phaser.Scene {
       model.fieldMatrix = fieldMatrix;
     }
     this.updateBonusesText();
-
-    if (model.activeBombs.length !== 0) {
-      model.activeBombs.forEach((bomb) => {
-        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer, bomb.isSuperBomb);
-      });
-    }
+    this.bombCheck();
   }
   update() {
     model.activeBombs.map((bomb) => {
@@ -1243,6 +1229,13 @@ class GameScene extends Phaser.Scene {
       clearInterval(tilt);
       cam.rotation = 0;
     }, 250);
+  }
+  bombCheck() {
+    if (model.activeBombs.length !== 0) {
+      model.activeBombs.forEach((bomb) => {
+        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer, bomb.isSuperBomb);
+      });
+    }
   }
 }
 export const gameScene = new GameScene();
