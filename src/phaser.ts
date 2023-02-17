@@ -36,7 +36,6 @@ const ceilsNum = 11;
 const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
 const fieldImgSize = 512;
-
 const charStartX = fieldStartX + 1.5 * fieldSquareLength;
 const charStartY = height - 1.5 * fieldSquareLength;
 
@@ -167,12 +166,10 @@ class GameScene extends Phaser.Scene {
 
     this.events.on("resume", () => {
       this.stageMusic.resume();
-
-      if (model.activeBombs.length !== 0) {
-        model.activeBombs.forEach((bomb) => {
-          this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
-        });
-      }
+      this.bombCheck();
+    });
+    this.events.on("start", () => {
+      this.charDeathSound.stop();
     });
 
     console.log("model.fieldMatrix", model.fieldMatrix);
@@ -231,10 +228,6 @@ class GameScene extends Phaser.Scene {
             fieldMatrix[i - 1][j - 1].object = "char";
           }
           if (current?.includes("enemy")) {
-            console.log(
-              "model.fieldMatrix[i - 1][j - 1].object :",
-              model.fieldMatrix[i - 1][j - 1].object
-            );
             fieldMatrix[i - 1][j - 1].object = "enemy";
             this.enemies
               .create(
@@ -297,7 +290,11 @@ class GameScene extends Phaser.Scene {
       .find((square) => square.object === "char") as FieldSquare;
 
     this.char = this.physics.add
-      .sprite(charField.x, charField.y, "char")
+      .sprite(
+        charField.x ? charField.x : charStartX,
+        charField.y ? charField.y : charStartY,
+        "char"
+      )
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
       .refreshBody();
@@ -471,7 +468,11 @@ class GameScene extends Phaser.Scene {
     this.livesText = this.add.text(
       textStartX + 4 * fieldSquareLength,
       textStartY,
-      `LIVES : ${"❤️".repeat(model.lives)}`,
+      `${
+        model.lives <= 5
+          ? `LIVES :  ${"❤️".repeat(model.lives)}`
+          : `LIVES: ❤️ x${model.lives}`
+      }`,
       gameUITextStyle
     );
     this.add.text(
@@ -509,13 +510,10 @@ class GameScene extends Phaser.Scene {
     } else {
       model.fieldMatrix = fieldMatrix;
     }
-    this.updateBonusesText();
 
-    if (model.activeBombs.length !== 0) {
-      model.activeBombs.forEach((bomb) => {
-        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer);
-      });
-    }
+    this.bombCheck();
+    this.shieldCheck();
+    this.updateBonusesText();
   }
   update() {
     const keyESC = this.input.keyboard.addKey(
@@ -578,7 +576,6 @@ class GameScene extends Phaser.Scene {
 
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       console.log("matrix on esc", fieldMatrix);
-
       model.isGamePaused = true;
       model.escIsPressed = true;
 
@@ -677,8 +674,6 @@ class GameScene extends Phaser.Scene {
     }
   }
   enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
-    const testSquare = this.findClosestSquare(enemy);
-    // console.log("testSquare :", testSquare);
     const [closestX, closestY] = this.findClosestSquare(enemy);
     const flatFieldMatrix = fieldMatrix.flat();
 
@@ -693,12 +688,15 @@ class GameScene extends Phaser.Scene {
     );
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
+
+    /*  */
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
         if (fieldMatrix[i - 1][j - 1].object === `enemy_${curEnemyID}`)
           fieldMatrix[i - 1][j - 1].object = "grass";
       }
     }
+    /*  */
     newEnemySquare.object = `enemy_${curEnemyID}`;
 
     if (
@@ -774,7 +772,6 @@ class GameScene extends Phaser.Scene {
     this.charStepSound.stop();
     this.putBombSound.stop();
     this.stageClearSound.play();
-    //model.fieldMatrix = undefined;
     view.win.renderUI();
   }
 
@@ -813,7 +810,6 @@ class GameScene extends Phaser.Scene {
     if (!squareToCheck) {
       throw new Error("Square to check was not found");
     } else {
-      //console.log("squareToCheck.object :", squareToCheck.object);
       if (squareToCheck.object === "stone") return;
 
       this.drawExplosion(x, y);
@@ -1027,7 +1023,12 @@ class GameScene extends Phaser.Scene {
     }, 200);
   }
 
-  dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
+  dropBomb(
+    bombX: number,
+    bombY: number,
+    bombTimer = model.bombSpeed,
+    isSuperBomb = model.superBombActive
+  ) {
     if (
       (model.activeBombs.length < model.maxBombs ||
         bombTimer !== model.bombSpeed) &&
@@ -1047,11 +1048,7 @@ class GameScene extends Phaser.Scene {
       }
 
       const bomb = this.bombs
-        .create(
-          bombX,
-          bombY,
-          model.superBombActive ? Bombs.SUPERBOMB : Bombs.BOMB
-        )
+        .create(bombX, bombY, isSuperBomb ? Bombs.SUPERBOMB : Bombs.BOMB)
         .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setImmovable();
@@ -1070,6 +1067,7 @@ class GameScene extends Phaser.Scene {
         bombTimer: bombTimer,
         bombX: bombX,
         bombY: bombY,
+        isSuperBomb: model.superBombActive ? true : false,
       };
 
       bomb.on("destroy", () => {
@@ -1099,6 +1097,7 @@ class GameScene extends Phaser.Scene {
       }
     }
     model.superBombActive = false;
+    this.updateBonusesText();
   }
 
   charDie() {
@@ -1107,6 +1106,7 @@ class GameScene extends Phaser.Scene {
     model.maxBombs = 1;
     model.shieldActive = false;
     model.superBombActive = false;
+
     this.updateBonusesText();
     this.char.destroy();
     this.drawGameOver();
@@ -1209,12 +1209,12 @@ class GameScene extends Phaser.Scene {
     // this.destroyOnCollideCallback(char, heart);
   }
   collectShield(
-    char: Phaser.Physics.Arcade.Sprite,
+    _char: Phaser.Physics.Arcade.Sprite,
     shield: Phaser.Physics.Arcade.Sprite
   ) {
     shield.disableBody(true, true);
     model.shieldActive = true;
-    char.setTint(0x00ff00);
+    this.shieldCheck();
     this.updateBonusesText();
     // this.destroyOnCollideCallback(char, shield);
   }
@@ -1265,6 +1265,16 @@ class GameScene extends Phaser.Scene {
       clearInterval(tilt);
       cam.rotation = 0;
     }, 250);
+  }
+  bombCheck() {
+    if (model.activeBombs.length !== 0) {
+      model.activeBombs.forEach((bomb) => {
+        this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer, bomb.isSuperBomb);
+      });
+    }
+  }
+  shieldCheck() {
+    if (model.shieldActive) this.char.setTint(0x00ff00);
   }
 }
 export const gameScene = new GameScene();
