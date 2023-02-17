@@ -244,7 +244,7 @@ class GameScene extends Phaser.Scene {
               )
               .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
               .setScale(0.9)
-              .seеDepth(2)
+              .setDepth(1)
               .refreshBody();
           }
         } else {
@@ -285,9 +285,9 @@ class GameScene extends Phaser.Scene {
             fieldMatrix[randomX][randomY].y,
             "enemy"
           )
+          .setDepth(1)
           .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
           .setScale(0.9)
-          .setDepth(2)
           .refreshBody();
       }
     }
