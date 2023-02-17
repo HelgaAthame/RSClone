@@ -11,20 +11,19 @@ import titleScreenAudio from "../assets/sounds/title-screen.mp3";
 
 export class StartView {
   uid: string;
+  phaser: { gameScene: any };
+  gameScene: any;
+  canvas: HTMLCanvasElement;
 
   constructor() {
     this.phaser;
     this.gameScene;
     this.uid = model.uid;
-    this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
   }
-  phaser: { gameScene: any };
-  gameScene: any;
-  canvas: HTMLCanvasElement;
 
   renderUI() {
-    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-    if (canvas) canvas.style.display = "none";
+    this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
+    if (this.canvas) this.canvas.style.display = "none";
 
     let main = document.querySelector(".main");
     if (!main) {
@@ -197,24 +196,21 @@ export class StartView {
               selected.click();
               break;
           }
-          //document.removeEventListener("keydown", foo);
           break;
       }
     });
   }
 
   async handleContinueGame() {
-    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-
     if (!model.uid) {
       model.generateRandomUsername();
     }
 
     this.pauseBGAudio();
 
-    await model.takeFromBD.call(model);
+    await model.takeFromBD();
 
-    if (canvas) canvas.style.display = "initial";
+    if (this.canvas) this.canvas.style.display = "initial";
     if (view.start.phaser) {
       view.start.gameScene = view.start.phaser.gameScene;
       view.start.gameScene.scene.resume();
@@ -229,8 +225,6 @@ export class StartView {
   }
 
   async handleStartGame() {
-    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-
     if (!model.uid) {
       model.generateRandomUsername();
     }
@@ -242,7 +236,7 @@ export class StartView {
     <div class="begin">LEVEL ${model.level}</div>
   `;
     setTimeout(async () => {
-      if (canvas) canvas.style.display = "initial";
+      if (this.canvas) this.canvas.style.display = "initial";
       if (!view.start.phaser) {
         view.start.phaser = await import("../phaser.js");
       } else {
