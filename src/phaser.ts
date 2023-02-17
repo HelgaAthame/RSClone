@@ -148,7 +148,8 @@ class GameScene extends Phaser.Scene {
       this.stageMusic.resume();
       this.bombCheck();
     });
-    this.events.on("removedfromscene", () => {
+
+    this.events.once("start", () => {
       this.charDeathSound.stop();
       this.explosionSound.stop();
     });
@@ -338,8 +339,7 @@ class GameScene extends Phaser.Scene {
   drawLevelComplete() {
     model.nextLvl();
     this.stageMusic.stop();
-    this.charStepSound.stop();
-    this.putBombSound.stop();
+
     this.stageClearSound.play();
     view.win.renderUI();
   }
