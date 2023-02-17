@@ -42,7 +42,7 @@ export class Model {
 
   constructor() {
     this.charSpeed = 160;
-    this.curLvlEnemies = 3;
+    this.curLvlEnemies = 10;
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this.curLvlScore = 0;

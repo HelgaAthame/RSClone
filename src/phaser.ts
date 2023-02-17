@@ -1023,10 +1023,9 @@ class GameScene extends Phaser.Scene {
       if (!model.gameOver) this.charDie();
     });
 
-    this.physics.add.collider(this.enemies, this.enemies);
-    this.physics.add.collider(this.enemies, this.wood);
-    this.physics.add.collider(this.enemies, this.stone);
-    this.physics.add.collider(this.enemies, this.bombs);
+    [this.wood, this.stone, this.bombs].forEach((object) => {
+      this.physics.add.collider(this.enemies, object);
+    });
 
     this.physics.add.overlap(
       this.char,
@@ -1056,33 +1055,16 @@ class GameScene extends Phaser.Scene {
       undefined,
       this
     );
-    this.physics.add.overlap(
-      this.enemies,
-      this.superBombs,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.hearts,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.shields,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.bombIncreasers,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
+    [this.superBombs, this.hearts, this.shields, this.bombIncreasers].forEach(
+      (bonus) => {
+        this.physics.add.overlap(
+          this.enemies,
+          bonus,
+          this.destroyOnCollideCallback as ArcadePhysicsCallback,
+          undefined,
+          this
+        );
+      }
     );
   }
   setupChar() {
