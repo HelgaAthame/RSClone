@@ -332,21 +332,21 @@ class GameScene extends Phaser.Scene {
       this.char,
       this.shields,
       this.collectShield as ArcadePhysicsCallback,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
       this
     );
     this.physics.add.overlap(
       this.char,
       this.superBombs,
       this.collectSuperBomb as ArcadePhysicsCallback,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
       this
     );
     this.physics.add.overlap(
       this.char,
       this.bombIncreasers,
       this.collectBombIncrease as ArcadePhysicsCallback,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
       this
     );
     this.physics.add.overlap(
@@ -518,7 +518,6 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
-
     const keyESC = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
     );
@@ -558,7 +557,7 @@ class GameScene extends Phaser.Scene {
       if (keyESC.isDown) {
         view.start.renderUI();
         this.restartScene();
-      };
+      }
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
@@ -572,10 +571,6 @@ class GameScene extends Phaser.Scene {
       ) as number[];
       this.dropBomb(bombX, bombY);
     }
-
-    const keyESC = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC
-    );
 
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       console.log("matrix on esc", fieldMatrix);
@@ -593,7 +588,7 @@ class GameScene extends Phaser.Scene {
         });
         model.bombIsPlanting = false;
 
-      setTimeout(() => {
+        setTimeout(() => {
           this.charStepSound.stop();
         }, 0);
         model.fieldMatrix = fieldMatrix;
@@ -748,8 +743,8 @@ class GameScene extends Phaser.Scene {
     if (model.lives) {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
-      model.saveToBd().catch((e)=> {
-        console.log(`error while saving to DB ${e}`)
+      model.saveToBd().catch((e) => {
+        console.log(`error while saving to DB ${e}`);
       });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
@@ -1200,7 +1195,7 @@ class GameScene extends Phaser.Scene {
     _char: Phaser.Physics.Arcade.Sprite,
     heart: Phaser.Physics.Arcade.Sprite
   ) {
-    heart.disableBody(true, true);
+    heart.destroy();
     model.curLvlScore += 50;
     const livesText =
       ++model.lives <= 5
@@ -1213,7 +1208,7 @@ class GameScene extends Phaser.Scene {
     char: Phaser.Physics.Arcade.Sprite,
     shield: Phaser.Physics.Arcade.Sprite
   ) {
-    shield.disableBody(true, true);
+    shield.destroy();
     model.shieldActive = true;
     char.setTint(0x00ff00);
     this.updateBonusesText();
@@ -1223,7 +1218,7 @@ class GameScene extends Phaser.Scene {
     _char: Phaser.Physics.Arcade.Sprite,
     superBomb: Phaser.Physics.Arcade.Sprite
   ) {
-    superBomb.disableBody(true, true);
+    superBomb.destroy();
     model.superBombActive = true;
     this.updateBonusesText();
     // this.destroyOnCollideCallback(char, superBomb);
@@ -1233,6 +1228,7 @@ class GameScene extends Phaser.Scene {
     _bonus: Phaser.Physics.Arcade.Sprite
   ) {
     model.maxBombs++;
+    _bonus.destroy();
     this.updateBonusesText();
   }
   destroyOnCollideCallback(
