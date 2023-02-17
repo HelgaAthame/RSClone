@@ -215,9 +215,8 @@ class GameScene extends Phaser.Scene {
           .create(curSquareXCenter, curSquareYCenter, "grass")
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
-               console.log(model.fieldMatrix);
+
         if (model.fieldMatrix) {
-          console.log('берем из БД');
           if (model.fieldMatrix[i - 1][j - 1].object === "wood") {
             fieldMatrix[i - 1][j - 1].object = "wood";
             this.wood
@@ -547,7 +546,6 @@ class GameScene extends Phaser.Scene {
     }
 
     if (!model.gameOver && keyESC.isDown /*&& !model.escIsPressed*/) {
-      console.log('key esc is down');
       model.isGamePaused = true;
       model.escIsPressed = true;
 

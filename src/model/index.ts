@@ -81,7 +81,11 @@ export class Model {
   }
 
   async saveToBd() {
-
+    console.log('вызвано созранение в БД');
+    console.log('fieldMatrix = ');
+    console.log(model.fieldMatrix);
+    if (model.fieldMatrix) {
+      console.log('вызываем setDoc');
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -108,6 +112,8 @@ export class Model {
       charSpeed: this.charSpeed,
       gameOver: this.gameOver,
     });
+
+    }
   }
 
   async takeFromBD() {

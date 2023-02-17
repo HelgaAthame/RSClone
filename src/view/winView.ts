@@ -21,7 +21,7 @@ export class WinView {
     `;
     this.addListeners(/*context*/);
     model.saveToBd();
-    model.fieldMatrix = undefined;
+   // model.fieldMatrix = undefined; //?????
   }
 
   addListeners(/*context: typeof gameScene*/) {
@@ -37,6 +37,7 @@ export class WinView {
         setTimeout(async () => {
           canvas.style.display = "initial";
           document.removeEventListener("keydown", callback);
+          model.fieldMatrix = undefined;
           view.start.phaser.gameScene.restartScene();
         }, 500);
 
