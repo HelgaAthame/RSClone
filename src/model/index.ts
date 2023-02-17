@@ -85,7 +85,6 @@ export class Model {
 
   async saveToBd() {
     console.log("we are saving info to DB");
-
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,

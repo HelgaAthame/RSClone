@@ -70,7 +70,6 @@ export class StartView {
 
     this.setContinueButtonState();
     this.navigateMenuListeners();
-    // this.addBGAudio();
   }
 
   addBGAudio() {
@@ -89,26 +88,18 @@ export class StartView {
   }
 
   async setContinueButtonState() {
-    const canvas = document.querySelector("canvas");
+    this.uid = model.uid;
     const continueButton = selectorChecker(
       document,
       ".continue"
     ) as HTMLButtonElement;
-    let docRef;
 
     if (this.uid) {
-      docRef = doc(db, "users", this.uid);
-
-      let docSnap;
-      if (docRef) {
-        docSnap = await getDoc(docRef);
-      }
-
-      if (docSnap) {
-        continueButton.disabled = docSnap.exists() || canvas ? false : true;
-      }
+      const docRef = doc(db, "users", this.uid);
+      const docSnap = await getDoc(docRef);
+      continueButton.disabled = docSnap.exists() ? false : true;
     } else {
-      continueButton.disabled = true;
+      continueButton.disabled = this.canvas ? false : true;
     }
   }
 
@@ -161,6 +152,7 @@ export class StartView {
           switch (selected.dataset.content) {
             case "authorization":
               firebase.googleAuth();
+              view.start.setContinueButtonState();
               break;
 
             case "start":
@@ -202,23 +194,18 @@ export class StartView {
   }
 
   async handleContinueGame() {
-    if (!model.uid) {
-      model.generateRandomUsername();
+    if (model.uid) {
+      await model.takeFromBD();
+    }
+    if (!this.phaser) {
+      this.phaser = await import("../phaser.js");
+      this.gameScene = this.phaser.gameScene;
+    } else {
+      this.canvas.style.display = "initial";
+      this.gameScene.scene.resume();
     }
 
     this.pauseBGAudio();
-
-    await model.takeFromBD();
-
-    if (this.canvas) this.canvas.style.display = "initial";
-    if (view.start.phaser) {
-      view.start.gameScene = view.start.phaser.gameScene;
-      view.start.gameScene.scene.resume();
-    }
-    if (!view.start.phaser) {
-      view.start.phaser = await import("../phaser.js");
-      return;
-    }
 
     model.escIsPressed = false;
     model.gameOver = false;
@@ -237,12 +224,13 @@ export class StartView {
   `;
     setTimeout(async () => {
       if (this.canvas) this.canvas.style.display = "initial";
-      if (!view.start.phaser) {
-        view.start.phaser = await import("../phaser.js");
+      if (!this.phaser) {
+        this.phaser = await import("../phaser.js");
+        this.gameScene = this.phaser.gameScene;
       } else {
         model.resetGame();
         model.saveToBd();
-        view.start.phaser.gameScene.restartGame();
+        this.phaser.gameScene.restartGame();
       }
     }, 500);
   }

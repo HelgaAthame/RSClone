@@ -6,11 +6,10 @@ import {
   signInWithPopup,
   Auth,
 } from "firebase/auth";
-import {
-  getFirestore
-} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 import { model } from "../model/index.js";
+import { view } from "../view/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 
 const provider = new GoogleAuthProvider();
@@ -34,34 +33,21 @@ class Firebase {
   googleAuth() {
     signInWithPopup(auth, provider)
       .then((result) => {
-
-                const user = result.user;
+        const user = result.user;
         model.uid = user.uid;
         model.userName = user.displayName as string;
         model.saveUsernameToLocalStorage();
         localStorage.setItem("uid", user.uid);
-        model.auth = 'authorized';
+        model.auth = "authorized";
 
-        const authBtn = selectorChecker(document, '.auth') as HTMLDivElement;
+        const authBtn = selectorChecker(document, ".auth") as HTMLDivElement;
         authBtn.dataset.content = model.auth;
-        authBtn.innerHTML = `${
-          model.auth
-        }${
-          model.auth === 'authorized'
-          ? `: ${model.userName}`
-          : ''
+        authBtn.innerHTML = `${model.auth}${
+          model.auth === "authorized" ? `: ${model.userName}` : ""
         }`;
+        view.start.setContinueButtonState();
       })
-      .catch((/*error*/) => {
-        // Handle Errors here.
-        //const errorCode = error.code;
-        //const errorMessage = error.message;
-        // The email of the user's account used.
-        //const email = error.customData.email;
-        // The AuthCredential type that was used.
-        //const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      })
+      .catch((e) => console.error(e));
   }
 }
 
