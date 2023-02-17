@@ -460,7 +460,11 @@ class GameScene extends Phaser.Scene {
     this.livesText = this.add.text(
       textStartX + 4 * fieldSquareLength,
       textStartY,
-      `LIVES : ${"❤️".repeat(model.lives)}`,
+      `${
+        model.lives <= 5
+          ? `LIVES :  ${"❤️".repeat(model.lives)}`
+          : `LIVES: ❤️ x${model.lives}`
+      }`,
       gameUITextStyle
     );
     this.add.text(
@@ -772,8 +776,6 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
-    // this.drawExplosion(x, y);
-
     const flatFieldMatrix = fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
@@ -786,7 +788,6 @@ class GameScene extends Phaser.Scene {
     if (!squareToCheck) {
       throw new Error("Square to check was not found");
     } else {
-      //console.log("squareToCheck.object :", squareToCheck.object);
       if (squareToCheck.object === "stone") return;
 
       this.drawExplosion(x, y);
