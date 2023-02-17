@@ -148,8 +148,9 @@ class GameScene extends Phaser.Scene {
       this.stageMusic.resume();
       this.bombCheck();
     });
-    this.events.on("start", () => {
+    this.events.on("removedfromscene", () => {
       this.charDeathSound.stop();
+      this.explosionSound.stop();
     });
 
     this.generateGameField();

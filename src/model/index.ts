@@ -139,6 +139,7 @@ export class Model {
     this.enemySpeed = 80;
     this.curLvlTimer = 120;
     this.shieldActive = false;
+    this.bombIsPlanting = false;
     this.superBombActive = false;
     this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;

@@ -225,6 +225,7 @@ export class StartView {
     }
 
     model.resetGame();
+
     model.saveToBd();
     this.pauseBGAudio();
 
