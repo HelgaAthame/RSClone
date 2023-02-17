@@ -46,7 +46,14 @@ export class StartView {
       <article data-content="start" class="nav-item start active article">Start</article>
       <article data-content="continue" class="nav-item continue article">Continue</article>
       <article data-content="settings" class="nav-item settings article">Settings</article>
-      <article data-content="authorization" class="nav-item auth article">Authorization</article>
+      <article data-content=${model.auth} class="nav-item auth article">${
+        model.auth
+      }${
+        model.auth === 'authorized'
+        ? `: ${model.userName}`
+        : ''
+      }
+        </article>
       <article data-content="leaderboard" class="nav-item settings article">Leaderboard</article>
     </nav>
     <footer class="footer">
@@ -158,6 +165,7 @@ export class StartView {
             switch (selected.dataset.content) {
               case "authorization":
                 firebase.googleAuth();
+
                 break;
 
               case "start":

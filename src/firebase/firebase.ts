@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 
 import { model } from "../model/index.js";
+import selectorChecker from "../utils/selectorChecker.js";
 
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
@@ -33,12 +34,28 @@ class Firebase {
   googleAuth() {
     signInWithPopup(auth, provider)
       .then((result) => {
+
                 const user = result.user;
         model.uid = user.uid;
         model.userName = user.displayName as string;
         model.saveUsernameToLocalStorage();
         localStorage.setItem("uid", user.uid);
+        model.auth = 'authorized';
 
+        const authBtn = selectorChecker(document, '.auth') as HTMLDivElement;
+        console.log(authBtn);
+        console.log('сработал then, меняем датасет ')
+        authBtn.dataset.content = model.auth;
+        console.log(`model.auth = ${model.auth}`)
+        console.log(`authBtn.dataset.content = ${authBtn.dataset.content}`)
+        authBtn.innerHTML = `${
+          model.auth
+        }${
+          model.auth === 'authorized'
+          ? `: ${model.userName}`
+          : ''
+        }`;
+        authBtn.classList.remove('article');
       })
       .catch((/*error*/) => {
         // Handle Errors here.

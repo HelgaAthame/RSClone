@@ -5,6 +5,7 @@ import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 import { Buttons } from "../utils/buttons.js";
 
 export class Model {
+  auth: string;
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
   charSpeed: number;
@@ -70,6 +71,7 @@ export class Model {
     this.shieldActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
+    this.auth = "authorization";
     if (localStorage.getItem("uid")) {
       const uid = localStorage.getItem("uid");
       this.uid = uid ? uid : "";
