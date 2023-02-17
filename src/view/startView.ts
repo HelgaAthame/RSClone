@@ -208,7 +208,9 @@ export class StartView {
 
     this.pauseBGAudio();
 
-    await model.takeFromBD();
+    await model.takeFromBD().catch((e) => {
+      console.log(`error catched while taking from DB ${e}`);
+    });
 
     if (canvas) canvas.style.display = "initial";
     if (view.start.phaser) {
@@ -243,7 +245,9 @@ export class StartView {
         view.start.phaser = await import("../phaser.js");
       } else {
         model.resetGame();
-        model.saveToBd();
+        model.saveToBd().catch((e)=> {
+          console.log(`error while saving to DB ${e}`)
+        });
         view.start.phaser.gameScene.restartGame();
       }
     }, 500);
