@@ -215,8 +215,9 @@ class GameScene extends Phaser.Scene {
           .create(curSquareXCenter, curSquareYCenter, "grass")
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
-
+               console.log(model.fieldMatrix);
         if (model.fieldMatrix) {
+          console.log('берем из БД');
           if (model.fieldMatrix[i - 1][j - 1].object === "wood") {
             fieldMatrix[i - 1][j - 1].object = "wood";
             this.wood
@@ -490,6 +491,11 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
+
+    const keyESC = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ESC
+    );
+
     model.activeBombs.map((bomb) => {
       if (bomb.bombTimer > 0) {
         bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
@@ -522,6 +528,10 @@ class GameScene extends Phaser.Scene {
     );
 
     if (model.gameOver) {
+      if (keyESC.isDown) {
+        view.start.renderUI();
+        this.restartScene();
+      };
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
@@ -536,11 +546,8 @@ class GameScene extends Phaser.Scene {
       this.dropBomb(bombX, bombY);
     }
 
-    const keyESC = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC
-    );
-
-    if (keyESC.isDown /*&& !model.escIsPressed*/) {
+    if (!model.gameOver && keyESC.isDown /*&& !model.escIsPressed*/) {
+      console.log('key esc is down');
       model.isGamePaused = true;
       model.escIsPressed = true;
 
