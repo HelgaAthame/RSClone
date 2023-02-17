@@ -84,7 +84,6 @@ export class Model {
   }
 
   async saveToBd() {
-    console.log("we are saving info to DB");
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -94,7 +93,6 @@ export class Model {
       volume: this.volume,
       buttons: this.buttons,
       fieldMatrix: JSON.stringify(this.fieldMatrix),
-      escIsPressed: this.escIsPressed,
       bombIsPlanting: this.bombIsPlanting,
       maxBombs: this.maxBombs,
       activeBombs: this.activeBombs,
@@ -119,35 +117,11 @@ export class Model {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      console.log("data from takedb :", data);
-      this.lives = data.lives;
-      this.score = data.score;
-      this.isMuted = data.isMuted;
-      this.volume = data.volume;
-      this.buttons = data.buttons;
+      Object.assign(this, data);
       this.fieldMatrix = JSON.parse(data.fieldMatrix);
-      console.log("this.fieldMatrix :", this.fieldMatrix);
-
-      this.charSpeed = data.charSpeed;
-      this.curLvlEnemies = data.curLvlEnemies;
-      //this.enemyCounter = data.enemyCounter;
-
-      this.bombSpeed = data.bombSpeed;
-      this.curLvlScore = data.curLvlScore;
-      this.curLvlTimer = data.curLvlTimer;
-      this.curTimer = data.curTimer;
-      this.uid = data.uid;
-      this.enemySpeed = data.enemySpeed;
-      this.level = data.level;
-      this.activeBombs = data.activeBombs;
-      this.gameOver = data.gameOver;
-      this.shieldActive = data.shieldActive;
-      this.superBombActive = data.superBombActive;
-      this.maxBombs = data.maxBombs;
-      this.bombIsPlanting = data.bombIsPlanting;
-      this.escIsPressed = data.escIsPressed;
-    } else {
     }
+
+    return docSnap.exists();
   }
 
   resetGame() {

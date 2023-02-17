@@ -94,10 +94,16 @@ export class StartView {
       ".continue"
     ) as HTMLButtonElement;
 
+    if (model.gameOver) {
+      continueButton.disabled = true;
+      return;
+    }
+
     if (this.uid) {
-      const docRef = doc(db, "users", this.uid);
-      const docSnap = await getDoc(docRef);
-      continueButton.disabled = docSnap.exists() ? false : true;
+      const dataExists = await model.takeFromBD();
+      console.log(model.gameOver);
+
+      continueButton.disabled = dataExists ? false : true;
     } else {
       continueButton.disabled = this.canvas ? false : true;
     }
@@ -194,9 +200,6 @@ export class StartView {
   }
 
   async handleContinueGame() {
-    if (model.uid) {
-      await model.takeFromBD();
-    }
     if (!this.phaser) {
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;

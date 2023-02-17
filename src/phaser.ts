@@ -141,8 +141,6 @@ class GameScene extends Phaser.Scene {
 
   create() {
     model.isGamePaused = false;
-    /* Draw field */
-    /* BIG WIDTH ONLY!!! */
     this.grass = this.physics.add.staticGroup();
     this.stone = this.physics.add.staticGroup();
     this.wood = this.physics.add.staticGroup();
@@ -546,10 +544,24 @@ class GameScene extends Phaser.Scene {
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
 
+    if (keyESC.isDown) {
+      model.fieldMatrix = fieldMatrix;
+      model.saveToBd();
+      model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
+      model.isGamePaused = true;
+      model.escIsPressed = true;
+      model.bombIsPlanting = false;
+
+      this.putBombSound.stop();
+      this.stageMusic.pause();
+      this.scene.pause();
+
+      setTimeout(() => this.charStepSound.stop(), 0);
+      setTimeout(() => (model.escIsPressed = false), 300);
+      view.start.renderUI();
+    }
+
     if (model.gameOver) {
-      if (keyESC.isDown) {
-        view.start.renderUI();
-      }
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
@@ -562,32 +574,6 @@ class GameScene extends Phaser.Scene {
         this.char as Phaser.Physics.Matter.Sprite
       ) as number[];
       this.dropBomb(bombX, bombY);
-    }
-
-    if (keyESC.isDown) {
-      model.isGamePaused = true;
-      model.escIsPressed = true;
-
-      if (model.isGamePaused) {
-        this.putBombSound.stop();
-        this.stageMusic.pause();
-        this.scene.pause();
-
-        model.activeBombs.forEach((bomb) => {
-          window.clearTimeout(bomb.curBomb);
-        });
-        model.bombIsPlanting = false;
-
-        setTimeout(() => {
-          this.charStepSound.stop();
-        }, 0);
-        model.fieldMatrix = fieldMatrix;
-        model.saveToBd(); //save field state
-      }
-
-      setTimeout(() => (model.escIsPressed = false), 300);
-
-      view.start.renderUI();
     }
 
     this.charMovement();
