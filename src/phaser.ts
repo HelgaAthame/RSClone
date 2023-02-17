@@ -1084,12 +1084,11 @@ class GameScene extends Phaser.Scene {
       .flat()
       .find((square) => square.object === "char") as FieldSquare;
 
+    const charX = charField ? charField.x : charStartX;
+    const charY = charField ? charField.y : charStartY;
+
     this.char = this.physics.add
-      .sprite(
-        charField.x !== undefined ? charField.x : charStartX,
-        charField.y !== undefined ? charField.y : charStartY,
-        "char"
-      )
+      .sprite(charX, charY, "char")
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
       .refreshBody();

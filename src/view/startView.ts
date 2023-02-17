@@ -224,6 +224,8 @@ export class StartView {
       model.generateRandomUsername();
     }
 
+    model.resetGame();
+    model.saveToBd();
     this.pauseBGAudio();
 
     const main = selectorChecker(document, "main");
@@ -236,8 +238,6 @@ export class StartView {
         this.phaser = await import("../phaser.js");
         this.gameScene = this.phaser.gameScene;
       } else {
-        model.resetGame();
-        model.saveToBd();
         this.phaser.gameScene.restartGame();
       }
     }, 500);

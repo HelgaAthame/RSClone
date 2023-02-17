@@ -133,6 +133,7 @@ export class Model {
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this.enemySpeed = 80;
+    this.curLvlTimer = 120;
     this.shieldActive = false;
     this.superBombActive = false;
     this.maxBombs = 1;
