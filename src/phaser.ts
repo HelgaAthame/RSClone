@@ -490,6 +490,11 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
+
+    const keyESC = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ESC
+    );
+
     model.activeBombs.map((bomb) => {
       if (bomb.bombTimer > 0) {
         bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
@@ -522,6 +527,10 @@ class GameScene extends Phaser.Scene {
     );
 
     if (model.gameOver) {
+      if (keyESC.isDown) {
+        view.start.renderUI();
+        this.restartScene();
+      };
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
@@ -536,11 +545,7 @@ class GameScene extends Phaser.Scene {
       this.dropBomb(bombX, bombY);
     }
 
-    const keyESC = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC
-    );
-
-    if (keyESC.isDown /*&& !model.escIsPressed*/) {
+    if (!model.gameOver && keyESC.isDown /*&& !model.escIsPressed*/) {
       model.isGamePaused = true;
       model.escIsPressed = true;
 

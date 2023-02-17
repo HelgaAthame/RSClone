@@ -24,6 +24,10 @@ export class StartView {
   canvas: HTMLCanvasElement;
 
   renderUI() {
+    console.log('вызван start view render UI');
+    console.log('fieldMatrix = ');
+    console.log(model.fieldMatrix);
+
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     if (canvas) canvas.style.display = "none";
 
@@ -149,44 +153,46 @@ export class StartView {
           footerlinks[k].classList.add("active");
           break;
         case "Enter":
-          const selected = selectorChecker(document, ".active") as HTMLElement;
+          const selected = document.querySelector(".active") as HTMLElement;
+          if (selected) {
+            switch (selected.dataset.content) {
+              case "authorization":
+                firebase.googleAuth();
+                break;
 
-          switch (selected.dataset.content) {
-            case "authorization":
-              firebase.googleAuth();
-              break;
+              case "start":
+                view.start.handleStartGame();
+                document.removeEventListener("keydown", foo);
+                break;
 
-            case "start":
-              view.start.handleStartGame();
-              document.removeEventListener("keydown", foo);
-              break;
+              case "continue":
+                view.start.handleContinueGame();
+                document.removeEventListener("keydown", foo);
+                break;
 
-            case "continue":
-              view.start.handleContinueGame();
-              document.removeEventListener("keydown", foo);
-              break;
-
-            case "settings":
-              view.settings.renderUI();
-              document.removeEventListener("keydown", foo);
-              break;
-            case "leaderboard":
-              view.scores.renderUI();
-              document.removeEventListener("keydown", foo);
-              break;
-            case "Olga":
-              selected.click();
-              break;
-            case "Gleb":
-              selected.click();
-              break;
-            case "Alex":
-              selected.click();
-              break;
-            default:
-              selected.click();
-              break;
+              case "settings":
+                view.settings.renderUI();
+                document.removeEventListener("keydown", foo);
+                break;
+              case "leaderboard":
+                view.scores.renderUI();
+                document.removeEventListener("keydown", foo);
+                break;
+              case "Olga":
+                selected.click();
+                break;
+              case "Gleb":
+                selected.click();
+                break;
+              case "Alex":
+                selected.click();
+                break;
+              default:
+                selected.click();
+                break;
+            }
           }
+
           //document.removeEventListener("keydown", foo);
           break;
       }
@@ -229,7 +235,7 @@ export class StartView {
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
-    <div class="begin">LEVEL ${model.level}</div>
+    <div class="begin">LEVEL 1</div>
   `;
     setTimeout(async () => {
       if (canvas) canvas.style.display = "initial";
