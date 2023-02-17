@@ -13,7 +13,7 @@ export class ScoresView {
         <tr>
             <td>${index + 1}</td>
             <td>${user.userName}</td>
-            <td>${user.score}</td>
+            <td>${user.highScore}</td>
         </tr>`;
     });
     main.innerHTML = `
@@ -37,7 +37,9 @@ export class ScoresView {
       userData.push(doc.data());
     });
 
-    const userDataSorted = userData.sort((a, b) => -(a.score - b.score));
+    const userDataSorted = userData.sort(
+      (a, b) => -(a.highScore - b.highScore)
+    );
     const userDataCut = userDataSorted.slice(0, 10);
     return userDataCut;
   }

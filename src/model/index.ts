@@ -38,6 +38,7 @@ export class Model {
   bombIsPlanting: boolean;
   isGamePaused: boolean;
   escIsPressed: boolean;
+  highScore: number;
 
   constructor() {
     this.charSpeed = 160;
@@ -45,13 +46,15 @@ export class Model {
     this.enemyCounter = 0;
     this.bombSpeed = 1600;
     this.curLvlScore = 0;
+    this.highScore = 0;
     this.curLvlTimer = 120;
+    this.score = 0;
     this.curTimer = this.curLvlTimer;
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
     this.level = 1;
     this.lives = 3;
-    this.score = 0;
+
     this._isMuted = false;
     this._volume = 0.5;
     this.buttons = {
@@ -89,6 +92,7 @@ export class Model {
       uid: this.uid,
       userName: this.userName,
       score: this.curLvlScore + this.score,
+      highScore: this.highScore,
       isMuted: this.isMuted,
       volume: this.volume,
       buttons: this.buttons,
