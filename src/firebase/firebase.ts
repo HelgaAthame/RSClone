@@ -43,11 +43,7 @@ class Firebase {
         model.auth = 'authorized';
 
         const authBtn = selectorChecker(document, '.auth') as HTMLDivElement;
-        console.log(authBtn);
-        console.log('сработал then, меняем датасет ')
         authBtn.dataset.content = model.auth;
-        console.log(`model.auth = ${model.auth}`)
-        console.log(`authBtn.dataset.content = ${authBtn.dataset.content}`)
         authBtn.innerHTML = `${
           model.auth
         }${
@@ -55,7 +51,6 @@ class Firebase {
           ? `: ${model.userName}`
           : ''
         }`;
-        authBtn.classList.remove('article');
       })
       .catch((/*error*/) => {
         // Handle Errors here.

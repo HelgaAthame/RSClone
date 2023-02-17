@@ -83,11 +83,7 @@ export class Model {
   }
 
   async saveToBd() {
-    //console.log('вызвано созранение в БД');
-    //console.log('fieldMatrix = ');
-    //console.log(model.fieldMatrix);
     if (model.fieldMatrix) {
-      //console.log('вызываем setDoc');
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -119,8 +115,6 @@ export class Model {
   }
 
   async takeFromBD() {
-    //console.log("take from DB");
-    //console.log(model.fieldMatrix);
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
@@ -152,7 +146,6 @@ export class Model {
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
     } else {
-      //console.log("No such document!");
     }
   }
 
