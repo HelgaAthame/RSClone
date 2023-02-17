@@ -20,7 +20,9 @@ export class WinView {
       </section>
     `;
     this.addListeners(/*context*/);
-    model.saveToBd();
+    model.saveToBd().catch((e)=> {
+      console.log(`error while saving to DB ${e}`)
+    });
    // model.fieldMatrix = undefined; //?????
   }
 

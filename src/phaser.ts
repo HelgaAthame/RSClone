@@ -563,7 +563,9 @@ class GameScene extends Phaser.Scene {
           this.charStepSound.stop();
         }, 0);
         model.fieldMatrix = fieldMatrix;
-        model.saveToBd(); //save field state
+        model.saveToBd().catch((e)=> {
+          console.log(`error while saving to DB ${e}`)
+        }); //save field state
       }
 
       setTimeout(() => (model.escIsPressed = false), 300);
@@ -703,7 +705,9 @@ class GameScene extends Phaser.Scene {
     if (model.lives) {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
-      model.saveToBd();
+      model.saveToBd().catch((e)=> {
+        console.log(`error while saving to DB ${e}`)
+      });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
 

@@ -5,6 +5,7 @@ import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 import { Buttons } from "../utils/buttons.js";
 
 export class Model {
+  auth: string;
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
   charSpeed: number;
@@ -70,6 +71,7 @@ export class Model {
     this.shieldActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
+    this.auth = "authorization";
     if (localStorage.getItem("uid")) {
       const uid = localStorage.getItem("uid");
       this.uid = uid ? uid : "";
@@ -81,11 +83,7 @@ export class Model {
   }
 
   async saveToBd() {
-    //console.log('вызвано созранение в БД');
-    //console.log('fieldMatrix = ');
-    //console.log(model.fieldMatrix);
     if (model.fieldMatrix) {
-      //console.log('вызываем setDoc');
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
       uid: this.uid,
@@ -117,8 +115,6 @@ export class Model {
   }
 
   async takeFromBD() {
-    //console.log("take from DB");
-    //console.log(model.fieldMatrix);
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
@@ -150,7 +146,6 @@ export class Model {
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
     } else {
-      //console.log("No such document!");
     }
   }
 

@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 
 import { model } from "../model/index.js";
+import selectorChecker from "../utils/selectorChecker.js";
 
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
@@ -33,12 +34,23 @@ class Firebase {
   googleAuth() {
     signInWithPopup(auth, provider)
       .then((result) => {
+
                 const user = result.user;
         model.uid = user.uid;
         model.userName = user.displayName as string;
         model.saveUsernameToLocalStorage();
         localStorage.setItem("uid", user.uid);
+        model.auth = 'authorized';
 
+        const authBtn = selectorChecker(document, '.auth') as HTMLDivElement;
+        authBtn.dataset.content = model.auth;
+        authBtn.innerHTML = `${
+          model.auth
+        }${
+          model.auth === 'authorized'
+          ? `: ${model.userName}`
+          : ''
+        }`;
       })
       .catch((/*error*/) => {
         // Handle Errors here.
