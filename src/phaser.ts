@@ -1137,21 +1137,29 @@ class GameScene extends Phaser.Scene {
       item: string = ""
     ) => {
       if (group) {
-        const bonus = group
+        const randomBonus = group
           .create(x, y, item)
           .setSize(fieldSquareLength, fieldSquareLength)
           .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
           .refreshBody();
 
         this.tweens.add({
-          targets: bonus,
-          scaleX: bonus.scaleX / 1.3,
-          scaleY: bonus.scaleY / 1.3,
+          targets: randomBonus,
+          scaleX: randomBonus.scaleX / 1.3,
+          scaleY: randomBonus.scaleY / 1.3,
           yoyo: true,
           repeat: -1,
           duration: 300,
           ease: "Sine.easeInOut",
         });
+        console.log("randomBonus :", randomBonus);
+        Object.defineProperty(randomBonus, "destroyLock", {
+          value: true,
+          writable: true,
+        });
+        setTimeout(() => {
+          randomBonus.destroyLock = false;
+        }, 1000);
       }
     };
 
@@ -1171,7 +1179,8 @@ class GameScene extends Phaser.Scene {
     if (group && item) {
       setTimeout(() => {
         createItem(group, item);
-      }, 1000);
+      }, 400);
+      // }, 1000);
     }
   }
 
@@ -1218,7 +1227,9 @@ class GameScene extends Phaser.Scene {
     _subject: Phaser.Physics.Arcade.Sprite,
     object: Phaser.Physics.Arcade.Sprite
   ) {
-    object.disableBody(true, true);
+    if (!object.destroyLock) {
+      object.destroy();
+    }
   }
 
   updateBonusesText() {
