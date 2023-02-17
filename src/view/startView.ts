@@ -235,7 +235,7 @@ export class StartView {
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
-    <div class="begin">LEVEL ${model.level}</div>
+    <div class="begin">LEVEL 1</div>
   `;
     setTimeout(async () => {
       if (canvas) canvas.style.display = "initial";
