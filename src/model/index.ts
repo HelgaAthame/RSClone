@@ -20,6 +20,7 @@ export class Model {
     bombTimer: number;
     bombX: number;
     bombY: number;
+    isSuperBomb: boolean;
   }[];
   lives: number;
   curLvlScore: number;
@@ -84,7 +85,6 @@ export class Model {
 
   async saveToBd() {
     console.log("we are saving info to DB");
-
 
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
