@@ -22,6 +22,7 @@ export class StartView {
   }
 
   renderUI() {
+    const isAuthorized = model.auth === "authorized";
     this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
     if (this.canvas) this.canvas.style.display = "none";
 
@@ -40,7 +41,11 @@ export class StartView {
       <button data-content="start" class="nav-item start active article">Start</button>
       <button data-content="continue" class="nav-item continue article">Continue</button>
       <button data-content="settings" class="nav-item settings article">Settings</button>
-      <button data-content="authorization" class="nav-item auth article">Authorization</button>
+      <button data-content="authorization" class="nav-item auth article" ${
+        isAuthorized ? "disabled" : ""
+      }>${model.auth}${
+      model.auth === "authorized" ? `: ${model.userName}` : ""
+    }</button>
       <button data-content="leaderboard" class="nav-item settings article">Leaderboard</button>
     </nav>
     <footer class="footer">
@@ -101,8 +106,6 @@ export class StartView {
 
     if (this.uid) {
       const dataExists = await model.takeFromBD();
-      console.log(model.gameOver);
-
       continueButton.disabled = dataExists ? false : true;
     } else {
       continueButton.disabled = this.canvas ? false : true;
@@ -157,8 +160,10 @@ export class StartView {
 
           switch (selected.dataset.content) {
             case "authorization":
-              firebase.googleAuth();
-              view.start.setContinueButtonState();
+              if (selected.disabled === false) {
+                firebase.googleAuth();
+                view.start.setContinueButtonState();
+              }
               break;
 
             case "start":

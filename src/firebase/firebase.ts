@@ -40,11 +40,12 @@ class Firebase {
         localStorage.setItem("uid", user.uid);
         model.auth = "authorized";
 
-        const authBtn = selectorChecker(document, ".auth") as HTMLDivElement;
+        const authBtn = selectorChecker(document, ".auth") as HTMLButtonElement;
         authBtn.dataset.content = model.auth;
         authBtn.innerHTML = `${model.auth}${
           model.auth === "authorized" ? `: ${model.userName}` : ""
         }`;
+        authBtn.disabled = true;
         view.start.setContinueButtonState();
       })
       .catch((e) => console.error(e));
