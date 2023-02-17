@@ -175,6 +175,7 @@ class GameScene extends Phaser.Scene {
       }
     });
 
+    console.log("model.fieldMatrix", model.fieldMatrix);
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
         const curSquareXCenter =
@@ -216,18 +217,35 @@ class GameScene extends Phaser.Scene {
           .setScale((1 / fieldImgSize) * fieldSquareLength)
           .refreshBody();
 
+        // load from saved game
         if (model.fieldMatrix) {
-          if (model.fieldMatrix[i - 1][j - 1].object === "wood") {
-            fieldMatrix[i - 1][j - 1].object = "wood";
+          const current = model.fieldMatrix[i - 1][j - 1].object;
+          // console.log("model.fieldMatrix :", model.fieldMatrix);
+          if (current === "wood") {
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")
               .setScale((1 / fieldImgSize) * fieldSquareLength)
               .refreshBody();
-            continue;
           }
-          if (model.fieldMatrix[i - 1][j - 1].object === "char") {
+          if (current === "char") {
             fieldMatrix[i - 1][j - 1].object = "char";
-            continue;
+          }
+          if (current?.includes("enemy")) {
+            console.log(
+              "model.fieldMatrix[i - 1][j - 1].object :",
+              model.fieldMatrix[i - 1][j - 1].object
+            );
+            fieldMatrix[i - 1][j - 1].object = "enemy";
+            this.enemies
+              .create(
+                fieldMatrix[i - 1][j - 1].x,
+                fieldMatrix[i - 1][j - 1].y,
+                "enemy"
+              )
+              .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+              .setScale(0.9)
+              .setDepth(1)
+              .refreshBody();
           }
         } else {
           if (i === ceilsNum - 1 && j === 2) {
@@ -246,40 +264,50 @@ class GameScene extends Phaser.Scene {
       }
     }
 
+    // generate random enemies if no saved game
+    if (!model.fieldMatrix) {
+      while (model.enemyCounter < model.curLvlEnemies) {
+        const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+        const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+
+        if (
+          fieldMatrix[randomX][randomY].object !== "grass" ||
+          (randomX === ceilsNum - 2 && randomY === 1) ||
+          (randomX === ceilsNum - 3 && randomY === 1) ||
+          (randomX === ceilsNum - 2 && randomY === 2)
+        )
+          continue;
+        fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
+        model.enemyCounter++;
+        this.enemies
+          .create(
+            fieldMatrix[randomX][randomY].x,
+            fieldMatrix[randomX][randomY].y,
+            "enemy"
+          )
+          .setDepth(1)
+          .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+          .setScale(0.9)
+          .refreshBody();
+      }
+    }
+
+    const charField = fieldMatrix
+      .flat()
+      .find((square) => square.object === "char") as FieldSquare;
+
     this.char = this.physics.add
-      .sprite(charStartX, charStartY, "char")
+      .sprite(charField.x, charField.y, "char")
       .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
       .refreshBody();
+
+    if (model.shieldActive) this.char.setTint(0x00ff00);
 
     this.char.on("destroy", () => {
       this.charStepSound.stop();
       this.charDeathSound.play();
     });
-
-    while (model.enemyCounter < model.curLvlEnemies) {
-      const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
-      const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
-
-      if (
-        fieldMatrix[randomX][randomY].object !== "grass" ||
-        (randomX === ceilsNum - 2 && randomY === 1) ||
-        (randomX === ceilsNum - 3 && randomY === 1) ||
-        (randomX === ceilsNum - 2 && randomY === 2)
-      )
-        continue;
-      fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
-      model.enemyCounter++;
-      this.enemies
-        .create(
-          fieldMatrix[randomX][randomY].x,
-          fieldMatrix[randomX][randomY].y,
-          "enemy"
-        )
-        .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-        .setScale(0.9)
-        .refreshBody();
-    }
 
     this.physics.add.collider(this.char, this.stone);
     this.physics.add.collider(this.char, this.wood);
@@ -490,6 +518,10 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
+    const keyESC = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ESC
+    );
+
     model.activeBombs.map((bomb) => {
       if (bomb.bombTimer > 0) {
         bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
@@ -522,6 +554,10 @@ class GameScene extends Phaser.Scene {
     );
 
     if (model.gameOver) {
+      if (keyESC.isDown) {
+        view.start.renderUI();
+        this.restartScene();
+      }
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
@@ -541,6 +577,8 @@ class GameScene extends Phaser.Scene {
     );
 
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
+      console.log("matrix on esc", fieldMatrix);
+
       model.isGamePaused = true;
       model.escIsPressed = true;
 
@@ -639,6 +677,8 @@ class GameScene extends Phaser.Scene {
     }
   }
   enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
+    const testSquare = this.findClosestSquare(enemy);
+    // console.log("testSquare :", testSquare);
     const [closestX, closestY] = this.findClosestSquare(enemy);
     const flatFieldMatrix = fieldMatrix.flat();
 
@@ -707,7 +747,9 @@ class GameScene extends Phaser.Scene {
     if (model.lives) {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
-      model.saveToBd();
+      model.saveToBd().catch((e) => {
+        console.log(`error while saving to DB ${e}`);
+      });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
 
@@ -757,6 +799,8 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
+    // this.drawExplosion(x, y);
+
     const flatFieldMatrix = fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
@@ -801,6 +845,7 @@ class GameScene extends Phaser.Scene {
           return closestX === squareToCheck.x && closestY === squareToCheck.y;
         });
         enemyToDestroy?.on("destroy", () => {
+          squareToCheck.object = "";
           model.curLvlScore += 100;
           this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
           this.enemyDeathSound.play();
@@ -904,6 +949,82 @@ class GameScene extends Phaser.Scene {
       undefined,
       this
     );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.wood,
+    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.enemies,
+    //   this.destroyEnemy as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+    // this.physics.add.overlap(
+    //   this.explosion,
+    //   this.char,
+    //   this.destroyEnemy as ArcadePhysicsCallback,
+    //   undefined,
+    //   this
+    // );
+  }
+
+  destroyEnemy(
+    _explosion: Phaser.Physics.Arcade.Sprite,
+    enemy: Phaser.Physics.Arcade.Sprite
+  ) {
+    console.log("enemy to destroy :", enemy);
+    // enemy.deathTriggered = true
+    Object.defineProperty(enemy, "isDeathTriggered", { value: true });
+
+    // enemy.disableBody(true, true);
+
+    // const squareToCheck = flatFieldMatrix.find(
+    //   //   (square) =>
+    //   //     Math.floor(square.x) === Math.floor(x) &&
+    //   //     Math.floor(square.y) === Math.floor(y)
+    //   );
+    // const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
+    //         const [closestX, closestY] = this.findClosestSquare( enemy as Phaser.Physics.Matter.Sprite
+    //         );
+    //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
+    //       });
+    enemy.once("destroy", () => {
+      const { isDeathTriggered } = enemy;
+      console.log("isDeathTriggered :", isDeathTriggered);
+      // console.log("test", enemy.deathTriggered);
+      console.log("model.curLvlScore :", model.curLvlScore);
+      console.log("model.curLvlScore :", model.curLvlScore);
+      if (!isDeathTriggered) {
+        model.curLvlScore += 100;
+        this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
+        this.enemyDeathSound.play();
+        model.enemyCounter--;
+
+        enemy.setTint(0xff0000);
+        this.add.tween({
+          targets: enemy,
+          ease: "Sine.easeInOut",
+          duration: 200,
+          delay: 0,
+          alpha: {
+            getStart: () => 1,
+            getEnd: () => 0,
+          },
+        });
+        if (model.enemyCounter === 0 && !model.gameOver) {
+          this.drawLevelComplete();
+        }
+      }
+    });
+
+    setTimeout(() => {
+      console.log("model.enemyCounter :", model.enemyCounter);
+      enemy.destroy();
+    }, 200);
   }
 
   dropBomb(bombX: number, bombY: number, bombTimer = model.bombSpeed) {
@@ -1027,21 +1148,29 @@ class GameScene extends Phaser.Scene {
       item: string = ""
     ) => {
       if (group) {
-        const bonus = group
+        const randomBonus = group
           .create(x, y, item)
           .setSize(fieldSquareLength, fieldSquareLength)
           .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
           .refreshBody();
 
         this.tweens.add({
-          targets: bonus,
-          scaleX: bonus.scaleX / 1.3,
-          scaleY: bonus.scaleY / 1.3,
+          targets: randomBonus,
+          scaleX: randomBonus.scaleX / 1.3,
+          scaleY: randomBonus.scaleY / 1.3,
           yoyo: true,
           repeat: -1,
           duration: 300,
           ease: "Sine.easeInOut",
         });
+        console.log("randomBonus :", randomBonus);
+        Object.defineProperty(randomBonus, "destroyLock", {
+          value: true,
+          writable: true,
+        });
+        setTimeout(() => {
+          randomBonus.destroyLock = false;
+        }, 1000);
       }
     };
 
@@ -1061,7 +1190,8 @@ class GameScene extends Phaser.Scene {
     if (group && item) {
       setTimeout(() => {
         createItem(group, item);
-      }, 1000);
+      }, 400);
+      // }, 1000);
     }
   }
 
@@ -1108,7 +1238,9 @@ class GameScene extends Phaser.Scene {
     _subject: Phaser.Physics.Arcade.Sprite,
     object: Phaser.Physics.Arcade.Sprite
   ) {
-    object.disableBody(true, true);
+    if (!object.destroyLock) {
+      object.destroy();
+    }
   }
 
   updateBonusesText() {
@@ -1127,7 +1259,7 @@ class GameScene extends Phaser.Scene {
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      if (cam.rotation) cam.rotation += random;
+      cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);

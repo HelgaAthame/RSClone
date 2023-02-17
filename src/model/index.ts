@@ -5,6 +5,7 @@ import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 import { Buttons } from "../utils/buttons.js";
 
 export class Model {
+  auth: string;
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
   charSpeed: number;
@@ -70,6 +71,7 @@ export class Model {
     this.shieldActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
+    this.auth = "authorization";
     if (localStorage.getItem("uid")) {
       const uid = localStorage.getItem("uid");
       this.uid = uid ? uid : "";
@@ -82,8 +84,7 @@ export class Model {
 
   async saveToBd() {
     console.log("we are saving info to DB");
-    console.log('field matrix is');
-    console.log(model.fieldMatrix);
+
 
     await setDoc(doc(db, "users", this.uid), {
       lives: this.lives,
@@ -114,19 +115,19 @@ export class Model {
   }
 
   async takeFromBD() {
-    console.log("take from DB");
-    console.log(model.fieldMatrix);
     const docRef = doc(db, "users", this.uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const data = docSnap.data();
+      console.log("data from takedb :", data);
       this.lives = data.lives;
       this.score = data.score;
       this.isMuted = data.isMuted;
       this.volume = data.volume;
       this.buttons = data.buttons;
       this.fieldMatrix = JSON.parse(data.fieldMatrix);
+      console.log("this.fieldMatrix :", this.fieldMatrix);
 
       this.charSpeed = data.charSpeed;
       this.curLvlEnemies = data.curLvlEnemies;
@@ -147,7 +148,6 @@ export class Model {
       this.bombIsPlanting = data.bombIsPlanting;
       this.escIsPressed = data.escIsPressed;
     } else {
-      //console.log("No such document!");
     }
   }
 
