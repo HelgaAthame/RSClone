@@ -98,15 +98,19 @@ export class StartView {
     let docRef;
     if (this.uid) {
       docRef = doc(db, "users", this.uid);
-    }
-    let docSnap;
-    if (docRef) {
-      docSnap = await getDoc(docRef);
-    }
 
-    if (docSnap)
-      continueButton.disabled = docSnap.exists() && this.uid ? false : true;
-    console.log(continueButton.disabled);
+      let docSnap;
+      if (docRef) {
+        docSnap = await getDoc(docRef);
+      }
+
+      if (docSnap) {
+        continueButton.disabled = docSnap.exists() ? false : true;
+        continueButton.classList.add("disabled");
+      }
+    } else {
+      continueButton.disabled = true;
+    }
   }
 
   navigateMenuListeners() {
@@ -150,7 +154,10 @@ export class StartView {
           footerlinks[k].classList.add("active");
           break;
         case "Enter":
-          const selected = selectorChecker(document, ".active") as HTMLElement;
+          const selected = selectorChecker(
+            document,
+            ".active"
+          ) as HTMLButtonElement;
 
           switch (selected.dataset.content) {
             case "authorization":
@@ -163,8 +170,10 @@ export class StartView {
               break;
 
             case "continue":
-              view.start.handleContinueGame();
-              document.removeEventListener("keydown", foo);
+              if (selected.disabled === false) {
+                view.start.handleContinueGame();
+                document.removeEventListener("keydown", foo);
+              }
               break;
 
             case "settings":
