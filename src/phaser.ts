@@ -978,10 +978,6 @@ class GameScene extends Phaser.Scene {
     //       });
     enemy.once("destroy", () => {
       const { isDeathTriggered } = enemy;
-      console.log("isDeathTriggered :", isDeathTriggered);
-      // console.log("test", enemy.deathTriggered);
-      console.log("model.curLvlScore :", model.curLvlScore);
-      console.log("model.curLvlScore :", model.curLvlScore);
       if (!isDeathTriggered) {
         model.curLvlScore += 100;
         this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
@@ -1150,7 +1146,6 @@ class GameScene extends Phaser.Scene {
           duration: 300,
           ease: "Sine.easeInOut",
         });
-        console.log("randomBonus :", randomBonus);
         Object.defineProperty(randomBonus, "destroyLock", {
           value: true,
           writable: true,
