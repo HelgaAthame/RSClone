@@ -2,7 +2,6 @@ import { model } from "../model/index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import { view } from "./index.js";
 import "./winview.scss";
-//import { gameScene } from "../phaser.js";
 
 export class WinView {
   renderUI() {
@@ -19,16 +18,14 @@ export class WinView {
         <article class="win-esc">press ESC to go to start menu</article>
       </section>
     `;
-    this.addListeners(/*context*/);
+    this.addListeners();
     model.saveToBd();
     model.fieldMatrix = undefined;
   }
 
-  addListeners(/*context: typeof gameScene*/) {
-
+  addListeners() {
     const callback = async (e: KeyboardEvent) => {
       if (e.code === "Enter") {
-        //model.level++;
         const main = selectorChecker(document, "main");
         main.innerHTML = `
           <div class="begin">LEVEL ${model.level}</div>
@@ -39,7 +36,6 @@ export class WinView {
           document.removeEventListener("keydown", callback);
           view.start.phaser.gameScene.restartScene();
         }, 500);
-
       }
       if (e.code === "Esc") {
         document.removeEventListener("keydown", callback);

@@ -168,6 +168,9 @@ class GameScene extends Phaser.Scene {
       this.stageMusic.resume();
       this.bombCheck();
     });
+    this.events.on("start", () => {
+      this.charDeathSound.stop();
+    });
 
     for (let i = 1; i <= ceilsNum; i++) {
       for (let j = 1; j <= ceilsNum; j++) {
@@ -753,7 +756,6 @@ class GameScene extends Phaser.Scene {
     this.charStepSound.stop();
     this.putBombSound.stop();
     this.stageClearSound.play();
-    //model.fieldMatrix = undefined;
     view.win.renderUI();
   }
 
@@ -1086,6 +1088,7 @@ class GameScene extends Phaser.Scene {
     model.maxBombs = 1;
     model.shieldActive = false;
     model.superBombActive = false;
+
     this.updateBonusesText();
     this.char.destroy();
     this.drawGameOver();
