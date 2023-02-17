@@ -20,8 +20,10 @@ export class WinView {
       </section>
     `;
     this.addListeners(/*context*/);
-    model.saveToBd();
-    model.fieldMatrix = undefined;
+    model.saveToBd().catch((e)=> {
+      console.log(`error while saving to DB ${e}`)
+    });
+   // model.fieldMatrix = undefined; //?????
   }
 
   addListeners(/*context: typeof gameScene*/) {
@@ -37,6 +39,7 @@ export class WinView {
         setTimeout(async () => {
           canvas.style.display = "initial";
           document.removeEventListener("keydown", callback);
+          model.fieldMatrix = undefined;
           view.start.phaser.gameScene.restartScene();
         }, 500);
 

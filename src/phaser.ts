@@ -518,6 +518,11 @@ class GameScene extends Phaser.Scene {
     }
   }
   update() {
+
+    const keyESC = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ESC
+    );
+
     model.activeBombs.map((bomb) => {
       if (bomb.bombTimer > 0) {
         bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
@@ -550,6 +555,10 @@ class GameScene extends Phaser.Scene {
     );
 
     if (model.gameOver) {
+      if (keyESC.isDown) {
+        view.start.renderUI();
+        this.restartScene();
+      };
       this.stageMusic.stop();
       this.putBombSound.stop();
       if (bombSet.isDown && model.lives) this.restartScene();
@@ -570,6 +579,7 @@ class GameScene extends Phaser.Scene {
 
     if (keyESC.isDown /*&& !model.escIsPressed*/) {
       console.log("matrix on esc", fieldMatrix);
+
       model.isGamePaused = true;
       model.escIsPressed = true;
 
@@ -583,7 +593,7 @@ class GameScene extends Phaser.Scene {
         });
         model.bombIsPlanting = false;
 
-        setTimeout(() => {
+      setTimeout(() => {
           this.charStepSound.stop();
         }, 0);
         model.fieldMatrix = fieldMatrix;
@@ -738,7 +748,9 @@ class GameScene extends Phaser.Scene {
     if (model.lives) {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
-      model.saveToBd();
+      model.saveToBd().catch((e)=> {
+        console.log(`error while saving to DB ${e}`)
+      });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
 
