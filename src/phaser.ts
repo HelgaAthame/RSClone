@@ -141,25 +141,7 @@ class GameScene extends Phaser.Scene {
 
   create() {
     model.isGamePaused = false;
-    this.grass = this.physics.add.staticGroup();
-    this.stone = this.physics.add.staticGroup();
-    this.wood = this.physics.add.staticGroup();
-    this.enemies = this.physics.add.group();
-    this.bombs = this.physics.add.group();
-    this.hearts = this.physics.add.staticGroup();
-    this.bombIncreasers = this.physics.add.staticGroup();
-    this.shields = this.physics.add.staticGroup();
-    this.superBombs = this.physics.add.staticGroup();
-    this.explosions = this.physics.add.staticGroup();
-
-    this.explosionSound = this.sound.add("explosion", { loop: false });
-    this.charStepSound = this.sound.add("charStep", { loop: true });
-    this.charDeathSound = this.sound.add("charDeath", { loop: false });
-    this.enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
-    this.bonusSound = this.sound.add("bonusSound", { loop: false });
-    this.putBombSound = this.sound.add("putBomb", { loop: false });
-    this.stageClearSound = this.sound.add("stageClear", { loop: false });
-    this.stageMusic = this.sound.add("stageMusic", { loop: true });
+    this.defineGameObjects();
     this.stageMusic.play();
 
     this.events.on("resume", () => {
@@ -170,412 +152,26 @@ class GameScene extends Phaser.Scene {
       this.charDeathSound.stop();
     });
 
-    for (let i = 1; i <= ceilsNum; i++) {
-      for (let j = 1; j <= ceilsNum; j++) {
-        const curSquareXCenter =
-          fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
-        const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
-        const randomWoodSquare = Math.round(Math.random());
-
-        const emptyStartLocations =
-          (i === ceilsNum - 1 && j === 2) ||
-          (i === ceilsNum - 2 && j === 2) ||
-          (i === ceilsNum - 1 && j === 3);
-
-        fieldMatrix[i - 1][j - 1] = {
-          x: curSquareXCenter,
-          y: curSquareYCenter,
-        };
-
-        if (i === 1 || i === ceilsNum || j === 1 || j === ceilsNum) {
-          fieldMatrix[i - 1][j - 1].object = "stone";
-          this.stone
-            .create(curSquareXCenter, curSquareYCenter, "stone")
-            .setScale((1 / fieldImgSize) * fieldSquareLength)
-            .refreshBody();
-          continue;
-        }
-
-        if (i % 3 === 0 && j % 3 === 0) {
-          fieldMatrix[i - 1][j - 1].object = "stone";
-          this.stone
-            .create(curSquareXCenter, curSquareYCenter, "stone")
-            .setScale((1 / fieldImgSize) * fieldSquareLength)
-            .refreshBody();
-          continue;
-        }
-
-        fieldMatrix[i - 1][j - 1].object = "grass";
-        this.grass
-          .create(curSquareXCenter, curSquareYCenter, "grass")
-          .setScale((1 / fieldImgSize) * fieldSquareLength)
-          .refreshBody();
-
-        if (model.fieldMatrix) {
-          const current = model.fieldMatrix[i - 1][j - 1].object;
-          if (current === "wood") {
-            this.wood
-              .create(curSquareXCenter, curSquareYCenter, "wood")
-              .setScale((1 / fieldImgSize) * fieldSquareLength)
-              .refreshBody();
-          }
-          if (current === "char") {
-            fieldMatrix[i - 1][j - 1].object = "char";
-          }
-          if (current?.includes("enemy")) {
-            fieldMatrix[i - 1][j - 1].object = "enemy";
-            this.enemies
-              .create(
-                fieldMatrix[i - 1][j - 1].x,
-                fieldMatrix[i - 1][j - 1].y,
-                "enemy"
-              )
-              .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-              .setScale(0.9)
-              .setDepth(1)
-              .refreshBody();
-          }
-        } else {
-          if (i === ceilsNum - 1 && j === 2) {
-            fieldMatrix[i - 1][j - 1].object = "char";
-            continue;
-          }
-          if (randomWoodSquare && !emptyStartLocations) {
-            fieldMatrix[i - 1][j - 1].object = "wood";
-            this.wood
-              .create(curSquareXCenter, curSquareYCenter, "wood")
-              .setScale((1 / fieldImgSize) * fieldSquareLength)
-              .refreshBody();
-            continue;
-          }
-        }
-      }
-    }
-
-    // generate random enemies if no saved game
-    if (!model.fieldMatrix) {
-      while (model.enemyCounter < model.curLvlEnemies) {
-        const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
-        const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
-
-        if (
-          fieldMatrix[randomX][randomY].object !== "grass" ||
-          (randomX === ceilsNum - 2 && randomY === 1) ||
-          (randomX === ceilsNum - 3 && randomY === 1) ||
-          (randomX === ceilsNum - 2 && randomY === 2)
-        )
-          continue;
-        fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
-        model.enemyCounter++;
-        this.enemies
-          .create(
-            fieldMatrix[randomX][randomY].x,
-            fieldMatrix[randomX][randomY].y,
-            "enemy"
-          )
-          .setDepth(1)
-          .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-          .setScale(0.9)
-          .refreshBody();
-      }
-    }
-
-    const charField = fieldMatrix
-      .flat()
-      .find((square) => square.object === "char") as FieldSquare;
-
-    this.char = this.physics.add
-      .sprite(
-        charField.x !== undefined ? charField.x : charStartX,
-        charField.y !== undefined ? charField.y : charStartY,
-        "char"
-      )
-      .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
-      .setScale(0.9, 0.9)
-      .refreshBody();
-
-    this.char.on("destroy", () => {
-      this.charStepSound.stop();
-      this.charDeathSound.play();
-    });
-
-    this.physics.add.collider(this.char, this.stone);
-    this.physics.add.collider(this.char, this.wood);
-    this.physics.add.collider(this.char, this.enemies, () => {
-      if (!model.gameOver) this.charDie();
-    });
-    // this.physics.add.collider(this.char, this.bombs);
-
-    this.physics.add.collider(this.enemies, this.enemies);
-    this.physics.add.collider(this.enemies, this.wood);
-    this.physics.add.collider(this.enemies, this.stone);
-    this.physics.add.collider(this.enemies, this.bombs);
-
-    this.physics.add.overlap(
-      this.char,
-      this.hearts,
-      this.collectHeart as ArcadePhysicsCallback,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      this
-    );
-    this.physics.add.overlap(
-      this.char,
-      this.shields,
-      this.collectShield as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.char,
-      this.superBombs,
-      this.collectSuperBomb as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.char,
-      this.bombIncreasers,
-      this.collectBombIncrease as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.superBombs,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.hearts,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.shields,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.enemies,
-      this.bombIncreasers,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.bombIncreasers,
-    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.hearts,
-    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.superBombs,
-    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.shields,
-    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-
-    /*Draw explosion */
-    this.anims.create({
-      key: "bombExplosion",
-      frames: this.anims.generateFrameNumbers("explosion", {
-        frames: Array.from(Array(64).keys()),
-      }),
-      frameRate: 64,
-      repeat: 0,
-    });
-
-    /* CHAR ANIMATIONS */
-    this.anims.create({
-      key: "up",
-      frames: this.anims.generateFrameNumbers("char", {
-        frames: [15, 16, 17, 18, 19, 18, 17, 16],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "right",
-      frames: this.anims.generateFrameNumbers("char", {
-        frames: [0, 1, 2, 3, 4, 3, 2, 1],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "down",
-      frames: this.anims.generateFrameNumbers("char", {
-        frames: [5, 6, 7, 8, 9, 8, 7, 6],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "left",
-      frames: this.anims.generateFrameNumbers("char", {
-        frames: [10, 11, 12, 13, 14, 13, 12, 11],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "turn",
-      frames: [{ key: "char", frame: 7 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: "placeBomb",
-      frames: [{ key: "char", frame: 27 }],
-      frameRate: 10,
-      repeat: -1,
-    });
-
+    this.generateGameField();
+    this.generateEnemies();
+    this.setupChar();
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.livesText = this.add.text(
-      textStartX + 4 * fieldSquareLength,
-      textStartY,
-      `${
-        model.lives <= 5
-          ? `LIVES :  ${"❤️".repeat(model.lives)}`
-          : `LIVES: ❤️ x${model.lives}`
-      }`,
-      gameUITextStyle
-    );
-    this.add.text(
-      textStartX + 8.5 * fieldSquareLength,
-      textStartY,
-      `LEVEL : ${model.level}`,
-      gameUITextStyle
-    );
+    model.fieldMatrix
+      ? (fieldMatrix = model.fieldMatrix)
+      : (model.fieldMatrix = fieldMatrix);
 
-    this.scoreText = this.add.text(
-      textStartX,
-      textStartY,
-      `SCORE : ${model.score}`,
-      gameUITextStyle
-    );
-    this.bonusesText = this.add.text(
-      textStartX,
-      textStartY + 9.85 * fieldSquareLength,
-      "",
-      bonusTextStyle
-    );
-
-    this.timerText = this.add.text(
-      textStartX + 4 * fieldSquareLength,
-      textStartY + 10 * fieldSquareLength,
-      `TIME : ${model.curLvlTimer}`,
-      gameUITextStyle
-    );
-
-    //if there is field matrix in model - we take it
-    //if no - we write it into model
-
-    if (model.fieldMatrix) {
-      fieldMatrix = model.fieldMatrix;
-    } else {
-      model.fieldMatrix = fieldMatrix;
-    }
-
+    this.setupOverlapsAndColliders();
+    this.createGameAnimations();
+    this.setupGameText();
     this.bombCheck();
     this.shieldCheck();
     this.updateBonusesText();
   }
   update() {
-    const keyESC = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC
-    );
-
-    model.activeBombs.map((bomb) => {
-      if (bomb.bombTimer > 0) {
-        bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
-      } else {
-        model.activeBombs = model.activeBombs.filter((cur) => cur !== bomb);
-      }
-    });
-    model.curTimer -= 1 / 60;
-    if (model.curTimer <= 20) {
-      this.timerText.setTint(0xff0000);
-      this.add.tween({
-        targets: this.timerText,
-        ease: "Sine.easeInOut",
-        delay: 0,
-        alpha: {
-          getStart: () => 1,
-          getEnd: () => 0,
-        },
-      });
-    }
-    if (model.curTimer <= 0) {
-      this.char.destroy();
-      model.gameOver = true;
-      model.curTimer = 0;
-      this.drawGameOver();
-    }
-    this.timerText.setText(`TIMER: ${model.curTimer.toFixed(0)}`);
-    const bombSet = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
-    );
-
-    if (keyESC.isDown) {
-      model.fieldMatrix = fieldMatrix;
-      model.saveToBd();
-      model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
-      model.isGamePaused = true;
-      model.escIsPressed = true;
-      model.bombIsPlanting = false;
-
-      this.putBombSound.stop();
-      this.stageMusic.pause();
-      this.scene.pause();
-
-      setTimeout(() => this.charStepSound.stop(), 0);
-      setTimeout(() => (model.escIsPressed = false), 300);
-      view.start.renderUI();
-    }
-
-    if (model.gameOver) {
-      this.stageMusic.stop();
-      this.putBombSound.stop();
-      if (bombSet.isDown && model.lives) this.restartScene();
-      else if (bombSet.isDown && !model.lives) this.restartGame();
-      else return;
-    }
-
-    if (!model.gameOver && bombSet.isDown) {
-      const [bombX, bombY] = this.findClosestSquare(
-        this.char as Phaser.Physics.Matter.Sprite
-      ) as number[];
-      this.dropBomb(bombX, bombY);
-    }
-
+    this.bombTimerCheck();
+    this.gameTimer();
+    this.gameBtnsHandler();
     this.charMovement();
     this.enemies.children.entries.forEach((enemy) =>
       this.enemyMovement(enemy as Phaser.Physics.Matter.Sprite)
@@ -1240,6 +836,403 @@ class GameScene extends Phaser.Scene {
   }
   shieldCheck() {
     if (model.shieldActive) this.char.setTint(0x00ff00);
+  }
+
+  bombTimerCheck() {
+    model.activeBombs.map((bomb) => {
+      if (bomb.bombTimer > 0) {
+        bomb.bombTimer = Math.floor(bomb.bombTimer - (1 / 60) * 1000);
+      } else {
+        model.activeBombs = model.activeBombs.filter((cur) => cur !== bomb);
+      }
+    });
+  }
+
+  gameTimer() {
+    model.curTimer -= 1 / 60;
+    if (model.curTimer <= 20) {
+      this.timerText.setTint(0xff0000);
+      this.add.tween({
+        targets: this.timerText,
+        ease: "Sine.easeInOut",
+        delay: 0,
+        alpha: {
+          getStart: () => 1,
+          getEnd: () => 0,
+        },
+      });
+    }
+    if (model.curTimer <= 0) {
+      this.char.destroy();
+      model.gameOver = true;
+      model.curTimer = 0;
+      this.drawGameOver();
+    }
+    this.timerText.setText(`TIMER: ${model.curTimer.toFixed(0)}`);
+  }
+  gameBtnsHandler() {
+    const keyESC = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ESC
+    );
+    const bombSet = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
+    );
+
+    if (keyESC.isDown) {
+      model.fieldMatrix = fieldMatrix;
+      model.saveToBd();
+      model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
+      model.isGamePaused = true;
+      model.escIsPressed = true;
+      model.bombIsPlanting = false;
+
+      this.putBombSound.stop();
+      this.stageMusic.pause();
+      this.scene.pause();
+
+      setTimeout(() => this.charStepSound.stop(), 0);
+      setTimeout(() => (model.escIsPressed = false), 300);
+      view.start.renderUI();
+    }
+
+    if (model.gameOver) {
+      this.stageMusic.stop();
+      this.putBombSound.stop();
+      if (bombSet.isDown && model.lives) this.restartScene();
+      else if (bombSet.isDown && !model.lives) this.restartGame();
+      else return;
+    }
+
+    if (!model.gameOver && bombSet.isDown) {
+      const [bombX, bombY] = this.findClosestSquare(
+        this.char as Phaser.Physics.Matter.Sprite
+      ) as number[];
+      this.dropBomb(bombX, bombY);
+    }
+  }
+
+  setupGameText() {
+    this.livesText = this.add.text(
+      textStartX + 4 * fieldSquareLength,
+      textStartY,
+      `${
+        model.lives <= 5
+          ? `LIVES :  ${"❤️".repeat(model.lives)}`
+          : `LIVES: ❤️ x${model.lives}`
+      }`,
+      gameUITextStyle
+    );
+    this.add.text(
+      textStartX + 8.5 * fieldSquareLength,
+      textStartY,
+      `LEVEL : ${model.level}`,
+      gameUITextStyle
+    );
+
+    this.scoreText = this.add.text(
+      textStartX,
+      textStartY,
+      `SCORE : ${model.score}`,
+      gameUITextStyle
+    );
+    this.bonusesText = this.add.text(
+      textStartX,
+      textStartY + 9.85 * fieldSquareLength,
+      "",
+      bonusTextStyle
+    );
+
+    this.timerText = this.add.text(
+      textStartX + 4 * fieldSquareLength,
+      textStartY + 10 * fieldSquareLength,
+      `TIME : ${model.curLvlTimer}`,
+      gameUITextStyle
+    );
+  }
+
+  createGameAnimations() {
+    this.anims.create({
+      key: "bombExplosion",
+      frames: this.anims.generateFrameNumbers("explosion", {
+        frames: Array.from(Array(64).keys()),
+      }),
+      frameRate: 64,
+      repeat: 0,
+    });
+
+    this.anims.create({
+      key: "up",
+      frames: this.anims.generateFrameNumbers("char", {
+        frames: [15, 16, 17, 18, 19, 18, 17, 16],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "right",
+      frames: this.anims.generateFrameNumbers("char", {
+        frames: [0, 1, 2, 3, 4, 3, 2, 1],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "down",
+      frames: this.anims.generateFrameNumbers("char", {
+        frames: [5, 6, 7, 8, 9, 8, 7, 6],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "left",
+      frames: this.anims.generateFrameNumbers("char", {
+        frames: [10, 11, 12, 13, 14, 13, 12, 11],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "turn",
+      frames: [{ key: "char", frame: 7 }],
+      frameRate: 20,
+    });
+
+    this.anims.create({
+      key: "placeBomb",
+      frames: [{ key: "char", frame: 27 }],
+      frameRate: 10,
+      repeat: -1,
+    });
+  }
+
+  setupOverlapsAndColliders() {
+    this.physics.add.collider(this.char, this.stone);
+    this.physics.add.collider(this.char, this.wood);
+    this.physics.add.collider(this.char, this.enemies, () => {
+      if (!model.gameOver) this.charDie();
+    });
+
+    this.physics.add.collider(this.enemies, this.enemies);
+    this.physics.add.collider(this.enemies, this.wood);
+    this.physics.add.collider(this.enemies, this.stone);
+    this.physics.add.collider(this.enemies, this.bombs);
+
+    this.physics.add.overlap(
+      this.char,
+      this.hearts,
+      this.collectHeart as ArcadePhysicsCallback,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      this
+    );
+    this.physics.add.overlap(
+      this.char,
+      this.shields,
+      this.collectShield as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.char,
+      this.superBombs,
+      this.collectSuperBomb as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.char,
+      this.bombIncreasers,
+      this.collectBombIncrease as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.superBombs,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.hearts,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.shields,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+    this.physics.add.overlap(
+      this.enemies,
+      this.bombIncreasers,
+      this.destroyOnCollideCallback as ArcadePhysicsCallback,
+      undefined,
+      this
+    );
+  }
+  setupChar() {
+    const charField = fieldMatrix
+      .flat()
+      .find((square) => square.object === "char") as FieldSquare;
+
+    this.char = this.physics.add
+      .sprite(
+        charField.x !== undefined ? charField.x : charStartX,
+        charField.y !== undefined ? charField.y : charStartY,
+        "char"
+      )
+      .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
+      .setScale(0.9, 0.9)
+      .refreshBody();
+
+    this.char.on("destroy", () => {
+      this.charStepSound.stop();
+      this.charDeathSound.play();
+    });
+  }
+
+  generateGameField() {
+    for (let i = 1; i <= ceilsNum; i++) {
+      for (let j = 1; j <= ceilsNum; j++) {
+        const curSquareXCenter =
+          fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
+        const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
+        const randomWoodSquare = Math.round(Math.random());
+
+        const emptyStartLocations =
+          (i === ceilsNum - 1 && j === 2) ||
+          (i === ceilsNum - 2 && j === 2) ||
+          (i === ceilsNum - 1 && j === 3);
+
+        fieldMatrix[i - 1][j - 1] = {
+          x: curSquareXCenter,
+          y: curSquareYCenter,
+        };
+
+        if (i === 1 || i === ceilsNum || j === 1 || j === ceilsNum) {
+          fieldMatrix[i - 1][j - 1].object = "stone";
+          this.stone
+            .create(curSquareXCenter, curSquareYCenter, "stone")
+            .setScale((1 / fieldImgSize) * fieldSquareLength)
+            .refreshBody();
+          continue;
+        }
+
+        if (i % 3 === 0 && j % 3 === 0) {
+          fieldMatrix[i - 1][j - 1].object = "stone";
+          this.stone
+            .create(curSquareXCenter, curSquareYCenter, "stone")
+            .setScale((1 / fieldImgSize) * fieldSquareLength)
+            .refreshBody();
+          continue;
+        }
+
+        fieldMatrix[i - 1][j - 1].object = "grass";
+        this.grass
+          .create(curSquareXCenter, curSquareYCenter, "grass")
+          .setScale((1 / fieldImgSize) * fieldSquareLength)
+          .refreshBody();
+
+        if (model.fieldMatrix) {
+          const current = model.fieldMatrix[i - 1][j - 1].object;
+          if (current === "wood") {
+            this.wood
+              .create(curSquareXCenter, curSquareYCenter, "wood")
+              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .refreshBody();
+          }
+          if (current === "char") {
+            fieldMatrix[i - 1][j - 1].object = "char";
+          }
+          if (current?.includes("enemy")) {
+            fieldMatrix[i - 1][j - 1].object = "enemy";
+            this.enemies
+              .create(
+                fieldMatrix[i - 1][j - 1].x,
+                fieldMatrix[i - 1][j - 1].y,
+                "enemy"
+              )
+              .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+              .setScale(0.9)
+              .setDepth(1)
+              .refreshBody();
+          }
+        } else {
+          if (i === ceilsNum - 1 && j === 2) {
+            fieldMatrix[i - 1][j - 1].object = "char";
+            continue;
+          }
+          if (randomWoodSquare && !emptyStartLocations) {
+            fieldMatrix[i - 1][j - 1].object = "wood";
+            this.wood
+              .create(curSquareXCenter, curSquareYCenter, "wood")
+              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .refreshBody();
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+  defineGameObjects() {
+    this.grass = this.physics.add.staticGroup();
+    this.stone = this.physics.add.staticGroup();
+    this.wood = this.physics.add.staticGroup();
+    this.enemies = this.physics.add.group();
+    this.bombs = this.physics.add.group();
+    this.hearts = this.physics.add.staticGroup();
+    this.bombIncreasers = this.physics.add.staticGroup();
+    this.shields = this.physics.add.staticGroup();
+    this.superBombs = this.physics.add.staticGroup();
+    this.explosions = this.physics.add.staticGroup();
+
+    this.explosionSound = this.sound.add("explosion", { loop: false });
+    this.charStepSound = this.sound.add("charStep", { loop: true });
+    this.charDeathSound = this.sound.add("charDeath", { loop: false });
+    this.enemyDeathSound = this.sound.add("enemyDeath", { loop: false });
+    this.bonusSound = this.sound.add("bonusSound", { loop: false });
+    this.putBombSound = this.sound.add("putBomb", { loop: false });
+    this.stageClearSound = this.sound.add("stageClear", { loop: false });
+    this.stageMusic = this.sound.add("stageMusic", { loop: true });
+  }
+
+  generateEnemies() {
+    if (!model.fieldMatrix) {
+      while (model.enemyCounter < model.curLvlEnemies) {
+        const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+        const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+
+        if (
+          fieldMatrix[randomX][randomY].object !== "grass" ||
+          (randomX === ceilsNum - 2 && randomY === 1) ||
+          (randomX === ceilsNum - 3 && randomY === 1) ||
+          (randomX === ceilsNum - 2 && randomY === 2)
+        )
+          continue;
+        fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
+        model.enemyCounter++;
+        this.enemies
+          .create(
+            fieldMatrix[randomX][randomY].x,
+            fieldMatrix[randomX][randomY].y,
+            "enemy"
+          )
+          .setDepth(1)
+          .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+          .setScale(0.9)
+          .refreshBody();
+      }
+    }
   }
 }
 export const gameScene = new GameScene();
