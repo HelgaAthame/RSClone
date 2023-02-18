@@ -326,7 +326,7 @@ class GameScene extends Phaser.Scene {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
       model.saveToBd().catch((e) => {
-        console.log(`error while saving to DB ${e}`);
+        (`error while saving to DB ${e}`);
       });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }

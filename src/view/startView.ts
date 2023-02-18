@@ -161,8 +161,6 @@ export class StartView {
         case "Enter":
 
           const selected = document.querySelector('.active') as HTMLButtonElement;
-          console.log(`selected is`);
-          console.log(selected);
           if (selected) {
             switch (selected.dataset.content) {
               case "authorization":
@@ -254,7 +252,6 @@ export class StartView {
   }
 
   pauseBGAudio() {
-    console.log(`pause BG Audio, level ${model.level}`);
     const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
     if (bgAudio) bgAudio.pause();
   }
