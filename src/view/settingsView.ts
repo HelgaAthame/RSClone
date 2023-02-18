@@ -164,6 +164,7 @@ export class SettingsView {
               select: keys[6].innerHTML as "SHIFT",
               start: keys[7].innerHTML as "ENTER",
             };
+            model.saveToBd();
             document.removeEventListener("keydown", f);
             view.start.renderUI();
           }
