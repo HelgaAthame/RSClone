@@ -205,6 +205,8 @@ export class StartView {
   }
 
   async handleContinueGame() {
+
+    console.log('handleConttGame');
     if (!this.phaser) {
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;
@@ -220,6 +222,7 @@ export class StartView {
   }
 
   async handleStartGame() {
+    console.log('handleStartGame');
     if (!model.uid) {
       model.generateRandomUsername();
     }

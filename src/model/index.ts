@@ -87,32 +87,35 @@ export class Model {
   }
 
   async saveToBd() {
-    await setDoc(doc(db, "users", this.uid), {
-      lives: this.lives,
-      uid: this.uid,
-      userName: this.userName,
-      score: this.curLvlScore + this.score,
-      highScore: this.highScore,
-      isMuted: this.isMuted,
-      volume: this.volume,
-      buttons: this.buttons,
-      fieldMatrix: JSON.stringify(this.fieldMatrix),
-      bombIsPlanting: this.bombIsPlanting,
-      maxBombs: this.maxBombs,
-      activeBombs: this.activeBombs,
-      level: this.level,
-      enemySpeed: this.enemySpeed,
-      curTimer: this.curTimer,
-      shieldActive: this.shieldActive,
-      superBombActive: this.superBombActive,
-      curLvlTimer: this.curLvlTimer,
-      curLvlScore: this.curLvlScore,
-      bombSpeed: this.bombSpeed,
-      enemyCounter: this.enemyCounter,
-      curLvlEnemies: this.curLvlEnemies,
-      charSpeed: this.charSpeed,
-      gameOver: this.gameOver,
-    });
+    if (model.fieldMatrix) {
+      await setDoc(doc(db, "users", this.uid), {
+        lives: this.lives,
+        uid: this.uid,
+        userName: this.userName,
+        score: this.curLvlScore + this.score,
+        highScore: this.highScore,
+        isMuted: this.isMuted,
+        volume: this.volume,
+        buttons: this.buttons,
+        fieldMatrix: JSON.stringify(this.fieldMatrix),
+        bombIsPlanting: this.bombIsPlanting,
+        maxBombs: this.maxBombs,
+        activeBombs: this.activeBombs,
+        level: this.level,
+        enemySpeed: this.enemySpeed,
+        curTimer: this.curTimer,
+        shieldActive: this.shieldActive,
+        superBombActive: this.superBombActive,
+        curLvlTimer: this.curLvlTimer,
+        curLvlScore: this.curLvlScore,
+        bombSpeed: this.bombSpeed,
+        enemyCounter: this.enemyCounter,
+        curLvlEnemies: this.curLvlEnemies,
+        charSpeed: this.charSpeed,
+        gameOver: this.gameOver,
+      });
+    }
+
   }
 
   async takeFromBD() {
