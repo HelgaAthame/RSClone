@@ -87,7 +87,14 @@ export class Model {
   }
 
   async saveToBd() {
-    if (model.fieldMatrix) {
+    let allValuesExists = true;
+    Object.entries(this).forEach(entrie => {
+      if (entrie[1] === undefined) {
+        console.log(`${entrie[0]} is ${entrie[1]} (saving to DB)`);
+        allValuesExists = false;
+      }
+    })
+    if (allValuesExists) {
       await setDoc(doc(db, "users", this.uid), {
         lives: this.lives,
         uid: this.uid,

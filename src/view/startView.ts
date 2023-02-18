@@ -152,51 +152,51 @@ export class StartView {
           footerlinks[k].classList.add("active");
           break;
         case "Enter":
-          const selected = selectorChecker(
-            document,
-            ".active"
-          ) as HTMLButtonElement;
 
-          switch (selected.dataset.content) {
-            case "authorization":
-              if (selected.disabled === false) {
-                firebase.googleAuth();
-                view.start.setContinueButtonState();
-              }
-              break;
+          const selected = document.querySelector(".active") as HTMLButtonElement;
 
-            case "start":
-              view.start.handleStartGame();
-              document.removeEventListener("keydown", foo);
-              break;
+          if (selected) {
+            switch (selected.dataset.content) {
+              case "authorization":
+                if (selected.disabled === false) {
+                  firebase.googleAuth();
+                  view.start.setContinueButtonState();
+                }
+                break;
 
-            case "continue":
-              if (selected.disabled === false) {
-                view.start.handleContinueGame();
+              case "start":
+                view.start.handleStartGame();
                 document.removeEventListener("keydown", foo);
-              }
-              break;
+                break;
 
-            case "settings":
-              view.settings.renderUI();
-              document.removeEventListener("keydown", foo);
-              break;
-            case "leaderboard":
-              view.scores.renderUI();
-              document.removeEventListener("keydown", foo);
-              break;
-            case "Olga":
-              selected.click();
-              break;
-            case "Gleb":
-              selected.click();
-              break;
-            case "Alex":
-              selected.click();
-              break;
-            default:
-              selected.click();
-              break;
+              case "continue":
+                if (selected.disabled === false) {
+                  view.start.handleContinueGame();
+                  document.removeEventListener("keydown", foo);
+                }
+                break;
+
+              case "settings":
+                view.settings.renderUI();
+                document.removeEventListener("keydown", foo);
+                break;
+              case "leaderboard":
+                view.scores.renderUI();
+                document.removeEventListener("keydown", foo);
+                break;
+              case "Olga":
+                selected.click();
+                break;
+              case "Gleb":
+                selected.click();
+                break;
+              case "Alex":
+                selected.click();
+                break;
+              default:
+                selected.click();
+                break;
+            }
           }
           break;
       }

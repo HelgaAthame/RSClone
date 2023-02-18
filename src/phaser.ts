@@ -825,7 +825,7 @@ class GameScene extends Phaser.Scene {
       rotation?: number | undefined;
     }
 
-    const cam: Camera = this.cameras.main;
+    const cam: Camera = this.cameras.main; 
 
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
