@@ -21,6 +21,8 @@ export class StartView {
   }
 
   renderUI() {
+    this.playBgAudio();
+
     const isAuthorized = model.auth === "authorized";
     this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
     if (this.canvas) this.canvas.style.display = "none";
@@ -88,7 +90,12 @@ export class StartView {
       document.body.append(bgAudio);
       bgAudio.play();
     }
-    if (bgAudio instanceof HTMLAudioElement) bgAudio.play();
+    //if (bgAudio instanceof HTMLAudioElement) bgAudio.play();
+  }
+
+  playBgAudio() {
+    const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
+    if(bgAudio) bgAudio.play();
   }
 
   async setContinueButtonState() {
@@ -153,8 +160,9 @@ export class StartView {
           break;
         case "Enter":
 
-          const selected = document.querySelector(".active") as HTMLButtonElement;
-
+          const selected = document.querySelector('.active') as HTMLButtonElement;
+          console.log(`selected is`);
+          console.log(selected);
           if (selected) {
             switch (selected.dataset.content) {
               case "authorization":
@@ -194,6 +202,8 @@ export class StartView {
                 selected.click();
                 break;
               default:
+
+                view.start.pauseBGAudio();
                 selected.click();
                 break;
             }
@@ -204,8 +214,7 @@ export class StartView {
   }
 
   async handleContinueGame() {
-
-    console.log('handleConttGame');
+    console.log(`model.curLvlEnemies =${model.curLvlEnemies}`);
     if (!this.phaser) {
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;
@@ -214,14 +223,13 @@ export class StartView {
       this.gameScene.scene.resume();
     }
 
-    this.pauseBGAudio();
-
     model.escIsPressed = false;
     model.gameOver = false;
   }
 
   async handleStartGame() {
-    console.log('handleStartGame');
+
+    this.pauseBGAudio();
     if (!model.uid) {
       model.generateRandomUsername();
     }
@@ -229,7 +237,6 @@ export class StartView {
     model.resetGame();
 
     model.saveToBd();
-    this.pauseBGAudio();
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
@@ -247,6 +254,7 @@ export class StartView {
   }
 
   pauseBGAudio() {
+    console.log(`pause BG Audio, level ${model.level}`);
     const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
     if (bgAudio) bgAudio.pause();
   }

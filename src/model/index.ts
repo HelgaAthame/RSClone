@@ -31,7 +31,7 @@ export class Model {
   uid: string;
   userName: string;
   gameOver: boolean;
-  bombActive: boolean;
+  //bombActive: boolean;
   superBombActive: boolean;
   shieldActive: boolean;
   maxBombs: number;

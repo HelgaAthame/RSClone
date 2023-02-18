@@ -148,11 +148,13 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    view.start.pauseBGAudio();
     model.isGamePaused = false;
     this.defineGameObjects();
     this.stageMusic.play();
 
     this.events.on("resume", () => {
+      view.start.pauseBGAudio();
       this.stageMusic.resume();
       this.bombCheck();
     });
@@ -825,7 +827,7 @@ class GameScene extends Phaser.Scene {
       rotation?: number | undefined;
     }
 
-    const cam: Camera = this.cameras.main; 
+    const cam: Camera = this.cameras.main;
 
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
