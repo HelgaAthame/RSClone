@@ -89,7 +89,7 @@ const keysObject: KeyObj = {
   'ShiftRight': 'SHIFT',
   'ShiftLeft': 'SHIFT',
   'Digit6': 'SIX',
-  'Space': 'SPACEBAR',
+  'Space': 'SPACE',
   'T': 'T',
   'Tab': 'TAB',
   'Digit3': 'THREE',
