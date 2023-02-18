@@ -75,6 +75,14 @@ enum Bombs {
   SUPERBOMB = "superbomb",
 }
 
+interface EnhancedEnemy extends Phaser.Physics.Arcade.Sprite {
+  isDeathTriggered: boolean;
+}
+
+interface EnhancedObj extends Phaser.Physics.Arcade.Sprite {
+  destroyLock: boolean;
+}
+
 class GameScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   scoreText: Phaser.GameObjects.Text;
@@ -140,11 +148,13 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    view.start.pauseBGAudio();
     model.isGamePaused = false;
     this.defineGameObjects();
     this.stageMusic.play();
 
     this.events.on("resume", () => {
+      view.start.pauseBGAudio();
       this.stageMusic.resume();
       this.bombCheck();
     });
@@ -316,7 +326,7 @@ class GameScene extends Phaser.Scene {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
       model.saveToBd().catch((e) => {
-        console.log(`error while saving to DB ${e}`);
+        (`error while saving to DB ${e}`);
       });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
@@ -538,7 +548,7 @@ class GameScene extends Phaser.Scene {
 
   destroyEnemy(
     _explosion: Phaser.Physics.Arcade.Sprite,
-    enemy: Phaser.Physics.Arcade.Sprite
+    enemy: EnhancedEnemy//Phaser.Physics.Arcade.Sprite
   ) {
     // enemy.deathTriggered = true
     Object.defineProperty(enemy, "isDeathTriggered", { value: true });
@@ -555,6 +565,7 @@ class GameScene extends Phaser.Scene {
     //         );
     //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
     //       });
+
     enemy.once("destroy", () => {
       const { isDeathTriggered } = enemy;
       if (!isDeathTriggered) {
@@ -798,7 +809,7 @@ class GameScene extends Phaser.Scene {
   }
   destroyOnCollideCallback(
     _subject: Phaser.Physics.Arcade.Sprite,
-    object: Phaser.Physics.Arcade.Sprite
+    object: EnhancedObj//Phaser.Physics.Arcade.Sprite
   ) {
     if (!object.destroyLock) {
       object.destroy();
@@ -821,7 +832,7 @@ class GameScene extends Phaser.Scene {
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      cam.rotation += random;
+      if (cam.rotation) cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);

@@ -1,5 +1,4 @@
-import { db, firebase } from "../firebase/firebase.js";
-import { doc, getDoc } from "firebase/firestore";
+import { firebase } from "../firebase/firebase.js";
 import GithubLogo from "../assets/logos/github.png";
 import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
@@ -22,6 +21,8 @@ export class StartView {
   }
 
   renderUI() {
+    this.playBgAudio();
+
     const isAuthorized = model.auth === "authorized";
     this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
     if (this.canvas) this.canvas.style.display = "none";
@@ -89,7 +90,12 @@ export class StartView {
       document.body.append(bgAudio);
       bgAudio.play();
     }
-    if (bgAudio instanceof HTMLAudioElement) bgAudio.play();
+    //if (bgAudio instanceof HTMLAudioElement) bgAudio.play();
+  }
+
+  playBgAudio() {
+    const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
+    if(bgAudio) bgAudio.play();
   }
 
   async setContinueButtonState() {
@@ -153,51 +159,52 @@ export class StartView {
           footerlinks[k].classList.add("active");
           break;
         case "Enter":
-          const selected = selectorChecker(
-            document,
-            ".active"
-          ) as HTMLButtonElement;
 
-          switch (selected.dataset.content) {
-            case "authorization":
-              if (selected.disabled === false) {
-                firebase.googleAuth();
-                view.start.setContinueButtonState();
-              }
-              break;
+          const selected = document.querySelector('.active') as HTMLButtonElement;
+          if (selected) {
+            switch (selected.dataset.content) {
+              case "authorization":
+                if (selected.disabled === false) {
+                  firebase.googleAuth();
+                  view.start.setContinueButtonState();
+                }
+                break;
 
-            case "start":
-              view.start.handleStartGame();
-              document.removeEventListener("keydown", foo);
-              break;
-
-            case "continue":
-              if (selected.disabled === false) {
-                view.start.handleContinueGame();
+              case "start":
+                view.start.handleStartGame();
                 document.removeEventListener("keydown", foo);
-              }
-              break;
+                break;
 
-            case "settings":
-              view.settings.renderUI();
-              document.removeEventListener("keydown", foo);
-              break;
-            case "leaderboard":
-              view.scores.renderUI();
-              document.removeEventListener("keydown", foo);
-              break;
-            case "Olga":
-              selected.click();
-              break;
-            case "Gleb":
-              selected.click();
-              break;
-            case "Alex":
-              selected.click();
-              break;
-            default:
-              selected.click();
-              break;
+              case "continue":
+                if (selected.disabled === false) {
+                  view.start.handleContinueGame();
+                  document.removeEventListener("keydown", foo);
+                }
+                break;
+
+              case "settings":
+                view.settings.renderUI();
+                document.removeEventListener("keydown", foo);
+                break;
+              case "leaderboard":
+                view.scores.renderUI();
+                document.removeEventListener("keydown", foo);
+                break;
+              case "Olga":
+                selected.click();
+                break;
+              case "Gleb":
+                selected.click();
+                break;
+              case "Alex":
+                selected.click();
+                break;
+              default:
+
+                view.start.pauseBGAudio();
+                selected.click();
+                break;
+            }
           }
           break;
       }
@@ -205,8 +212,7 @@ export class StartView {
   }
 
   async handleContinueGame() {
-
-    console.log('handleConttGame');
+    //console.log(`model.curLvlEnemies =${model.curLvlEnemies}`);
     if (!this.phaser) {
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;
@@ -215,14 +221,13 @@ export class StartView {
       this.gameScene.scene.resume();
     }
 
-    this.pauseBGAudio();
-
     model.escIsPressed = false;
     model.gameOver = false;
   }
 
   async handleStartGame() {
-    console.log('handleStartGame');
+
+    this.pauseBGAudio();
     if (!model.uid) {
       model.generateRandomUsername();
     }
@@ -230,7 +235,6 @@ export class StartView {
     model.resetGame();
 
     model.saveToBd();
-    this.pauseBGAudio();
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `

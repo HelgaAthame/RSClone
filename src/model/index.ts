@@ -31,7 +31,7 @@ export class Model {
   uid: string;
   userName: string;
   gameOver: boolean;
-  bombActive: boolean;
+  //bombActive: boolean;
   superBombActive: boolean;
   shieldActive: boolean;
   maxBombs: number;
@@ -87,7 +87,14 @@ export class Model {
   }
 
   async saveToBd() {
-    if (model.fieldMatrix) {
+    let allValuesExists = true;
+    Object.entries(this).forEach(entrie => {
+      if (entrie[1] === undefined) {
+        console.log(`${entrie[0]} is ${entrie[1]} (saving to DB)`);
+        allValuesExists = false;
+      }
+    })
+    if (allValuesExists) {
       await setDoc(doc(db, "users", this.uid), {
         lives: this.lives,
         uid: this.uid,
