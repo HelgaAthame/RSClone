@@ -79,6 +79,10 @@ interface EnhancedEnemy extends Phaser.Physics.Arcade.Sprite {
   isDeathTriggered: boolean;
 }
 
+interface EnhancedObj extends Phaser.Physics.Arcade.Sprite {
+  destroyLock: boolean;
+}
+
 class GameScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   scoreText: Phaser.GameObjects.Text;
@@ -803,7 +807,7 @@ class GameScene extends Phaser.Scene {
   }
   destroyOnCollideCallback(
     _subject: Phaser.Physics.Arcade.Sprite,
-    object: Phaser.Physics.Arcade.Sprite
+    object: EnhancedObj//Phaser.Physics.Arcade.Sprite
   ) {
     if (!object.destroyLock) {
       object.destroy();
@@ -826,7 +830,7 @@ class GameScene extends Phaser.Scene {
     // const cam = this.cameras.main;
     const tilt = setInterval(() => {
       const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      cam.rotation += random;
+      if (cam.rotation) cam.rotation += random;
     }, 50);
     setTimeout(() => {
       clearInterval(tilt);
