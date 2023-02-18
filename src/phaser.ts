@@ -75,6 +75,10 @@ enum Bombs {
   SUPERBOMB = "superbomb",
 }
 
+interface EnhancedEnemy extends Phaser.Physics.Arcade.Sprite {
+  isDeathTriggered: boolean;
+}
+
 class GameScene extends Phaser.Scene {
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   scoreText: Phaser.GameObjects.Text;
@@ -538,7 +542,7 @@ class GameScene extends Phaser.Scene {
 
   destroyEnemy(
     _explosion: Phaser.Physics.Arcade.Sprite,
-    enemy: Phaser.Physics.Arcade.Sprite
+    enemy: EnhancedEnemy//Phaser.Physics.Arcade.Sprite
   ) {
     // enemy.deathTriggered = true
     Object.defineProperty(enemy, "isDeathTriggered", { value: true });
@@ -555,6 +559,7 @@ class GameScene extends Phaser.Scene {
     //         );
     //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
     //       });
+
     enemy.once("destroy", () => {
       const { isDeathTriggered } = enemy;
       if (!isDeathTriggered) {

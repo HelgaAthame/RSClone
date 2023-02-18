@@ -1,5 +1,4 @@
-import { db, firebase } from "../firebase/firebase.js";
-import { doc, getDoc } from "firebase/firestore";
+import { firebase } from "../firebase/firebase.js";
 import GithubLogo from "../assets/logos/github.png";
 import RsschoolLogo from "../assets/logos/logo-rs.svg";
 import selectorChecker from "../utils/selectorChecker.js";
