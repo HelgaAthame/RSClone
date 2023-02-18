@@ -212,7 +212,7 @@ export class StartView {
   }
 
   async handleContinueGame() {
-    console.log(`model.curLvlEnemies =${model.curLvlEnemies}`);
+    //console.log(`model.curLvlEnemies =${model.curLvlEnemies}`);
     if (!this.phaser) {
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;
