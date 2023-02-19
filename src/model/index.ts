@@ -16,7 +16,7 @@ export class Model {
   curTimer: number;
   bombSpeed: number;
   activeBombs: {
-    curBomb: ReturnType<typeof setTimeout> | 'bombRemove';
+    curBomb: NodeJS.Timeout | "bombRemove";
     bombTimer: number;
     bombX: number;
     bombY: number;
@@ -88,12 +88,12 @@ export class Model {
 
   async saveToBd() {
     let allValuesExists = true;
-    Object.entries(this).forEach(entrie => {
+    Object.entries(this).forEach((entrie) => {
       if (entrie[1] === undefined) {
         console.log(`${entrie[0]} is ${entrie[1]} (saving to DB)`);
         allValuesExists = false;
       }
-    })
+    });
     if (allValuesExists) {
       await setDoc(doc(db, "users", this.uid), {
         lives: this.lives,
@@ -120,13 +120,11 @@ export class Model {
         curLvlEnemies: this.curLvlEnemies,
         charSpeed: this.charSpeed,
         gameOver: this.gameOver,
-      })
-      .catch(e => {
+      }).catch((e) => {
         console.log(`Error when saving to DB: ${e.message}`);
         model.saveToBd();
       });
     }
-
   }
 
   async takeFromBD() {

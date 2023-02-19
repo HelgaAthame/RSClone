@@ -32,7 +32,7 @@ loadFont("Mayhem", mayhem);
 
 const width = window.innerWidth;
 const height = window.innerHeight;
-const ceilsNum = 30;
+const ceilsNum = 11;
 const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
 const fieldImgSize = 512;
@@ -635,12 +635,12 @@ class GameScene extends Phaser.Scene {
       this.putBombSound.play();
 
       type CurBomb = {
-        curBomb: NodeJS.Timeout | 'bombRemove';
+        curBomb: NodeJS.Timeout | "bombRemove";
         bombTimer: number;
         bombX: number;
         bombY: number;
         isSuperBomb: boolean;
-      }
+      };
 
       const curBomb: CurBomb = {
         curBomb: setTimeout(() => {
@@ -657,22 +657,21 @@ class GameScene extends Phaser.Scene {
           (bomb) => bomb !== curBomb
         );
         console.log(`bomb.curBomb = ${curBomb.curBomb}`);
-        if (curBomb.curBomb !== 'bombRemove') this.explosionSound.play();
+        if (curBomb.curBomb !== "bombRemove") this.explosionSound.play();
 
         setTimeout(() => {
           if (model.activeBombs.length === 0) this.putBombSound.stop();
         }, 0);
       });
 
-
-    this.input.keyboard.on(`keydown-${model.buttons.bombRemove}`, () => {
-      model.activeBombs = model.activeBombs.filter(
-        (bomb) => bomb !== curBomb
-      );
-      clearTimeout(curBomb.curBomb);
-      curBomb.curBomb = 'bombRemove';
-      bomb.destroy();
-    })
+      this.input.keyboard.on(`keydown-${model.buttons.bombRemove}`, () => {
+        model.activeBombs = model.activeBombs.filter(
+          (bomb) => bomb !== curBomb
+        );
+        clearTimeout(curBomb.curBomb);
+        curBomb.curBomb = "bombRemove";
+        bomb.destroy();
+      });
 
       this.tweens.add({
         targets: bomb,
