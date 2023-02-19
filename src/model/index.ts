@@ -16,7 +16,7 @@ export class Model {
   curTimer: number;
   bombSpeed: number;
   activeBombs: {
-    curBomb: ReturnType<typeof setTimeout>;
+    curBomb: ReturnType<typeof setTimeout> | 'bombRemove';
     bombTimer: number;
     bombX: number;
     bombY: number;

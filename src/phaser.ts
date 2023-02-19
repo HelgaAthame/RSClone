@@ -375,7 +375,6 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
-    console.log(`handle tile explosion , x = ${x}, y= ${y}`);
     const flatFieldMatrix = fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
@@ -386,6 +385,7 @@ class GameScene extends Phaser.Scene {
       square.object?.startsWith("enemy")
     );
     if (!squareToCheck) {
+      console.log(`handle tile explosion , x = ${x}, y= ${y}`);
       throw new Error("Square to check was not found");
     } else {
       if (squareToCheck.object === "stone") return;
@@ -634,7 +634,15 @@ class GameScene extends Phaser.Scene {
 
       this.putBombSound.play();
 
-      const curBomb = {
+      type CurBomb = {
+        curBomb: NodeJS.Timeout | 'bombRemove';
+        bombTimer: number;
+        bombX: number;
+        bombY: number;
+        isSuperBomb: boolean;
+      }
+
+      const curBomb: CurBomb = {
         curBomb: setTimeout(() => {
           this.explodeBomb(bomb, bombX, bombY);
         }, bombTimer),
@@ -648,7 +656,8 @@ class GameScene extends Phaser.Scene {
         model.activeBombs = model.activeBombs.filter(
           (bomb) => bomb !== curBomb
         );
-        this.explosionSound.play();
+        console.log(`bomb.curBomb = ${bomb.curBomb}`)
+        if (curBomb.curBomb !== 'bombRemove') this.explosionSound.play();
 
         setTimeout(() => {
           if (model.activeBombs.length === 0) this.putBombSound.stop();
@@ -657,11 +666,12 @@ class GameScene extends Phaser.Scene {
 
 
     this.input.keyboard.on(`keydown-${model.buttons.bombRemove}`, () => {
-      bomb.destroy();
       model.activeBombs = model.activeBombs.filter(
         (bomb) => bomb !== curBomb
       );
       clearTimeout(curBomb.curBomb);
+      curBomb.curBomb = 'bombRemove';
+      bomb.destroy();
     })
 
       this.tweens.add({
