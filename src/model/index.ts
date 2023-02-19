@@ -16,7 +16,7 @@ export class Model {
   curTimer: number;
   bombSpeed: number;
   activeBombs: {
-    curBomb: ReturnType<typeof setTimeout>;
+    curBomb: ReturnType<typeof setTimeout> | 'bombRemove';
     bombTimer: number;
     bombX: number;
     bombY: number;
@@ -120,6 +120,10 @@ export class Model {
         curLvlEnemies: this.curLvlEnemies,
         charSpeed: this.charSpeed,
         gameOver: this.gameOver,
+      })
+      .catch(e => {
+        console.log(`Error when saving to DB: ${e.message}`);
+        model.saveToBd();
       });
     }
 
