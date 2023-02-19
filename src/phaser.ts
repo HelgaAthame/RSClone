@@ -656,7 +656,7 @@ class GameScene extends Phaser.Scene {
         model.activeBombs = model.activeBombs.filter(
           (bomb) => bomb !== curBomb
         );
-        console.log(`bomb.curBomb = ${bomb.curBomb}`)
+        console.log(`bomb.curBomb = ${curBomb.curBomb}`);
         if (curBomb.curBomb !== 'bombRemove') this.explosionSound.play();
 
         setTimeout(() => {

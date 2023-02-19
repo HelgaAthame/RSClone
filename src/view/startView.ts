@@ -212,7 +212,6 @@ export class StartView {
   }
 
   async handleContinueGame() {
-    //console.log(`model.curLvlEnemies =${model.curLvlEnemies}`);
     if (!this.phaser) {
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;
@@ -226,7 +225,6 @@ export class StartView {
   }
 
   async handleStartGame() {
-
     this.pauseBGAudio();
     if (!model.uid) {
       model.generateRandomUsername();
@@ -234,7 +232,7 @@ export class StartView {
 
     model.resetGame();
 
-    model.saveToBd();
+    //model.saveToBd();
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `
