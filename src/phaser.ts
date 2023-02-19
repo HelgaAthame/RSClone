@@ -32,7 +32,7 @@ loadFont("Mayhem", mayhem);
 
 const width = window.innerWidth;
 const height = window.innerHeight;
-const ceilsNum = 11;
+const ceilsNum = 30;
 const fieldSquareLength = height / ceilsNum;
 const fieldStartX = width / 2 - height / 2;
 const fieldImgSize = 512;
@@ -326,7 +326,7 @@ class GameScene extends Phaser.Scene {
       gameOverString = `You have ${model.lives}❤️ left \nPRESS ${model.buttons.bombSet} TO CONTINUE\nPRESS ESC TO EXIT`;
     } else {
       model.saveToBd().catch((e) => {
-        (`error while saving to DB ${e}`);
+        `error while saving to DB ${e}`;
       });
       gameOverString = `GAME OVER\nPRESS ${model.buttons.bombSet} TO RESTART\nPRESS ESC TO EXIT`;
     }
@@ -548,7 +548,7 @@ class GameScene extends Phaser.Scene {
 
   destroyEnemy(
     _explosion: Phaser.Physics.Arcade.Sprite,
-    enemy: EnhancedEnemy//Phaser.Physics.Arcade.Sprite
+    enemy: EnhancedEnemy //Phaser.Physics.Arcade.Sprite
   ) {
     // enemy.deathTriggered = true
     Object.defineProperty(enemy, "isDeathTriggered", { value: true });
@@ -809,7 +809,7 @@ class GameScene extends Phaser.Scene {
   }
   destroyOnCollideCallback(
     _subject: Phaser.Physics.Arcade.Sprite,
-    object: EnhancedObj//Phaser.Physics.Arcade.Sprite
+    object: EnhancedObj //Phaser.Physics.Arcade.Sprite
   ) {
     if (!object.destroyLock) {
       object.destroy();
