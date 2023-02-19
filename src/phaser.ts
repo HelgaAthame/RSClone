@@ -654,6 +654,15 @@ class GameScene extends Phaser.Scene {
         }, 0);
       });
 
+
+    this.input.keyboard.on(`keydown-${model.buttons.bombRemove}`, () => {
+      bomb.destroy();
+      model.activeBombs = model.activeBombs.filter(
+        (bomb) => bomb !== curBomb
+      );
+      clearTimeout(curBomb.curBomb);
+    })
+
       this.tweens.add({
         targets: bomb,
         scaleX: bomb.scaleX * 0.66,
