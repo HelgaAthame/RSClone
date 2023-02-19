@@ -375,6 +375,7 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
+    console.log(`handle tile explosion , x = ${x}, y= ${y}`);
     const flatFieldMatrix = fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>

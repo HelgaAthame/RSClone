@@ -120,6 +120,10 @@ export class Model {
         curLvlEnemies: this.curLvlEnemies,
         charSpeed: this.charSpeed,
         gameOver: this.gameOver,
+      })
+      .catch(e => {
+        console.log(`Error when saving to DB: ${e.message}`);
+        model.saveToBd();
       });
     }
 
