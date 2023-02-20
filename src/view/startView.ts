@@ -7,6 +7,8 @@ import { model } from "../model/index.js";
 import "./startView.scss";
 
 import titleScreenAudio from "../assets/sounds/title-screen.mp3";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase-config.js";
 
 export class StartView {
   uid: string;
@@ -111,7 +113,9 @@ export class StartView {
     }
 
     if (this.uid) {
-      const dataExists = await model.takeFromBD();
+      const docRef = doc(db, "users", this.uid);
+      const docSnap = await getDoc(docRef);
+      const dataExists = docSnap.exists();
       continueButton.disabled = dataExists ? false : true;
     } else {
       continueButton.disabled = this.canvas ? false : true;
@@ -212,7 +216,9 @@ export class StartView {
   }
 
   async handleContinueGame() {
+    console.log('handle continue game');
     if (!this.phaser) {
+      await model.takeFromBD();
       this.phaser = await import("../phaser.js");
       this.gameScene = this.phaser.gameScene;
     } else {
