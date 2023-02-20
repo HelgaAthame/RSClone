@@ -140,6 +140,10 @@ export class StartView {
         });
       }
 
+      if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+        view.start.drawPopup();
+      }
+
       switch (e.code) {
         case "ArrowUp":
           clearStyles();
@@ -258,5 +262,44 @@ export class StartView {
   pauseBGAudio() {
     const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
     if (bgAudio) bgAudio.pause();
+  }
+
+  drawPopup() {
+    let popup = document.querySelector('.level-popup') as HTMLDivElement;
+    if (!popup) {
+      popup = document.createElement('div');
+      popup.classList.add('level-popup');
+      popup.innerHTML = `
+        <div class="popup__wrapper">
+          <form id="popup__form">
+            <label for="popup__input">Level № </label>
+            <br>
+            <input id="popup__input" type="number" value="1">
+            <br>
+            <button class="popup__button" type="submit" form="popup__form">OK</button>
+          </form>
+        </div>
+      `;
+    }
+
+    document.body.append(popup);
+
+    let form = selectorChecker(document, '#popup__form') as HTMLFormElement;
+    form.addEventListener('submit', submitFunc);
+
+    let input = selectorChecker(document, '#popup__input') as HTMLFormElement;
+
+    function submitFunc(e: Event) {
+      e.preventDefault();
+      if (input.value) {
+        form.removeEventListener('submit', submitFunc);
+        popup.style.display = 'none';
+        model.enteredLevel = input.value;
+      } else {
+
+      }
+    }
+
+    popup.style.display = 'flex';
   }
 }

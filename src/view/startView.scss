@@ -41,12 +41,42 @@ $basic-padding: 1rem;
 $text-color: #ddd;
 $ancor-color: palevioletred;
 $disabled-color: #444;
+$grad: linear-gradient(#e66465, #9198e5);
 
 body {
   overflow: hidden;
   background-color: black;
   font-family: Mayhem;
   color: #ddd;
+  .level-popup {
+    background-color: rgba(10, 10, 20, 0.75);
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    .popup__wrapper {
+      padding: $basic-padding;
+      font-family: Mayhem;
+      font-size: 2rem;
+      margin: $basic-padding;
+      border-width: 5px;
+      border-color: $text-color;
+      color: $text-color;
+      border-style: solid;
+      background-image: $grad;
+      width: 20rem;
+      height: 10rem;
+      transition: 0.2s;
+      @include flexCenter;
+      .popup__form {
+        @include flexCol;
+      }
+    }
+  }
+
   .main {
     @include flexCol;
     height: 95vh;
