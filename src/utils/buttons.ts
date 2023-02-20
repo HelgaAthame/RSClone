@@ -4,7 +4,6 @@ export type Buttons = {
   arrowLeft: "LEFT";
   arrowRight: "RIGHT";
   bombSet: "SPACE";
-  bombRemove: "Z";
-  select: "SHIFT";
+  bombRemove: "SHIFT";
   start: "ENTER";
 };

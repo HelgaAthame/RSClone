@@ -34,16 +34,12 @@ export class SettingsView {
             <div class="key">${model.buttons.arrowRight}</div>
           </div>
           <div class="setting__button">
-            <div class="sign">A</div>
+            <div class="sign">SET BOMB</div>
             <div class="key">${model.buttons.bombSet}</div>
           </div>
           <div class="setting__button">
-            <div class="sign">B</div>
+            <div class="sign">REMOVE BOMB</div>
             <div class="key">${model.buttons.bombRemove}</div>
-          </div>
-          <div class="setting__button">
-            <div class="sign">select</div>
-            <div class="key">${model.buttons.select}</div>
           </div>
           <div class="setting__button">
             <div class="sign">start</div>
@@ -160,8 +156,7 @@ export class SettingsView {
               arrowLeft: keys[2].innerHTML as "LEFT",
               arrowRight: keys[3].innerHTML as "RIGHT",
               bombSet: keys[4].innerHTML as "SPACE",
-              bombRemove: keys[5].innerHTML as "Z",
-              select: keys[6].innerHTML as "SHIFT",
+              bombRemove: keys[5].innerHTML as "SHIFT",
               start: keys[7].innerHTML as "ENTER",
             };
             model.saveToBd();
