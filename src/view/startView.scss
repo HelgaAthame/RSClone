@@ -37,16 +37,86 @@
   }
 }
 
+$button-color: #222;
 $basic-padding: 1rem;
 $text-color: #ddd;
 $ancor-color: palevioletred;
 $disabled-color: #444;
+$grad: linear-gradient(#e66465, #9198e5);
 
 body {
   overflow: hidden;
   background-color: black;
   font-family: Mayhem;
   color: #ddd;
+  .level-popup {
+    background-color: rgba(10, 10, 20, 0.75);
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    .popup__wrapper {
+      padding: $basic-padding;
+      font-family: Mayhem;
+      font-size: 2rem;
+      margin: $basic-padding;
+      border-width: 5px;
+      border-color: $text-color;
+      color: $text-color;
+      border-style: solid;
+      background-image: $grad;
+      width: 20rem;
+      height: 20rem;
+      transition: 0.2s;
+      @include flexCenter;
+      #popup__form {
+        @include flexCol;
+        padding: 2rem;
+        .popup__input {align-self: center;
+          text-align: center;
+          width: 4rem;
+          height: 3rem;
+          background-color: $text-color;
+          color: $button-color;
+          font-family: Mayhem;
+          font-size: 1.5rem;
+          padding: $basic-padding;
+          outline: 0;
+          border:0;
+          margin: 0;
+        }
+        .popup__input::-webkit-outer-spin-button,
+        .popup__input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .popup__button {
+          font-size: 1.5rem;
+          background-color: $text-color;
+          padding: $basic-padding;
+          color: $button-color;
+          font-family: Mayhem;
+          outline: 0;
+          border:0;
+          transition: 0.2s;
+          /*&:hover {
+            //box-shadow: 0 0 10px $ancor-color;
+            background-color: $button-color;
+            color: $text-color;
+          }*/
+
+        }
+        .active {
+          background-color: $button-color;
+          color: $text-color;
+        }
+      }
+    }
+  }
+
   .main {
     @include flexCol;
     height: 95vh;

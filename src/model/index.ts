@@ -5,6 +5,7 @@ import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 import { Buttons } from "../utils/buttons.js";
 
 export class Model {
+  enteredLevel: number;
   auth: string;
   fieldMatrix: FieldSquare[][] | undefined;
   level: number;
@@ -41,6 +42,7 @@ export class Model {
   highScore: number;
 
   constructor() {
+    this.enteredLevel = 1;
     this.charSpeed = 160;
     this.curLvlEnemies = 10;
     this.enemyCounter = 0;
@@ -63,8 +65,7 @@ export class Model {
       arrowLeft: "LEFT",
       arrowRight: "RIGHT",
       bombSet: "SPACE",
-      bombRemove: "Z",
-      select: "SHIFT",
+      bombRemove: "SHIFT",
       start: "ENTER",
     };
     this.activeBombs = [];
@@ -144,12 +145,12 @@ export class Model {
     this.score = 0;
     this.curLvlScore = 0;
     this.lives = 3;
-    this.level = 1;
-    this.curLvlEnemies = 3;
+    this.level = Number(this.enteredLevel);
+    this.curLvlEnemies = this.level + 2;
     this.enemyCounter = 0;
-    this.bombSpeed = 1600;
-    this.enemySpeed = 80;
-    this.curLvlTimer = 120;
+    this.bombSpeed = this.bombSpeed < 1000 ? 1000: 1000 + this.level*100;
+    this.enemySpeed = this.enemySpeed > 200 ? 200 : 70 + this.level*10;
+    this.curLvlTimer = 110 + this.level*20;
     this.shieldActive = false;
     this.bombIsPlanting = false;
     this.superBombActive = false;

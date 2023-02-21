@@ -72,17 +72,17 @@ body {
       .setting__table {
         .setting__button {
           @include flexCenter;
-          width: 17rem;
+          width: 22rem;
           .sign {
             padding: $small-padding;
             flex-grow: 1;
             @include ancor;
-            width: 30%;
+            width: 50%;
           }
           .key {
             margin: $small-padding;
             flex-grow: 1;
-            width: 70%;
+            width: 50%;
           }
           .active {
             color: $ancor-color;
