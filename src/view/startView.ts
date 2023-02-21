@@ -140,81 +140,86 @@ export class StartView {
         });
       }
 
-      if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l' || e.key === 'Д' || e.key === 'д')) {
         view.start.drawPopup();
+        document.addEventListener('keydown', view.start.popupKeyControl);
       }
 
-      switch (e.code) {
-        case "ArrowUp":
-          clearStyles();
-          if (i > 0) i--;
-          navs[i].classList.add("active");
-          break;
-        case "ArrowDown":
-          clearStyles();
-          if (i < navs.length - 1) i++;
-          navs[i].classList.add("active");
-          // ctx.pauseBGAudio();
-          break;
-        case "ArrowLeft":
-          clearStyles();
-          if (k > 0) k--;
-          footerlinks[k].classList.add("active");
-          break;
-        case "ArrowRight":
-          clearStyles();
-          if (k < footerlinks.length - 1) k++;
-          footerlinks[k].classList.add("active");
-          break;
-        case "Enter":
+      const popup = document.querySelector('.level-popup') as HTMLDivElement;
+      if (!popup || (popup.style.display === 'none')) {
 
-          const selected = document.querySelector('.active') as HTMLButtonElement;
-          if (selected) {
-            switch (selected.dataset.content) {
-              case "authorization":
-                if (selected.disabled === false) {
-                  firebase.googleAuth();
-                  view.start.setContinueButtonState();
-                }
-                break;
+        switch (e.code) {
+          case "ArrowUp":
+            clearStyles();
+            if (i > 0) i--;
+            navs[i].classList.add("active");
+            break;
+          case "ArrowDown":
+            clearStyles();
+            if (i < navs.length - 1) i++;
+            navs[i].classList.add("active");
+            // ctx.pauseBGAudio();
+            break;
+          case "ArrowLeft":
+            clearStyles();
+            if (k > 0) k--;
+            footerlinks[k].classList.add("active");
+            break;
+          case "ArrowRight":
+            clearStyles();
+            if (k < footerlinks.length - 1) k++;
+            footerlinks[k].classList.add("active");
+            break;
+          case "Enter":
 
-              case "start":
-                view.start.handleStartGame();
-                document.removeEventListener("keydown", foo);
-                break;
+            const selected = document.querySelector('.active') as HTMLButtonElement;
+            if (selected) {
+              switch (selected.dataset.content) {
+                case "authorization":
+                  if (selected.disabled === false) {
+                    firebase.googleAuth();
+                    view.start.setContinueButtonState();
+                  }
+                  break;
 
-              case "continue":
-                if (selected.disabled === false) {
-                  view.start.handleContinueGame();
+                case "start":
+                  view.start.handleStartGame();
                   document.removeEventListener("keydown", foo);
-                }
-                break;
+                  break;
 
-              case "settings":
-                view.settings.renderUI();
-                document.removeEventListener("keydown", foo);
-                break;
-              case "leaderboard":
-                view.scores.renderUI();
-                document.removeEventListener("keydown", foo);
-                break;
-              case "Olga":
-                selected.click();
-                break;
-              case "Gleb":
-                selected.click();
-                break;
-              case "Alex":
-                selected.click();
-                break;
-              default:
+                case "continue":
+                  if (selected.disabled === false) {
+                    view.start.handleContinueGame();
+                    document.removeEventListener("keydown", foo);
+                  }
+                  break;
 
-                view.start.pauseBGAudio();
-                selected.click();
-                break;
+                case "settings":
+                  view.settings.renderUI();
+                  document.removeEventListener("keydown", foo);
+                  break;
+                case "leaderboard":
+                  view.scores.renderUI();
+                  document.removeEventListener("keydown", foo);
+                  break;
+                case "Olga":
+                  selected.click();
+                  break;
+                case "Gleb":
+                  selected.click();
+                  break;
+                case "Alex":
+                  selected.click();
+                  break;
+                default:
+
+                  view.start.pauseBGAudio();
+                  selected.click();
+                  break;
+              }
             }
-          }
-          break;
+            break;
+        }
       }
     });
   }
@@ -272,11 +277,11 @@ export class StartView {
       popup.innerHTML = `
         <div class="popup__wrapper">
           <form id="popup__form">
-            <label for="popup__input">Level № </label>
+            <label for="popup__input">Level Num </label>
             <br>
-            <input id="popup__input" type="number" value="1">
+            <input id="popup__input" type="text" value="1" min="1" max="20" class="form_elem popup__input">
             <br>
-            <button class="popup__button" type="submit" form="popup__form">OK</button>
+            <button class="popup__button form_elem" type="submit" form="popup__form">OK</button>
           </form>
         </div>
       `;
@@ -287,7 +292,14 @@ export class StartView {
     let form = selectorChecker(document, '#popup__form') as HTMLFormElement;
     form.addEventListener('submit', submitFunc);
 
-    let input = selectorChecker(document, '#popup__input') as HTMLFormElement;
+    let input = selectorChecker(document, '.popup__input') as HTMLFormElement;
+
+    input.addEventListener('input', () => {
+
+      if (input.value.length > 2
+        || !input.value.match(/^[1-9]+[0-9]*$/)
+        || Number(input.value) > 30) input.value = input.value.slice( 0, (input.value.length - 1) );
+    })
 
     function submitFunc(e: Event) {
       e.preventDefault();
@@ -295,11 +307,46 @@ export class StartView {
         form.removeEventListener('submit', submitFunc);
         popup.style.display = 'none';
         model.enteredLevel = input.value;
+        document.removeEventListener('keydown', view.start.popupKeyControl);
       } else {
 
       }
     }
 
     popup.style.display = 'flex';
+  }
+
+  popupKeyControl(e: KeyboardEvent) {
+    let j = 0;
+
+    const formElems: NodeListOf<HTMLInputElement> = document.querySelectorAll('.form_elem');
+
+    function clearPopupStyles() {
+      formElems.forEach( elem => elem.classList.remove('active') );
+    }
+
+    switch (e.code) {
+      case "ArrowUp":
+        clearPopupStyles();
+        j = 0;
+        formElems[j].classList.add('active');
+        formElems[j].focus();
+        break;
+      case "ArrowDown":
+        clearPopupStyles();
+        j = 1;
+        formElems[j].classList.add('active');
+        formElems[j].focus();
+        break;
+      case "ArrowLeft":
+
+        break;
+      case "ArrowRight":
+
+        break;
+      case "Enter":
+
+        break;
+    }
   }
 }

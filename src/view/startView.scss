@@ -37,6 +37,7 @@
   }
 }
 
+$button-color: #222;
 $basic-padding: 1rem;
 $text-color: #ddd;
 $ancor-color: palevioletred;
@@ -68,11 +69,50 @@ body {
       border-style: solid;
       background-image: $grad;
       width: 20rem;
-      height: 10rem;
+      height: 20rem;
       transition: 0.2s;
       @include flexCenter;
-      .popup__form {
+      #popup__form {
         @include flexCol;
+        padding: 2rem;
+        .popup__input {align-self: center;
+          text-align: center;
+          width: 4rem;
+          height: 3rem;
+          background-color: $text-color;
+          color: $button-color;
+          font-family: Mayhem;
+          font-size: 1.5rem;
+          padding: $basic-padding;
+          outline: 0;
+          border:0;
+          margin: 0;
+        }
+        .popup__input::-webkit-outer-spin-button,
+        .popup__input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .popup__button {
+          font-size: 1.5rem;
+          background-color: $text-color;
+          padding: $basic-padding;
+          color: $button-color;
+          font-family: Mayhem;
+          outline: 0;
+          border:0;
+          transition: 0.2s;
+          /*&:hover {
+            //box-shadow: 0 0 10px $ancor-color;
+            background-color: $button-color;
+            color: $text-color;
+          }*/
+
+        }
+        .active {
+          background-color: $button-color;
+          color: $text-color;
+        }
       }
     }
   }
