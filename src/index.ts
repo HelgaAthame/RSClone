@@ -15,3 +15,7 @@ const app = new App(view, model);
 //app.view.start.phaser = await import("./phaser.js");
 
 app.view.start.renderUI();
+
+window.addEventListener('unload', async () => {
+  await model.saveToBd();
+});
