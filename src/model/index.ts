@@ -35,6 +35,7 @@ export class Model {
   //bombActive: boolean;
   superBombActive: boolean;
   shieldActive: boolean;
+  berserkActive: boolean;
   maxBombs: number;
   bombIsPlanting: boolean;
   isGamePaused: boolean;
@@ -74,6 +75,7 @@ export class Model {
     this.bombIsPlanting = false;
     this.superBombActive = false;
     this.shieldActive = false;
+    this.berserkActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
     this.auth = "authorization";
@@ -113,6 +115,7 @@ export class Model {
         enemySpeed: this.enemySpeed,
         curTimer: this.curTimer,
         shieldActive: this.shieldActive,
+        berserkActive: this.berserkActive,
         superBombActive: this.superBombActive,
         curLvlTimer: this.curLvlTimer,
         curLvlScore: this.curLvlScore,
@@ -152,6 +155,7 @@ export class Model {
     this.enemySpeed = this.enemySpeed > 200 ? 200 : 70 + this.level*10;
     this.curLvlTimer = 110 + this.level*20;
     this.shieldActive = false;
+    this.berserkActive = false;
     this.bombIsPlanting = false;
     this.superBombActive = false;
     this.maxBombs = 1;
