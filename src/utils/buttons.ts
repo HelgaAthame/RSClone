@@ -1,10 +1,9 @@
-export type Buttons = {
+export default interface Buttons {
   arrowUp: "UP";
   arrowDown: "DOWN";
   arrowLeft: "LEFT";
   arrowRight: "RIGHT";
   bombSet: "SPACE";
-  bombRemove: "Z";
-  select: "SHIFT";
+  bombRemove: "SHIFT";
   start: "ENTER";
-};
+}

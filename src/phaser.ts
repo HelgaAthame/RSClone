@@ -3,6 +3,7 @@ import loadFont from "./utils/loadFont.js";
 import { model } from "./model/index.js";
 import { view } from "./view/index.js";
 import FieldSquare from "./utils/fieldSquare.js";
+import ActiveBomb from "./utils/activeBomb.js";
 
 import charSprite from "./assets/char__sprite.png";
 import explosionSprite from "./assets/explosion_sprite.png";
@@ -634,15 +635,7 @@ class GameScene extends Phaser.Scene {
 
       this.putBombSound.play();
 
-      type CurBomb = {
-        curBomb: NodeJS.Timeout | "bombRemove";
-        bombTimer: number;
-        bombX: number;
-        bombY: number;
-        isSuperBomb: boolean;
-      };
-
-      const curBomb: CurBomb = {
+      const curBomb: ActiveBomb = {
         curBomb: setTimeout(() => {
           this.explodeBomb(bomb, bombX, bombY);
         }, bombTimer),
@@ -656,21 +649,10 @@ class GameScene extends Phaser.Scene {
         model.activeBombs = model.activeBombs.filter(
           (bomb) => bomb !== curBomb
         );
-        console.log(`bomb.curBomb = ${curBomb.curBomb}`);
-        if (curBomb.curBomb !== "bombRemove") this.explosionSound.play();
 
         setTimeout(() => {
           if (model.activeBombs.length === 0) this.putBombSound.stop();
         }, 0);
-      });
-
-      this.input.keyboard.on(`keydown-${model.buttons.bombRemove}`, () => {
-        model.activeBombs = model.activeBombs.filter(
-          (bomb) => bomb !== curBomb
-        );
-        clearTimeout(curBomb.curBomb);
-        curBomb.curBomb = "bombRemove";
-        bomb.destroy();
       });
 
       this.tweens.add({
@@ -908,6 +890,37 @@ class GameScene extends Phaser.Scene {
     const bombSet = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes[model.buttons.bombSet]
     );
+    const bombRemove = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes[model.buttons.bombRemove]
+    );
+
+    if (bombRemove.isDown) {
+      const curCharSquare = fieldMatrix
+        .flat()
+        .find((item) => item.object === "char") as FieldSquare;
+      const curCharX = curCharSquare.x;
+      const curCharY = curCharSquare?.y;
+
+      const curBomb = this.bombs.children.entries.find(
+        (bomb) =>
+          (bomb as Phaser.Physics.Matter.Sprite).x === curCharX &&
+          (bomb as Phaser.Physics.Matter.Sprite).y === curCharY
+      ) as Phaser.Physics.Matter.Sprite;
+
+      if (curBomb) {
+        if (curCharX === curBomb.x && curCharX === curBomb.x) {
+          const findBombInModel = model.activeBombs.find(
+            (bomb) => bomb.bombX === curBomb.x && bomb.bombY === curBomb.y
+          ) as ActiveBomb;
+          clearTimeout(findBombInModel?.curBomb);
+          model.activeBombs = model.activeBombs.filter(
+            (bomb) => bomb !== findBombInModel
+          );
+
+          curBomb.destroy();
+        }
+      }
+    }
 
     if (keyESC.isDown) {
       model.fieldMatrix = fieldMatrix;
@@ -1007,18 +1020,18 @@ class GameScene extends Phaser.Scene {
     });
 
     this.anims.create({
-      key: "right",
+      key: "bombRemove",
       frames: this.anims.generateFrameNumbers("char", {
-        frames: [0, 1, 2, 3, 4, 3, 2, 1],
+        frames: [15, 16, 17, 18, 19, 18, 17, 16],
       }),
       frameRate: 10,
       repeat: -1,
     });
 
     this.anims.create({
-      key: "down",
+      key: "right",
       frames: this.anims.generateFrameNumbers("char", {
-        frames: [5, 6, 7, 8, 9, 8, 7, 6],
+        frames: [0, 1, 2, 3, 4, 3, 2, 1],
       }),
       frameRate: 10,
       repeat: -1,
@@ -1041,6 +1054,12 @@ class GameScene extends Phaser.Scene {
 
     this.anims.create({
       key: "placeBomb",
+      frames: [{ key: "char", frame: 27 }],
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "bombRemove",
       frames: [{ key: "char", frame: 27 }],
       frameRate: 10,
       repeat: -1,
