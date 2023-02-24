@@ -35,7 +35,6 @@ export class Model {
   isGamePaused: boolean;
   escIsPressed: boolean;
   highScore: number;
-  berserkActive: boolean;
 
   constructor() {
     this.enteredLevel = 1;
@@ -111,7 +110,6 @@ export class Model {
         enemySpeed: this.enemySpeed,
         curTimer: this.curTimer,
         shieldActive: this.shieldActive,
-        berserkActive: false,
         superBombActive: this.superBombActive,
         curLvlTimer: this.curLvlTimer,
         curLvlScore: this.curLvlScore,

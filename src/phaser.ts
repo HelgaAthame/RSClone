@@ -252,12 +252,12 @@ class GameScene extends Phaser.Scene {
       thisChar.setVelocityX(0);
       thisChar.anims.play("down", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
-    } else if (/*cursors.*/ left.isDown) {
+    } else if (left.isDown) {
       thisChar.setVelocityX(-model.charSpeed);
       thisChar.setVelocityY(0);
       thisChar.anims.play("left", true);
       if (!this.charStepSound.isPlaying) this.charStepSound.play();
-    } else if (!(/*cursors.space*/ bombSet.isDown)) {
+    } else if (!bombSet.isDown) {
       thisChar.setVelocityX(0);
       thisChar.setVelocityY(0);
 
@@ -1058,9 +1058,9 @@ class GameScene extends Phaser.Scene {
     });
 
     this.anims.create({
-      key: "bombRemove",
+      key: "down",
       frames: this.anims.generateFrameNumbers("char", {
-        frames: [15, 16, 17, 18, 19, 18, 17, 16],
+        frames: [5, 6, 7, 8, 9, 8, 7, 6],
       }),
       frameRate: 10,
       repeat: -1,
