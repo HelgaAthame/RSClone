@@ -6,6 +6,7 @@ import { db } from "../firebase-config.js";
 import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 
 export class Model {
+  ceilsNum: number;
   enteredLevel: number;
   auth: string;
   fieldMatrix: FieldSquare[][] | undefined;
@@ -37,6 +38,7 @@ export class Model {
   highScore: number;
 
   constructor() {
+    this.ceilsNum = 11;
     this.enteredLevel = 1;
     this.charSpeed = 160;
     this.curLvlEnemies = 10;

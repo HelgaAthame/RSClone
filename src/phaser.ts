@@ -34,8 +34,8 @@ loadFont("Mayhem", mayhem);
 
 const width = window.innerWidth;
 const height = window.innerHeight;
-const ceilsNum = 11;
-const fieldSquareLength = height / ceilsNum;
+
+const fieldSquareLength = height / model.ceilsNum;
 const fieldStartX = width / 2 - height / 2;
 const fieldImgSize = 512;
 const charStartX = fieldStartX + 1.5 * fieldSquareLength;
@@ -62,9 +62,9 @@ const bonusTextStyle = {
   strokeThickness: 3,
 };
 
-let fieldMatrix: FieldSquare[][] = Array(ceilsNum)
+let fieldMatrix: FieldSquare[][] = Array(model.ceilsNum)
   .fill([])
-  .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
+  .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
 
 enum Items {
   SUPERBOMB = "superbomb_item",
@@ -279,8 +279,8 @@ class GameScene extends Phaser.Scene {
     if (!newEnemySquare) throw Error("New enemy square was not found");
 
     /*  */
-    for (let i = 1; i <= ceilsNum; i++) {
-      for (let j = 1; j <= ceilsNum; j++) {
+    for (let i = 1; i <= model.ceilsNum; i++) {
+      for (let j = 1; j <= model.ceilsNum; j++) {
         if (fieldMatrix[i - 1][j - 1].object === `enemy_${curEnemyID}`)
           fieldMatrix[i - 1][j - 1].object = "grass";
       }
@@ -477,8 +477,8 @@ class GameScene extends Phaser.Scene {
           Math.floor(square.x) === Math.floor(x) &&
           Math.floor(square.y) === Math.floor(y)
       );
-    const index_Y = Math.floor(index / ceilsNum);
-    const index_X = index % ceilsNum;
+    const index_Y = Math.floor(index / model.ceilsNum);
+    const index_X = index % model.ceilsNum;
 
     let yUp = index_Y;
     let yDown = index_Y;
@@ -1000,10 +1000,10 @@ class GameScene extends Phaser.Scene {
       const [bombX, bombY] = this.findClosestSquare(
         this.char as Phaser.Physics.Matter.Sprite
       ) as number[];
-      const bombXSquare = Math.floor(
+      const bombXSquare = Math.round(
         (bombX - fieldStartX + fieldSquareLength / 2) / fieldSquareLength
       );
-      const bombYSquare = Math.floor(
+      const bombYSquare = Math.round(
         (bombY + fieldSquareLength / 2) / fieldSquareLength
       );
       console.log(bombXSquare, bombYSquare);
@@ -1208,24 +1208,29 @@ class GameScene extends Phaser.Scene {
   }
 
   generateGameField() {
-    for (let i = 1; i <= ceilsNum; i++) {
-      for (let j = 1; j <= ceilsNum; j++) {
+    for (let i = 1; i <= model.ceilsNum; i++) {
+      for (let j = 1; j <= model.ceilsNum; j++) {
         const curSquareXCenter =
           fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
         const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
         const randomWoodSquare = Math.round(Math.random());
 
         const emptyStartLocations =
-          (i === ceilsNum - 1 && j === 2) ||
-          (i === ceilsNum - 2 && j === 2) ||
-          (i === ceilsNum - 1 && j === 3);
+          (i === model.ceilsNum - 1 && j === 2) ||
+          (i === model.ceilsNum - 2 && j === 2) ||
+          (i === model.ceilsNum - 1 && j === 3);
 
         fieldMatrix[i - 1][j - 1] = {
           x: curSquareXCenter,
           y: curSquareYCenter,
         };
 
-        if (i === 1 || i === ceilsNum || j === 1 || j === ceilsNum) {
+        if (
+          i === 1 ||
+          i === model.ceilsNum ||
+          j === 1 ||
+          j === model.ceilsNum
+        ) {
           fieldMatrix[i - 1][j - 1].object = "stone";
           this.stone
             .create(curSquareXCenter, curSquareYCenter, "stone")
@@ -1274,7 +1279,7 @@ class GameScene extends Phaser.Scene {
               .refreshBody();
           }
         } else {
-          if (i === ceilsNum - 1 && j === 2) {
+          if (i === model.ceilsNum - 1 && j === 2) {
             fieldMatrix[i - 1][j - 1].object = "char";
             continue;
           }
@@ -1317,14 +1322,14 @@ class GameScene extends Phaser.Scene {
   generateEnemies() {
     if (!model.fieldMatrix) {
       while (model.enemyCounter < model.curLvlEnemies) {
-        const randomX = Math.floor(Math.random() * (ceilsNum - 1) + 1);
-        const randomY = Math.floor(Math.random() * (ceilsNum - 1) + 1);
+        const randomX = Math.floor(Math.random() * (model.ceilsNum - 1) + 1);
+        const randomY = Math.floor(Math.random() * (model.ceilsNum - 1) + 1);
 
         if (
           fieldMatrix[randomX][randomY].object !== "grass" ||
-          (randomX === ceilsNum - 2 && randomY === 1) ||
-          (randomX === ceilsNum - 3 && randomY === 1) ||
-          (randomX === ceilsNum - 2 && randomY === 2)
+          (randomX === model.ceilsNum - 2 && randomY === 1) ||
+          (randomX === model.ceilsNum - 3 && randomY === 1) ||
+          (randomX === model.ceilsNum - 2 && randomY === 2)
         )
           continue;
         fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
@@ -1344,13 +1349,13 @@ class GameScene extends Phaser.Scene {
   }
 
   fieldMatrixAdapter(matrix: FieldSquare[][]): FieldSquare[][] {
-    const returnMatrix: FieldSquare[][] = Array(ceilsNum)
+    const returnMatrix: FieldSquare[][] = Array(model.ceilsNum)
       .fill([])
-      .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
+      .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
     switch (matrix) {
       case fieldMatrix:
-        for (let i = 1; i <= ceilsNum; i++) {
-          for (let j = 1; j <= ceilsNum; j++) {
+        for (let i = 1; i <= model.ceilsNum; i++) {
+          for (let j = 1; j <= model.ceilsNum; j++) {
             returnMatrix[i - 1][j - 1] = {
               x: j,
               y: i,
@@ -1361,8 +1366,8 @@ class GameScene extends Phaser.Scene {
         break;
 
       case model.fieldMatrix:
-        for (let i = 1; i <= ceilsNum; i++) {
-          for (let j = 1; j <= ceilsNum; j++) {
+        for (let i = 1; i <= model.ceilsNum; i++) {
+          for (let j = 1; j <= model.ceilsNum; j++) {
             const curSquareXCenter =
               fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
             const curSquareYCenter =
