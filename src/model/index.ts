@@ -6,6 +6,10 @@ import { db } from "../firebase-config.js";
 import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 
 export class Model {
+  width: number;
+  height: number;
+  fieldSquareLength: number;
+  fieldStartX: number;
   ceilsNum: number;
   enteredLevel: number;
   auth: string;
@@ -38,6 +42,10 @@ export class Model {
   highScore: number;
 
   constructor() {
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.fieldSquareLength = this.height / this.ceilsNum;
+    this.fieldStartX = this.width / 2 - this.height / 2;
     this.ceilsNum = 11;
     this.enteredLevel = 1;
     this.charSpeed = 160;
@@ -96,6 +104,7 @@ export class Model {
     });
     if (allValuesExists) {
       await setDoc(doc(db, "users", this.uid), {
+        ceilsNum: this.ceilsNum,
         lives: this.lives,
         uid: this.uid,
         userName: this.userName,
@@ -142,11 +151,12 @@ export class Model {
   }
 
   resetGame() {
+    this.ceilsNum = 11; //11
     this.score = 0;
     this.curLvlScore = 0;
     this.lives = 3;
     this.level = Number(this.enteredLevel);
-    this.curLvlEnemies = this.level + 2;
+    this.curLvlEnemies = this.level + 0; //2
     this.enemyCounter = 0;
     this.bombSpeed = this.bombSpeed < 1000 ? 1000 : 2000 - this.level * 100;
     this.enemySpeed = this.enemySpeed > 200 ? 200 : 70 + this.level * 10;
@@ -173,6 +183,9 @@ export class Model {
     this.curLvlTimer += 20;
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
+    if (this.level === 1) {
+      this.ceilsNum = 14;
+    }
   }
 
   set isMuted(val: Boolean) {

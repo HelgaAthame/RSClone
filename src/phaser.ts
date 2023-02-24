@@ -32,16 +32,12 @@ import mayhem from "./assets/fonts/retro-land-mayhem.ttf";
 
 loadFont("Mayhem", mayhem);
 
-const width = window.innerWidth;
-const height = window.innerHeight;
-
-const fieldSquareLength = height / model.ceilsNum;
-const fieldStartX = width / 2 - height / 2;
+const fieldSquareLength = model.height / model.ceilsNum;
 const fieldImgSize = 512;
-const charStartX = fieldStartX + 1.5 * fieldSquareLength;
-const charStartY = height - 1.5 * fieldSquareLength;
+const charStartX = model.fieldStartX + 1.5 * fieldSquareLength;
+const charStartY = model.height - 1.5 * fieldSquareLength;
 
-const textStartX = fieldStartX + 0.5 * fieldSquareLength;
+const textStartX = model.fieldStartX + 0.5 * fieldSquareLength;
 const textStartY = 0.3 * fieldSquareLength;
 const gameUITextStyle: Partial<Phaser.GameObjects.TextStyle> = {
   fontFamily: "Mayhem",
@@ -1001,7 +997,7 @@ class GameScene extends Phaser.Scene {
         this.char as Phaser.Physics.Matter.Sprite
       ) as number[];
       const bombXSquare = Math.round(
-        (bombX - fieldStartX + fieldSquareLength / 2) / fieldSquareLength
+        (bombX - model.fieldStartX + fieldSquareLength / 2) / fieldSquareLength
       );
       const bombYSquare = Math.round(
         (bombY + fieldSquareLength / 2) / fieldSquareLength
@@ -1015,7 +1011,7 @@ class GameScene extends Phaser.Scene {
 
   setupGameText() {
     this.livesText = this.add.text(
-      textStartX + 4 * fieldSquareLength,
+      textStartX + (model.ceilsNum / 2) * fieldSquareLength - 120,
       textStartY,
       `${
         model.lives <= 5
@@ -1025,7 +1021,7 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.add.text(
-      textStartX + 8.5 * fieldSquareLength,
+      textStartX + (model.ceilsNum - 2.5) * fieldSquareLength,
       textStartY,
       `LEVEL : ${model.level}`,
       gameUITextStyle
@@ -1039,14 +1035,14 @@ class GameScene extends Phaser.Scene {
     );
     this.bonusesText = this.add.text(
       textStartX,
-      textStartY + 9.85 * fieldSquareLength,
+      textStartY + (model.ceilsNum - 1) * fieldSquareLength - 10,
       "",
       bonusTextStyle
     );
 
     this.timerText = this.add.text(
-      textStartX + 4 * fieldSquareLength,
-      textStartY + 10 * fieldSquareLength,
+      textStartX + (model.ceilsNum / 2) * fieldSquareLength - 110,
+      textStartY + (model.ceilsNum - 1) * fieldSquareLength,
       `TIME : ${model.curLvlTimer}`,
       gameUITextStyle
     );
@@ -1211,7 +1207,7 @@ class GameScene extends Phaser.Scene {
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
         const curSquareXCenter =
-          fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
+          model.fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
         const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
         const randomWoodSquare = Math.round(Math.random());
 
@@ -1369,7 +1365,7 @@ class GameScene extends Phaser.Scene {
         for (let i = 1; i <= model.ceilsNum; i++) {
           for (let j = 1; j <= model.ceilsNum; j++) {
             const curSquareXCenter =
-              fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
+              model.fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
             const curSquareYCenter =
               i * fieldSquareLength - fieldSquareLength / 2;
             returnMatrix[i - 1][j - 1] = {
@@ -1386,7 +1382,8 @@ class GameScene extends Phaser.Scene {
   }
 
   bombCoordsAdapter(bombX: number, bombY: number) {
-    bombX = fieldStartX + bombX * fieldSquareLength - fieldSquareLength / 2;
+    bombX =
+      model.fieldStartX + bombX * fieldSquareLength - fieldSquareLength / 2;
     bombY = bombY * fieldSquareLength - fieldSquareLength / 2;
     return [bombX, bombY];
   }
@@ -1395,8 +1392,8 @@ export const gameScene = new GameScene();
 
 const config = {
   type: Phaser.AUTO,
-  width: width,
-  height: height,
+  width: model.width,
+  height: model.height,
   physics: {
     default: "arcade",
     arcade: {
