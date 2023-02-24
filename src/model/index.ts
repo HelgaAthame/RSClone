@@ -41,6 +41,7 @@ export class Model {
   isGamePaused: boolean;
   escIsPressed: boolean;
   highScore: number;
+  berserkActive: boolean;
 
   constructor() {
     this.enteredLevel = 1;
@@ -78,6 +79,7 @@ export class Model {
     this.berserkActive = false;
     this.isGamePaused = false;
     this.escIsPressed = false;
+    this.berserkActive = false;
     this.auth = "authorization";
     if (localStorage.getItem("uid")) {
       const uid = localStorage.getItem("uid");
@@ -124,6 +126,7 @@ export class Model {
         curLvlEnemies: this.curLvlEnemies,
         charSpeed: this.charSpeed,
         gameOver: this.gameOver,
+        berserkActive: this.berserkActive,
       }).catch((e) => {
         console.log(`Error when saving to DB: ${e.message}`);
         model.saveToBd();
@@ -151,7 +154,7 @@ export class Model {
     this.level = Number(this.enteredLevel);
     this.curLvlEnemies = this.level + 2;
     this.enemyCounter = 0;
-    this.bombSpeed = this.bombSpeed < 1000 ? 1000 : 1000 + this.level * 100;
+    this.bombSpeed = this.bombSpeed < 1000 ? 1000 : 2000 - this.level * 100;
     this.enemySpeed = this.enemySpeed > 200 ? 200 : 70 + this.level * 10;
     this.curLvlTimer = 110 + this.level * 20;
     this.shieldActive = false;
@@ -159,6 +162,7 @@ export class Model {
     this.charSpeed = 160;
     this.bombIsPlanting = false;
     this.superBombActive = false;
+    this.berserkActive = false;
     this.maxBombs = 1;
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
