@@ -1,8 +1,9 @@
 import FieldSquare from "../utils/fieldSquare.js";
+import ActiveBomb from "../utils/activeBomb.js";
+import Buttons from "../utils/buttons.js";
 //import selectorChecker from "../utils/selectorChecker.js";
 import { db } from "../firebase-config.js";
 import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
-import { Buttons } from "../utils/buttons.js";
 
 export class Model {
   enteredLevel: number;
@@ -16,13 +17,7 @@ export class Model {
   curLvlTimer: number;
   curTimer: number;
   bombSpeed: number;
-  activeBombs: {
-    curBomb: NodeJS.Timeout | "bombRemove";
-    bombTimer: number;
-    bombX: number;
-    bombY: number;
-    isSuperBomb: boolean;
-  }[];
+  activeBombs: ActiveBomb[];
   lives: number;
   curLvlScore: number;
   score: number;
@@ -32,7 +27,6 @@ export class Model {
   uid: string;
   userName: string;
   gameOver: boolean;
-  //bombActive: boolean;
   superBombActive: boolean;
   shieldActive: boolean;
   berserkActive: boolean;
