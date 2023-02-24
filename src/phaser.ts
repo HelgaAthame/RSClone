@@ -76,7 +76,11 @@ enum Bombs {
   BOMB = "bomb",
   SUPERBOMB = "superbomb",
 }
-
+interface IBonusItem extends Phaser.GameObjects.GameObject {
+  destroyLock: boolean;
+  scaleX: number;
+  scaleY: number;
+}
 interface EnhancedEnemy extends Phaser.Physics.Arcade.Sprite {
   isDeathTriggered: boolean;
 }
@@ -353,7 +357,6 @@ class GameScene extends Phaser.Scene {
   drawLevelComplete() {
     model.nextLvl();
     this.stageMusic.stop();
-
     this.stageClearSound.play();
     view.win.renderUI();
   }
@@ -375,7 +378,7 @@ class GameScene extends Phaser.Scene {
       this.handleTileExplosion(x, nextY);
       this.handleTileExplosion(x, prevY);
     }
-    this.tiltCamera();
+    this.tiltCamera(isSuperBomb);
   }
 
   handleTileExplosion = (x: number, y: number) => {
@@ -407,7 +410,7 @@ class GameScene extends Phaser.Scene {
         if (!woodSquare) return;
         squareToCheck.object = "grass";
         woodSquare.destroy();
-        this.dropRandomBonus(x, y);
+        this.generateRandomBonus(x, y);
       } else if (squareToCheck.object === "char" && !model.gameOver) {
         if (model.shieldActive) {
           model.shieldActive = false;
@@ -444,16 +447,14 @@ class GameScene extends Phaser.Scene {
           });
           setTimeout(() => {
             enemyToDestroy.destroy();
-            // model.enemyCounter--;
-            // console.log(' :', );
-            this.killEnemy(enemyToDestroy);
+                       this.killEnemy(enemyToDestroy);
           }, 200);
         }
       }
     }
   };
 
-  killEnemy(enemy: Phaser.Physics.Arcade.Sprite) {
+  killEnemy(enemy: Phaser.GameObjects.GameObject) {
     enemy.destroy();
     model.enemyCounter--;
     this.checkLevelComplete();
@@ -462,6 +463,7 @@ class GameScene extends Phaser.Scene {
   checkLevelComplete() {
     if (model.enemyCounter === 0 && !model.gameOver) {
       setTimeout(() => {}, 1500);
+      model.berserkActive = false;
       this.drawLevelComplete();
     }
   }
@@ -730,7 +732,7 @@ class GameScene extends Phaser.Scene {
     model.gameOver = !model.gameOver;
   }
 
-  dropRandomBonus(x: number, y: number) {
+  generateRandomBonus(x: number, y: number) {
     const random = Math.random();
     let group: Phaser.Physics.Arcade.StaticGroup | null = null;
     let item: string = "";
@@ -740,7 +742,7 @@ class GameScene extends Phaser.Scene {
       item: string = ""
     ) => {
       if (group) {
-        const randomBonus = group
+        const randomBonus: IBonusItem = group
           .create(x, y, item)
           .setSize(fieldSquareLength, fieldSquareLength)
           .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
@@ -759,25 +761,26 @@ class GameScene extends Phaser.Scene {
           value: true,
           writable: true,
         });
+        randomBonus.destroyLock = true;
         setTimeout(() => {
           randomBonus.destroyLock = false;
         }, 1000);
       }
     };
 
-    if (random > 0.9) {
+    if (random > 0.93) {
       group = this.hearts;
       item = Items.LIFE;
-    } else if (random > 0.8) {
+    } else if (random > 0.86) {
       group = this.superBombs;
       item = Items.SUPERBOMB;
-    } else if (random > 0.7) {
+    } else if (random > 0.79) {
       group = this.shields;
       item = Items.SHIELD;
-    } else if (random > 0.6) {
+    } else if (random > 0.7) {
       group = this.bombIncreasers;
       item = Items.BOMB_ICREASER;
-    } else if (random > 0) {
+    } else if (random > 0 && random < 0.05) {
       group = this.berserkBonuses;
       item = Items.BERSERK;
     }
@@ -785,7 +788,6 @@ class GameScene extends Phaser.Scene {
       setTimeout(() => {
         createItem(group, item);
       }, 400);
-      // }, 1000);
     }
   }
 
@@ -800,7 +802,6 @@ class GameScene extends Phaser.Scene {
         ? `LIVES :  ${"❤️".repeat(model.lives)}`
         : `LIVES: ❤️ x${model.lives}`;
     this.livesText.setText(livesText);
-    // this.destroyOnCollideCallback(char, heart);
   }
   collectShield(
     _char: Phaser.Physics.Arcade.Sprite,
@@ -810,7 +811,6 @@ class GameScene extends Phaser.Scene {
     model.shieldActive = true;
     this.setCharTint();
     this.updateBonusesText();
-    // this.destroyOnCollideCallback(char, shield);
   }
   collideEnemyAsBerserk(
     _char: Phaser.Physics.Arcade.Sprite,
@@ -818,15 +818,13 @@ class GameScene extends Phaser.Scene {
   ) {
     if (model.berserkActive) {
       const { x, y } = enemy;
-      // this.handleTileExplosion(x, y);
       this.drawExplosion(x, y);
       this.killEnemy(enemy);
-      // enemy.destroy();
     }
   }
   collectBerserk(
     _char: Phaser.Physics.Arcade.Sprite,
-    berserk: Phaser.Physics.Arcade.Sprite
+    _berserk: Phaser.Physics.Arcade.Sprite
   ) {
     const speed = model.charSpeed;
     model.charSpeed = model.charSpeed * 1.5;
@@ -873,22 +871,26 @@ class GameScene extends Phaser.Scene {
     }${model.berserkActive ? " 😈" : ""}`;
     this.bonusesText.setText(text);
   }
-  tiltCamera() {
+  tiltCamera(superbomb: boolean) {
     interface Camera extends Phaser.Cameras.Scene2D.Camera {
-      rotation?: number | undefined;
+      rotation?: number;
     }
-
     const cam: Camera = this.cameras.main;
-
-    // const cam = this.cameras.main;
+    console.log("cam :", cam);
     const tilt = setInterval(() => {
-      const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      if (cam.rotation) cam.rotation += random;
+      const random =
+        (Math.round(Math.random()) * 2 - 1) * (superbomb ? 0.02 : 0.005);
+      if (!cam.rotation) cam.rotation = 0;
+      if (!cam.zoom) cam.zoom = 0;
+      cam.rotation += random;
     }, 50);
-    setTimeout(() => {
-      clearInterval(tilt);
-      cam.rotation = 0;
-    }, 250);
+    setTimeout(
+      () => {
+        clearInterval(tilt);
+        cam.rotation = 0;
+      },
+      superbomb ? 500 : 150
+    );
   }
   bombCheck() {
     if (model.activeBombs.length !== 0) {
