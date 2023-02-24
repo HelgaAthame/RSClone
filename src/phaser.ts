@@ -179,8 +179,8 @@ class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     model.fieldMatrix
-      ? (fieldMatrix = model.fieldMatrix)
-      : (model.fieldMatrix = fieldMatrix);
+      ? (fieldMatrix = this.fieldMatrixAdapter(model.fieldMatrix))
+      : (model.fieldMatrix = this.fieldMatrixAdapter(fieldMatrix));
 
     this.setupOverlapsAndColliders();
     this.createGameAnimations();
@@ -934,6 +934,7 @@ class GameScene extends Phaser.Scene {
       const curCharSquare = fieldMatrix
         .flat()
         .find((item) => item.object === "char") as FieldSquare;
+      if (!curCharSquare) return;
       const curCharX = curCharSquare.x;
       const curCharY = curCharSquare?.y;
 
@@ -959,7 +960,7 @@ class GameScene extends Phaser.Scene {
     }
 
     if (keyESC.isDown) {
-      model.fieldMatrix = fieldMatrix;
+      model.fieldMatrix = this.fieldMatrixAdapter(fieldMatrix);
 
       model.saveToBd();
       model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
@@ -1327,6 +1328,43 @@ class GameScene extends Phaser.Scene {
           .refreshBody();
       }
     }
+  }
+
+  fieldMatrixAdapter(matrix: FieldSquare[][]): FieldSquare[][] {
+    const returnMatrix: FieldSquare[][] = Array(ceilsNum)
+      .fill([])
+      .map(() => Array(ceilsNum).fill({ x: 0, y: 0, object: null }));
+    switch (matrix) {
+      case fieldMatrix:
+        for (let i = 1; i <= ceilsNum; i++) {
+          for (let j = 1; j <= ceilsNum; j++) {
+            returnMatrix[i - 1][j - 1] = {
+              x: j,
+              y: i,
+              object: matrix[i - 1][j - 1].object,
+            };
+          }
+        }
+        break;
+
+      case model.fieldMatrix:
+        for (let i = 1; i <= ceilsNum; i++) {
+          for (let j = 1; j <= ceilsNum; j++) {
+            const curSquareXCenter =
+              fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
+            const curSquareYCenter =
+              i * fieldSquareLength - fieldSquareLength / 2;
+            returnMatrix[i - 1][j - 1] = {
+              x: curSquareXCenter,
+              y: curSquareYCenter,
+              object: matrix[i - 1][j - 1].object,
+            };
+          }
+        }
+        break;
+    }
+
+    return returnMatrix;
   }
 }
 export const gameScene = new GameScene();
