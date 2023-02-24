@@ -954,8 +954,15 @@ class GameScene extends Phaser.Scene {
 
       if (curBomb) {
         if (curCharX === curBomb.x && curCharX === curBomb.x) {
+          const bombXSquare = Math.round(
+            (curBomb.x - model.fieldStartX + model.fieldSquareLength / 2) /
+              model.fieldSquareLength
+          );
+          const bombYSquare = Math.round(
+            (curBomb.y + model.fieldSquareLength / 2) / model.fieldSquareLength
+          );
           const findBombInModel = model.activeBombs.find(
-            (bomb) => bomb.bombX === curBomb.x && bomb.bombY === curBomb.y
+            (bomb) => bomb.bombX === bombXSquare && bomb.bombY === bombYSquare
           ) as ActiveBomb;
           clearTimeout(findBombInModel?.curBomb);
           model.activeBombs = model.activeBombs.filter(
