@@ -10,6 +10,7 @@ import grassImg from "./assets/grass.jpg";
 import stoneImg from "./assets/stone.jpg";
 import woodImg from "./assets/wood.jpg";
 import bombImg from "./assets/bomb.png";
+import berserkImg from "./assets/berserk-bonus.png";
 import enemyImg from "./assets/enemy1.png";
 import explosionAudio from "./assets/sounds/bomb_explosion.ogg";
 import charStepAudio from "./assets/sounds/char_step.mp3";
@@ -69,12 +70,17 @@ enum Items {
   LIFE = "heart",
   SHIELD = "shield",
   BOMB_ICREASER = "bomb_increaser",
+  BERSERK = "berserk",
 }
 enum Bombs {
   BOMB = "bomb",
   SUPERBOMB = "superbomb",
 }
-
+interface IBonusItem extends Phaser.GameObjects.GameObject {
+  destroyLock: boolean;
+  scaleX: number;
+  scaleY: number;
+}
 interface EnhancedEnemy extends Phaser.Physics.Arcade.Sprite {
   isDeathTriggered: boolean;
 }
@@ -99,6 +105,7 @@ class GameScene extends Phaser.Scene {
   explosions: Phaser.Physics.Arcade.StaticGroup;
   hearts: Phaser.Physics.Arcade.StaticGroup;
   shields: Phaser.Physics.Arcade.StaticGroup;
+  berserkBonuses: Phaser.Physics.Arcade.StaticGroup;
   bombIncreasers: Phaser.Physics.Arcade.StaticGroup;
   superBombs: Phaser.Physics.Arcade.StaticGroup;
   explosionSound: Phaser.Sound.BaseSound;
@@ -141,6 +148,7 @@ class GameScene extends Phaser.Scene {
     this.load.audio("stageClear", stageClearAudio);
     this.load.audio("stageMusic", stageMusicAudio);
     this.load.image(Items.SUPERBOMB, superBombImg);
+    this.load.image(Items.BERSERK, berserkImg);
     this.load.image(Bombs.SUPERBOMB, superBombImgFired);
     this.load.image(Items.LIFE, heartImg);
     this.load.image(Items.SHIELD, shieldImg);
@@ -177,7 +185,7 @@ class GameScene extends Phaser.Scene {
     this.createGameAnimations();
     this.setupGameText();
     this.bombCheck();
-    this.shieldCheck();
+    this.setCharTint();
     this.updateBonusesText();
   }
   update() {
@@ -349,7 +357,6 @@ class GameScene extends Phaser.Scene {
   drawLevelComplete() {
     model.nextLvl();
     this.stageMusic.stop();
-
     this.stageClearSound.play();
     view.win.renderUI();
   }
@@ -371,7 +378,7 @@ class GameScene extends Phaser.Scene {
       this.handleTileExplosion(x, nextY);
       this.handleTileExplosion(x, prevY);
     }
-    this.tiltCamera();
+    this.tiltCamera(isSuperBomb);
   }
 
   handleTileExplosion = (x: number, y: number) => {
@@ -403,7 +410,7 @@ class GameScene extends Phaser.Scene {
         if (!woodSquare) return;
         squareToCheck.object = "grass";
         woodSquare.destroy();
-        this.dropRandomBonus(x, y);
+        this.generateRandomBonus(x, y);
       } else if (squareToCheck.object === "char" && !model.gameOver) {
         if (model.shieldActive) {
           model.shieldActive = false;
@@ -440,15 +447,26 @@ class GameScene extends Phaser.Scene {
           });
           setTimeout(() => {
             enemyToDestroy.destroy();
-            model.enemyCounter--;
-            if (model.enemyCounter === 0 && !model.gameOver) {
-              this.drawLevelComplete();
-            }
+                       this.killEnemy(enemyToDestroy);
           }, 200);
         }
       }
     }
   };
+
+  killEnemy(enemy: Phaser.GameObjects.GameObject) {
+    enemy.destroy();
+    model.enemyCounter--;
+    this.checkLevelComplete();
+  }
+
+  checkLevelComplete() {
+    if (model.enemyCounter === 0 && !model.gameOver) {
+      setTimeout(() => {}, 1500);
+      model.berserkActive = false;
+      this.drawLevelComplete();
+    }
+  }
 
   handleExplodeSuperBomb(x = 0, y = 0) {
     const index = fieldMatrix
@@ -496,34 +514,18 @@ class GameScene extends Phaser.Scene {
       // this.dropRandomBonus(x, y);
     });
 
-    this.physics.add.overlap(
-      this.explosion,
-      this.bombIncreasers,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
+    [this.superBombs, this.hearts, this.shields, this.bombIncreasers].forEach(
+      (bonus) => {
+        this.physics.add.overlap(
+          this.explosion,
+          bonus,
+          this.destroyOnCollideCallback as ArcadePhysicsCallback,
+          undefined,
+          this
+        );
+      }
     );
-    this.physics.add.overlap(
-      this.explosion,
-      this.hearts,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.explosion,
-      this.superBombs,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
-    this.physics.add.overlap(
-      this.explosion,
-      this.shields,
-      this.destroyOnCollideCallback as ArcadePhysicsCallback,
-      undefined,
-      this
-    );
+
     // this.physics.add.overlap(
     //   this.explosion,
     //   this.wood,
@@ -547,55 +549,55 @@ class GameScene extends Phaser.Scene {
     // );
   }
 
-  destroyEnemy(
-    _explosion: Phaser.Physics.Arcade.Sprite,
-    enemy: EnhancedEnemy //Phaser.Physics.Arcade.Sprite
-  ) {
-    // enemy.deathTriggered = true
-    Object.defineProperty(enemy, "isDeathTriggered", { value: true });
+  // destroyEnemy(
+  //   _explosion: Phaser.Physics.Arcade.Sprite,
+  //   enemy: EnhancedEnemy //Phaser.Physics.Arcade.Sprite
+  // ) {
+  //   // enemy.deathTriggered = true
+  //   Object.defineProperty(enemy, "isDeathTriggered", { value: true });
 
-    // enemy.disableBody(true, true);
+  //   // enemy.disableBody(true, true);
 
-    // const squareToCheck = flatFieldMatrix.find(
-    //   //   (square) =>
-    //   //     Math.floor(square.x) === Math.floor(x) &&
-    //   //     Math.floor(square.y) === Math.floor(y)
-    //   );
-    // const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
-    //         const [closestX, closestY] = this.findClosestSquare( enemy as Phaser.Physics.Matter.Sprite
-    //         );
-    //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
-    //       });
+  //   // const squareToCheck = flatFieldMatrix.find(
+  //   //   //   (square) =>
+  //   //   //     Math.floor(square.x) === Math.floor(x) &&
+  //   //   //     Math.floor(square.y) === Math.floor(y)
+  //   //   );
+  //   // const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
+  //   //         const [closestX, closestY] = this.findClosestSquare( enemy as Phaser.Physics.Matter.Sprite
+  //   //         );
+  //   //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
+  //   //       });
 
-    enemy.once("destroy", () => {
-      const { isDeathTriggered } = enemy;
-      if (!isDeathTriggered) {
-        model.curLvlScore += 100;
-        this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
-        this.enemyDeathSound.play();
-        model.enemyCounter--;
+  //   enemy.once("destroy", () => {
+  //     const { isDeathTriggered } = enemy;
+  //     if (!isDeathTriggered) {
+  //       model.curLvlScore += 100;
+  //       this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
+  //       this.enemyDeathSound.play();
+  //       model.enemyCounter--;
 
-        enemy.setTint(0xff0000);
-        this.add.tween({
-          targets: enemy,
-          ease: "Sine.easeInOut",
-          duration: 200,
-          delay: 0,
-          alpha: {
-            getStart: () => 1,
-            getEnd: () => 0,
-          },
-        });
-        if (model.enemyCounter === 0 && !model.gameOver) {
-          this.drawLevelComplete();
-        }
-      }
-    });
+  //       enemy.setTint(0xff0000);
+  //       this.add.tween({
+  //         targets: enemy,
+  //         ease: "Sine.easeInOut",
+  //         duration: 200,
+  //         delay: 0,
+  //         alpha: {
+  //           getStart: () => 1,
+  //           getEnd: () => 0,
+  //         },
+  //       });
+  //       if (model.enemyCounter === 0 && !model.gameOver) {
+  //         this.drawLevelComplete();
+  //       }
+  //     }
+  //   });
 
-    setTimeout(() => {
-      enemy.destroy();
-    }, 200);
-  }
+  //   setTimeout(() => {
+  //     enemy.destroy();
+  //   }, 200);
+  // }
 
   dropBomb(
     bombX: number,
@@ -730,7 +732,7 @@ class GameScene extends Phaser.Scene {
     model.gameOver = !model.gameOver;
   }
 
-  dropRandomBonus(x: number, y: number) {
+  generateRandomBonus(x: number, y: number) {
     const random = Math.random();
     let group: Phaser.Physics.Arcade.StaticGroup | null = null;
     let item: string = "";
@@ -740,7 +742,7 @@ class GameScene extends Phaser.Scene {
       item: string = ""
     ) => {
       if (group) {
-        const randomBonus = group
+        const randomBonus: IBonusItem = group
           .create(x, y, item)
           .setSize(fieldSquareLength, fieldSquareLength)
           .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
@@ -759,30 +761,33 @@ class GameScene extends Phaser.Scene {
           value: true,
           writable: true,
         });
+        randomBonus.destroyLock = true;
         setTimeout(() => {
           randomBonus.destroyLock = false;
         }, 1000);
       }
     };
 
-    if (random > 0.8) {
+    if (random > 0.93) {
       group = this.hearts;
       item = Items.LIFE;
-    } else if (random > 0.6) {
+    } else if (random > 0.86) {
       group = this.superBombs;
       item = Items.SUPERBOMB;
-    } else if (random > 0.4) {
+    } else if (random > 0.79) {
       group = this.shields;
       item = Items.SHIELD;
-    } else if (random > 0.2) {
+    } else if (random > 0.7) {
       group = this.bombIncreasers;
       item = Items.BOMB_ICREASER;
+    } else if (random > 0 && random < 0.05) {
+      group = this.berserkBonuses;
+      item = Items.BERSERK;
     }
     if (group && item) {
       setTimeout(() => {
         createItem(group, item);
       }, 400);
-      // }, 1000);
     }
   }
 
@@ -797,7 +802,6 @@ class GameScene extends Phaser.Scene {
         ? `LIVES :  ${"❤️".repeat(model.lives)}`
         : `LIVES: ❤️ x${model.lives}`;
     this.livesText.setText(livesText);
-    // this.destroyOnCollideCallback(char, heart);
   }
   collectShield(
     _char: Phaser.Physics.Arcade.Sprite,
@@ -805,9 +809,35 @@ class GameScene extends Phaser.Scene {
   ) {
     shield.destroy();
     model.shieldActive = true;
-    this.shieldCheck();
+    this.setCharTint();
     this.updateBonusesText();
-    // this.destroyOnCollideCallback(char, shield);
+  }
+  collideEnemyAsBerserk(
+    _char: Phaser.Physics.Arcade.Sprite,
+    enemy: Phaser.Physics.Arcade.Sprite
+  ) {
+    if (model.berserkActive) {
+      const { x, y } = enemy;
+      this.drawExplosion(x, y);
+      this.killEnemy(enemy);
+    }
+  }
+  collectBerserk(
+    _char: Phaser.Physics.Arcade.Sprite,
+    _berserk: Phaser.Physics.Arcade.Sprite
+  ) {
+    const speed = model.charSpeed;
+    model.charSpeed = model.charSpeed * 1.5;
+    model.berserkActive = true;
+    this.setCharTint();
+    this.updateBonusesText();
+
+    setTimeout(() => {
+      model.berserkActive = false;
+      model.charSpeed = speed;
+      this.updateBonusesText();
+      this.setCharTint();
+    }, 5000);
   }
   collectSuperBomb(
     _char: Phaser.Physics.Arcade.Sprite,
@@ -838,25 +868,29 @@ class GameScene extends Phaser.Scene {
   updateBonusesText() {
     const text = `💣х${model.maxBombs}${model.shieldActive ? " ⛨" : ""}${
       model.superBombActive ? " 💥" : ""
-    }`;
+    }${model.berserkActive ? " 😈" : ""}`;
     this.bonusesText.setText(text);
   }
-  tiltCamera() {
+  tiltCamera(superbomb: boolean) {
     interface Camera extends Phaser.Cameras.Scene2D.Camera {
-      rotation?: number | undefined;
+      rotation?: number;
     }
-
     const cam: Camera = this.cameras.main;
-
-    // const cam = this.cameras.main;
+    console.log("cam :", cam);
     const tilt = setInterval(() => {
-      const random = (Math.round(Math.random()) * 2 - 1) * 0.005;
-      if (cam.rotation) cam.rotation += random;
+      const random =
+        (Math.round(Math.random()) * 2 - 1) * (superbomb ? 0.02 : 0.005);
+      if (!cam.rotation) cam.rotation = 0;
+      if (!cam.zoom) cam.zoom = 0;
+      cam.rotation += random;
     }, 50);
-    setTimeout(() => {
-      clearInterval(tilt);
-      cam.rotation = 0;
-    }, 250);
+    setTimeout(
+      () => {
+        clearInterval(tilt);
+        cam.rotation = 0;
+      },
+      superbomb ? 500 : 150
+    );
   }
   bombCheck() {
     if (model.activeBombs.length !== 0) {
@@ -865,8 +899,10 @@ class GameScene extends Phaser.Scene {
       });
     }
   }
-  shieldCheck() {
-    if (model.shieldActive) this.char.setTint(0x00ff00);
+  setCharTint() {
+    if (model.berserkActive) this.char.setTint(0xff0000);
+    else if (model.shieldActive) this.char.setTint(0x00ff00);
+    else this.char.clearTint();
   }
 
   bombTimerCheck() {
@@ -944,7 +980,9 @@ class GameScene extends Phaser.Scene {
       const [bombX, bombY] = this.findClosestSquare(
         this.char as Phaser.Physics.Matter.Sprite
       ) as number[];
-      this.dropBomb(bombX, bombY);
+      if (!model.berserkActive) {
+        this.dropBomb(bombX, bombY);
+      }
     }
   }
 
@@ -1048,47 +1086,62 @@ class GameScene extends Phaser.Scene {
   }
 
   setupOverlapsAndColliders() {
+    // char colliders
     this.physics.add.collider(this.char, this.stone);
     this.physics.add.collider(this.char, this.wood);
     this.physics.add.collider(this.char, this.enemies, () => {
-      if (!model.gameOver) this.charDie();
+      if (!model.gameOver && !model.berserkActive) this.charDie();
     });
 
+    // enemy colliders
     [this.wood, this.stone, this.bombs].forEach((object) => {
       this.physics.add.collider(this.enemies, object);
     });
 
-    [this.hearts, this.shields, this.superBombs, this.bombIncreasers].forEach(
-      (bonus) => {
-        let curCallback: ArcadePhysicsCallback | undefined;
-        switch (bonus) {
-          case this.hearts:
-            curCallback = this.collectHeart as ArcadePhysicsCallback;
-            break;
-          case this.shields:
-            curCallback = this.collectShield as ArcadePhysicsCallback;
-            break;
-          case this.superBombs:
-            curCallback = this.collectSuperBomb as ArcadePhysicsCallback;
-            break;
-          case this.bombIncreasers:
-            curCallback = this.collectBombIncrease as ArcadePhysicsCallback;
-            break;
+    // bonuses char overlap
+    [
+      this.hearts,
+      this.shields,
+      this.superBombs,
+      this.bombIncreasers,
+      this.berserkBonuses,
+      this.enemies,
+    ].forEach((object) => {
+      let curCallback: ArcadePhysicsCallback | undefined;
+      switch (object) {
+        case this.hearts:
+          curCallback = this.collectHeart as ArcadePhysicsCallback;
+          break;
+        case this.shields:
+          curCallback = this.collectShield as ArcadePhysicsCallback;
+          break;
+        case this.superBombs:
+          curCallback = this.collectSuperBomb as ArcadePhysicsCallback;
+          break;
+        case this.bombIncreasers:
+          curCallback = this.collectBombIncrease as ArcadePhysicsCallback;
+          break;
+        case this.berserkBonuses:
+          curCallback = this.collectBerserk as ArcadePhysicsCallback;
+          break;
+        case this.enemies:
+          curCallback = this.collideEnemyAsBerserk as ArcadePhysicsCallback;
+          break;
 
-          default:
-            curCallback = undefined;
-        }
-
-        this.physics.add.overlap(
-          this.char,
-          bonus,
-          curCallback,
-          this.destroyOnCollideCallback as ArcadePhysicsCallback,
-          this
-        );
+        default:
+          curCallback = undefined;
       }
-    );
 
+      this.physics.add.overlap(
+        this.char,
+        object,
+        curCallback,
+        this.destroyOnCollideCallback as ArcadePhysicsCallback,
+        this
+      );
+    });
+
+    // bonuses enemy destroy overlap
     [this.superBombs, this.hearts, this.shields, this.bombIncreasers].forEach(
       (bonus) => {
         this.physics.add.overlap(
@@ -1213,6 +1266,7 @@ class GameScene extends Phaser.Scene {
     this.bombs = this.physics.add.group();
     this.hearts = this.physics.add.staticGroup();
     this.bombIncreasers = this.physics.add.staticGroup();
+    this.berserkBonuses = this.physics.add.staticGroup();
     this.shields = this.physics.add.staticGroup();
     this.superBombs = this.physics.add.staticGroup();
     this.explosions = this.physics.add.staticGroup();
