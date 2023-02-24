@@ -611,10 +611,12 @@ class GameScene extends Phaser.Scene {
         bombTimer !== model.bombSpeed) &&
       !model.bombIsPlanting
     ) {
+      const [bombXCoord, bombYCoord] = this.bombCoordsAdapter(bombX, bombY);
+
       const checkSquare = this.bombs.children.entries.find(
         (bomb) =>
-          (bomb as Phaser.Physics.Matter.Sprite).x === bombX &&
-          (bomb as Phaser.Physics.Matter.Sprite).y === bombY
+          (bomb as Phaser.Physics.Matter.Sprite).x === bombXCoord &&
+          (bomb as Phaser.Physics.Matter.Sprite).y === bombYCoord
       );
       if (checkSquare) {
         if (bombTimer === model.bombSpeed) return;
@@ -625,7 +627,11 @@ class GameScene extends Phaser.Scene {
       }
 
       const bomb = this.bombs
-        .create(bombX, bombY, isSuperBomb ? Bombs.SUPERBOMB : Bombs.BOMB)
+        .create(
+          bombXCoord,
+          bombYCoord,
+          isSuperBomb ? Bombs.SUPERBOMB : Bombs.BOMB
+        )
         .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
         .setImmovable();
@@ -639,7 +645,7 @@ class GameScene extends Phaser.Scene {
 
       const curBomb: ActiveBomb = {
         curBomb: setTimeout(() => {
-          this.explodeBomb(bomb, bombX, bombY);
+          this.explodeBomb(bomb, bombXCoord, bombYCoord);
         }, bombTimer),
         bombTimer: bombTimer,
         bombX: bombX,
@@ -994,8 +1000,15 @@ class GameScene extends Phaser.Scene {
       const [bombX, bombY] = this.findClosestSquare(
         this.char as Phaser.Physics.Matter.Sprite
       ) as number[];
+      const bombXSquare = Math.floor(
+        (bombX - fieldStartX + fieldSquareLength / 2) / fieldSquareLength
+      );
+      const bombYSquare = Math.floor(
+        (bombY + fieldSquareLength / 2) / fieldSquareLength
+      );
+      console.log(bombXSquare, bombYSquare);
       if (!model.berserkActive) {
-        this.dropBomb(bombX, bombY);
+        this.dropBomb(bombXSquare, bombYSquare);
       }
     }
   }
@@ -1365,6 +1378,12 @@ class GameScene extends Phaser.Scene {
     }
 
     return returnMatrix;
+  }
+
+  bombCoordsAdapter(bombX: number, bombY: number) {
+    bombX = fieldStartX + bombX * fieldSquareLength - fieldSquareLength / 2;
+    bombY = bombY * fieldSquareLength - fieldSquareLength / 2;
+    return [bombX, bombY];
   }
 }
 export const gameScene = new GameScene();
