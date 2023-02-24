@@ -35,7 +35,12 @@ export class WinView {
           canvas.style.display = "initial";
           document.removeEventListener("keydown", callback);
           model.fieldMatrix = undefined;
-          view.start.phaser.gameScene.generateGameField(); //
+          view.start.phaser.gameScene.fieldMatrix = Array(model.ceilsNum)
+            .fill([])
+            .map(() =>
+              Array(model.ceilsNum).fill({ x: 0, y: 0, object: null })
+            );
+          view.start.phaser.gameScene.generateGameField();
           view.start.phaser.gameScene.restartScene();
         }, 500);
       }

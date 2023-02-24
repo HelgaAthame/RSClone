@@ -6,6 +6,10 @@ import { db } from "../firebase-config.js";
 import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
 
 export class Model {
+  textStartX: number;
+  textStartY: number;
+  charStartX: number;
+  charStartY: number;
   width: number;
   height: number;
   fieldSquareLength: number;
@@ -46,6 +50,7 @@ export class Model {
     this.height = window.innerHeight;
     this.fieldSquareLength = this.height / this.ceilsNum;
     this.fieldStartX = this.width / 2 - this.height / 2;
+
     this.ceilsNum = 11;
     this.enteredLevel = 1;
     this.charSpeed = 160;
@@ -151,12 +156,12 @@ export class Model {
   }
 
   resetGame() {
-    this.ceilsNum = 11; //11
+    this.ceilsNum = 11;
     this.score = 0;
     this.curLvlScore = 0;
     this.lives = 3;
     this.level = Number(this.enteredLevel);
-    this.curLvlEnemies = this.level + 0; //2
+    this.curLvlEnemies = this.level + 2;
     this.enemyCounter = 0;
     this.bombSpeed = this.bombSpeed < 1000 ? 1000 : 2000 - this.level * 100;
     this.enemySpeed = this.enemySpeed > 200 ? 200 : 70 + this.level * 10;
@@ -184,7 +189,8 @@ export class Model {
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
     if (this.level === 1) {
-      this.ceilsNum = 14;
+      this.ceilsNum = 13;
+      this.fieldSquareLength = this.height / this.ceilsNum;
     }
   }
 

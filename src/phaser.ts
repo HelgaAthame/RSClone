@@ -32,13 +32,13 @@ import mayhem from "./assets/fonts/retro-land-mayhem.ttf";
 
 loadFont("Mayhem", mayhem);
 
-const fieldSquareLength = model.height / model.ceilsNum;
+model.fieldSquareLength = model.height / model.ceilsNum;
+model.charStartX = model.fieldStartX + 1.5 * model.fieldSquareLength;
+model.charStartY = model.height - 1.5 * model.fieldSquareLength;
+model.textStartX = model.fieldStartX + 0.5 * model.fieldSquareLength;
+model.textStartY = 0.3 * model.fieldSquareLength;
 const fieldImgSize = 512;
-const charStartX = model.fieldStartX + 1.5 * fieldSquareLength;
-const charStartY = model.height - 1.5 * fieldSquareLength;
 
-const textStartX = model.fieldStartX + 0.5 * fieldSquareLength;
-const textStartY = 0.3 * fieldSquareLength;
 const gameUITextStyle: Partial<Phaser.GameObjects.TextStyle> = {
   fontFamily: "Mayhem",
   fontSize: "1.3rem",
@@ -57,10 +57,6 @@ const bonusTextStyle = {
   stroke: "#fff",
   strokeThickness: 3,
 };
-
-let fieldMatrix: FieldSquare[][] = Array(model.ceilsNum)
-  .fill([])
-  .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
 
 enum Items {
   SUPERBOMB = "superbomb_item",
@@ -87,6 +83,7 @@ interface EnhancedObj extends Phaser.Physics.Arcade.Sprite {
 }
 
 class GameScene extends Phaser.Scene {
+  fieldMatrix: FieldSquare[][];
   cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   scoreText: Phaser.GameObjects.Text;
   livesText: Phaser.GameObjects.Text;
@@ -153,6 +150,9 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.fieldMatrix = Array(model.ceilsNum)
+      .fill([])
+      .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
     view.start.pauseBGAudio();
     model.isGamePaused = false;
     this.defineGameObjects();
@@ -175,8 +175,8 @@ class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     model.fieldMatrix
-      ? (fieldMatrix = this.fieldMatrixAdapter(model.fieldMatrix))
-      : (model.fieldMatrix = this.fieldMatrixAdapter(fieldMatrix));
+      ? (this.fieldMatrix = this.fieldMatrixAdapter(model.fieldMatrix))
+      : (model.fieldMatrix = this.fieldMatrixAdapter(this.fieldMatrix));
 
     this.setupOverlapsAndColliders();
     this.createGameAnimations();
@@ -216,7 +216,7 @@ class GameScene extends Phaser.Scene {
     const [closestX, closestY] = this.findClosestSquare(
       this.char as Phaser.Physics.Matter.Sprite
     );
-    const flatFieldMatrix = fieldMatrix.flat();
+    const flatFieldMatrix = this.fieldMatrix.flat();
     const curCharSquare = flatFieldMatrix.find(
       (square) => square.object === "char"
     );
@@ -263,7 +263,7 @@ class GameScene extends Phaser.Scene {
   }
   enemyMovement(enemy: Phaser.Physics.Matter.Sprite): void {
     const [closestX, closestY] = this.findClosestSquare(enemy);
-    const flatFieldMatrix = fieldMatrix.flat();
+    const flatFieldMatrix = this.fieldMatrix.flat();
 
     const newEnemySquare = flatFieldMatrix.find(
       (square) =>
@@ -277,8 +277,8 @@ class GameScene extends Phaser.Scene {
     /*  */
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
-        if (fieldMatrix[i - 1][j - 1].object === `enemy_${curEnemyID}`)
-          fieldMatrix[i - 1][j - 1].object = "grass";
+        if (this.fieldMatrix[i - 1][j - 1].object === `enemy_${curEnemyID}`)
+          this.fieldMatrix[i - 1][j - 1].object = "grass";
       }
     }
     /*  */
@@ -310,7 +310,7 @@ class GameScene extends Phaser.Scene {
   findClosestSquare(object: Phaser.Physics.Matter.Sprite) {
     const objectX = object.x;
     const objectY = object.y;
-    const flatFieldMatrix = fieldMatrix.flat();
+    const flatFieldMatrix = this.fieldMatrix.flat();
     const charToSquareDist = flatFieldMatrix.map((square) =>
       Math.sqrt((objectX - square.x) ** 2 + (objectY - square.y) ** 2)
     );
@@ -360,10 +360,10 @@ class GameScene extends Phaser.Scene {
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
     const isSuperBomb = bomb.texture.key === Bombs.SUPERBOMB;
-    const nextX = x + fieldSquareLength;
-    const prevX = x - fieldSquareLength;
-    const nextY = y + fieldSquareLength;
-    const prevY = y - fieldSquareLength;
+    const nextX = x + model.fieldSquareLength;
+    const prevX = x - model.fieldSquareLength;
+    const nextY = y + model.fieldSquareLength;
+    const prevY = y - model.fieldSquareLength;
     bomb.destroy();
 
     if (isSuperBomb) {
@@ -379,7 +379,7 @@ class GameScene extends Phaser.Scene {
   }
 
   handleTileExplosion = (x: number, y: number) => {
-    const flatFieldMatrix = fieldMatrix.flat();
+    const flatFieldMatrix = this.fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
         Math.floor(square.x) === Math.floor(x) &&
@@ -466,7 +466,7 @@ class GameScene extends Phaser.Scene {
   }
 
   handleExplodeSuperBomb(x = 0, y = 0) {
-    const index = fieldMatrix
+    const index = this.fieldMatrix
       .flat()
       .findIndex(
         (square) =>
@@ -481,20 +481,20 @@ class GameScene extends Phaser.Scene {
     let xRight = index_X;
     let xLeft = index_X;
 
-    while (fieldMatrix[index_Y][xRight].object !== "stone") {
-      this.handleTileExplosion(fieldMatrix[index_Y][xRight].x, y);
+    while (this.fieldMatrix[index_Y][xRight].object !== "stone") {
+      this.handleTileExplosion(this.fieldMatrix[index_Y][xRight].x, y);
       xRight++;
     }
-    while (fieldMatrix[index_Y][xLeft].object !== "stone") {
-      this.handleTileExplosion(fieldMatrix[index_Y][xLeft].x, y);
+    while (this.fieldMatrix[index_Y][xLeft].object !== "stone") {
+      this.handleTileExplosion(this.fieldMatrix[index_Y][xLeft].x, y);
       xLeft--;
     }
-    while (fieldMatrix[yUp][index_X].object !== "stone") {
-      this.handleTileExplosion(x, fieldMatrix[yUp][index_X].y);
+    while (this.fieldMatrix[yUp][index_X].object !== "stone") {
+      this.handleTileExplosion(x, this.fieldMatrix[yUp][index_X].y);
       yUp--;
     }
-    while (fieldMatrix[yDown][index_X].object !== "stone") {
-      this.handleTileExplosion(x, fieldMatrix[yDown][index_X].y);
+    while (this.fieldMatrix[yDown][index_X].object !== "stone") {
+      this.handleTileExplosion(x, this.fieldMatrix[yDown][index_X].y);
       yDown++;
     }
     this.updateBonusesText();
@@ -628,8 +628,11 @@ class GameScene extends Phaser.Scene {
           bombYCoord,
           isSuperBomb ? Bombs.SUPERBOMB : Bombs.BOMB
         )
-        .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
-        .setDisplaySize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+        .setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
+        .setDisplaySize(
+          model.fieldSquareLength * 0.9,
+          model.fieldSquareLength * 0.9
+        )
         .setImmovable();
 
       if (bombTimer === model.bombSpeed) {
@@ -728,8 +731,11 @@ class GameScene extends Phaser.Scene {
       if (group) {
         const randomBonus: IBonusItem = group
           .create(x, y, item)
-          .setSize(fieldSquareLength, fieldSquareLength)
-          .setDisplaySize(fieldSquareLength / 1.5, fieldSquareLength / 1.5)
+          .setSize(model.fieldSquareLength, model.fieldSquareLength)
+          .setDisplaySize(
+            model.fieldSquareLength / 1.5,
+            model.fieldSquareLength / 1.5
+          )
           .refreshBody();
 
         this.tweens.add({
@@ -933,7 +939,7 @@ class GameScene extends Phaser.Scene {
     );
 
     if (bombRemove.isDown) {
-      const curCharSquare = fieldMatrix
+      const curCharSquare = this.fieldMatrix
         .flat()
         .find((item) => item.object === "char") as FieldSquare;
       if (!curCharSquare) return;
@@ -962,7 +968,7 @@ class GameScene extends Phaser.Scene {
     }
 
     if (keyESC.isDown) {
-      model.fieldMatrix = this.fieldMatrixAdapter(fieldMatrix);
+      model.fieldMatrix = this.fieldMatrixAdapter(this.fieldMatrix);
 
       model.saveToBd();
       model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
@@ -997,10 +1003,11 @@ class GameScene extends Phaser.Scene {
         this.char as Phaser.Physics.Matter.Sprite
       ) as number[];
       const bombXSquare = Math.round(
-        (bombX - model.fieldStartX + fieldSquareLength / 2) / fieldSquareLength
+        (bombX - model.fieldStartX + model.fieldSquareLength / 2) /
+          model.fieldSquareLength
       );
       const bombYSquare = Math.round(
-        (bombY + fieldSquareLength / 2) / fieldSquareLength
+        (bombY + model.fieldSquareLength / 2) / model.fieldSquareLength
       );
       console.log(bombXSquare, bombYSquare);
       if (!model.berserkActive) {
@@ -1011,8 +1018,8 @@ class GameScene extends Phaser.Scene {
 
   setupGameText() {
     this.livesText = this.add.text(
-      textStartX + (model.ceilsNum / 2) * fieldSquareLength - 120,
-      textStartY,
+      model.textStartX + (model.ceilsNum / 2) * model.fieldSquareLength - 120,
+      model.textStartY,
       `${
         model.lives <= 5
           ? `LIVES :  ${"❤️".repeat(model.lives)}`
@@ -1021,28 +1028,28 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.add.text(
-      textStartX + (model.ceilsNum - 2.5) * fieldSquareLength,
-      textStartY,
+      model.textStartX + (model.ceilsNum - 2.5) * model.fieldSquareLength,
+      model.textStartY,
       `LEVEL : ${model.level}`,
       gameUITextStyle
     );
 
     this.scoreText = this.add.text(
-      textStartX,
-      textStartY,
+      model.textStartX,
+      model.textStartY,
       `SCORE : ${model.score}`,
       gameUITextStyle
     );
     this.bonusesText = this.add.text(
-      textStartX,
-      textStartY + (model.ceilsNum - 1) * fieldSquareLength - 10,
+      model.textStartX,
+      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength - 10,
       "",
       bonusTextStyle
     );
 
     this.timerText = this.add.text(
-      textStartX + (model.ceilsNum / 2) * fieldSquareLength - 110,
-      textStartY + (model.ceilsNum - 1) * fieldSquareLength,
+      model.textStartX + (model.ceilsNum / 2) * model.fieldSquareLength - 110,
+      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength,
       `TIME : ${model.curLvlTimer}`,
       gameUITextStyle
     );
@@ -1184,16 +1191,16 @@ class GameScene extends Phaser.Scene {
     );
   }
   setupChar() {
-    const charField = fieldMatrix
+    const charField = this.fieldMatrix
       .flat()
       .find((square) => square.object === "char") as FieldSquare;
 
-    const charX = charField ? charField.x : charStartX;
-    const charY = charField ? charField.y : charStartY;
+    const charX = charField ? charField.x : model.charStartX;
+    const charY = charField ? charField.y : model.charStartY;
 
     this.char = this.physics.add
       .sprite(charX, charY, "char")
-      .setSize(fieldSquareLength * 0.8, fieldSquareLength * 0.8)
+      .setSize(model.fieldSquareLength * 0.8, model.fieldSquareLength * 0.8)
       .setScale(0.9, 0.9)
       .refreshBody();
 
@@ -1207,8 +1214,11 @@ class GameScene extends Phaser.Scene {
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
         const curSquareXCenter =
-          model.fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
-        const curSquareYCenter = i * fieldSquareLength - fieldSquareLength / 2;
+          model.fieldStartX +
+          j * model.fieldSquareLength -
+          model.fieldSquareLength / 2;
+        const curSquareYCenter =
+          i * model.fieldSquareLength - model.fieldSquareLength / 2;
         const randomWoodSquare = Math.round(Math.random());
 
         const emptyStartLocations =
@@ -1216,7 +1226,7 @@ class GameScene extends Phaser.Scene {
           (i === model.ceilsNum - 2 && j === 2) ||
           (i === model.ceilsNum - 1 && j === 3);
 
-        fieldMatrix[i - 1][j - 1] = {
+        this.fieldMatrix[i - 1][j - 1] = {
           x: curSquareXCenter,
           y: curSquareYCenter,
         };
@@ -1227,27 +1237,27 @@ class GameScene extends Phaser.Scene {
           j === 1 ||
           j === model.ceilsNum
         ) {
-          fieldMatrix[i - 1][j - 1].object = "stone";
+          this.fieldMatrix[i - 1][j - 1].object = "stone";
           this.stone
             .create(curSquareXCenter, curSquareYCenter, "stone")
-            .setScale((1 / fieldImgSize) * fieldSquareLength)
+            .setScale((1 / fieldImgSize) * model.fieldSquareLength)
             .refreshBody();
           continue;
         }
 
         if (i % 3 === 0 && j % 3 === 0) {
-          fieldMatrix[i - 1][j - 1].object = "stone";
+          this.fieldMatrix[i - 1][j - 1].object = "stone";
           this.stone
             .create(curSquareXCenter, curSquareYCenter, "stone")
-            .setScale((1 / fieldImgSize) * fieldSquareLength)
+            .setScale((1 / fieldImgSize) * model.fieldSquareLength)
             .refreshBody();
           continue;
         }
 
-        fieldMatrix[i - 1][j - 1].object = "grass";
+        this.fieldMatrix[i - 1][j - 1].object = "grass";
         this.grass
           .create(curSquareXCenter, curSquareYCenter, "grass")
-          .setScale((1 / fieldImgSize) * fieldSquareLength)
+          .setScale((1 / fieldImgSize) * model.fieldSquareLength)
           .refreshBody();
 
         if (model.fieldMatrix) {
@@ -1255,35 +1265,38 @@ class GameScene extends Phaser.Scene {
           if (current === "wood") {
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")
-              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .setScale((1 / fieldImgSize) * model.fieldSquareLength)
               .refreshBody();
           }
           if (current === "char") {
-            fieldMatrix[i - 1][j - 1].object = "char";
+            this.fieldMatrix[i - 1][j - 1].object = "char";
           }
           if (current?.includes("enemy")) {
-            fieldMatrix[i - 1][j - 1].object = "enemy";
+            this.fieldMatrix[i - 1][j - 1].object = "enemy";
             this.enemies
               .create(
-                fieldMatrix[i - 1][j - 1].x,
-                fieldMatrix[i - 1][j - 1].y,
+                this.fieldMatrix[i - 1][j - 1].x,
+                this.fieldMatrix[i - 1][j - 1].y,
                 "enemy"
               )
-              .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+              .setSize(
+                model.fieldSquareLength * 0.9,
+                model.fieldSquareLength * 0.9
+              )
               .setScale(0.9)
               .setDepth(1)
               .refreshBody();
           }
         } else {
           if (i === model.ceilsNum - 1 && j === 2) {
-            fieldMatrix[i - 1][j - 1].object = "char";
+            this.fieldMatrix[i - 1][j - 1].object = "char";
             continue;
           }
           if (randomWoodSquare && !emptyStartLocations) {
-            fieldMatrix[i - 1][j - 1].object = "wood";
+            this.fieldMatrix[i - 1][j - 1].object = "wood";
             this.wood
               .create(curSquareXCenter, curSquareYCenter, "wood")
-              .setScale((1 / fieldImgSize) * fieldSquareLength)
+              .setScale((1 / fieldImgSize) * model.fieldSquareLength)
               .refreshBody();
             continue;
           }
@@ -1322,22 +1335,24 @@ class GameScene extends Phaser.Scene {
         const randomY = Math.floor(Math.random() * (model.ceilsNum - 1) + 1);
 
         if (
-          fieldMatrix[randomX][randomY].object !== "grass" ||
+          this.fieldMatrix[randomX][randomY].object !== "grass" ||
           (randomX === model.ceilsNum - 2 && randomY === 1) ||
           (randomX === model.ceilsNum - 3 && randomY === 1) ||
           (randomX === model.ceilsNum - 2 && randomY === 2)
         )
           continue;
-        fieldMatrix[randomX][randomY].object = `enemy_${model.enemyCounter}`;
+        this.fieldMatrix[randomX][
+          randomY
+        ].object = `enemy_${model.enemyCounter}`;
         model.enemyCounter++;
         this.enemies
           .create(
-            fieldMatrix[randomX][randomY].x,
-            fieldMatrix[randomX][randomY].y,
+            this.fieldMatrix[randomX][randomY].x,
+            this.fieldMatrix[randomX][randomY].y,
             "enemy"
           )
           .setDepth(1)
-          .setSize(fieldSquareLength * 0.9, fieldSquareLength * 0.9)
+          .setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
           .setScale(0.9)
           .refreshBody();
       }
@@ -1349,7 +1364,7 @@ class GameScene extends Phaser.Scene {
       .fill([])
       .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
     switch (matrix) {
-      case fieldMatrix:
+      case this.fieldMatrix:
         for (let i = 1; i <= model.ceilsNum; i++) {
           for (let j = 1; j <= model.ceilsNum; j++) {
             returnMatrix[i - 1][j - 1] = {
@@ -1365,9 +1380,11 @@ class GameScene extends Phaser.Scene {
         for (let i = 1; i <= model.ceilsNum; i++) {
           for (let j = 1; j <= model.ceilsNum; j++) {
             const curSquareXCenter =
-              model.fieldStartX + j * fieldSquareLength - fieldSquareLength / 2;
+              model.fieldStartX +
+              j * model.fieldSquareLength -
+              model.fieldSquareLength / 2;
             const curSquareYCenter =
-              i * fieldSquareLength - fieldSquareLength / 2;
+              i * model.fieldSquareLength - model.fieldSquareLength / 2;
             returnMatrix[i - 1][j - 1] = {
               x: curSquareXCenter,
               y: curSquareYCenter,
@@ -1383,8 +1400,10 @@ class GameScene extends Phaser.Scene {
 
   bombCoordsAdapter(bombX: number, bombY: number) {
     bombX =
-      model.fieldStartX + bombX * fieldSquareLength - fieldSquareLength / 2;
-    bombY = bombY * fieldSquareLength - fieldSquareLength / 2;
+      model.fieldStartX +
+      bombX * model.fieldSquareLength -
+      model.fieldSquareLength / 2;
+    bombY = bombY * model.fieldSquareLength - model.fieldSquareLength / 2;
     return [bombX, bombY];
   }
 }
