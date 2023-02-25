@@ -51,7 +51,8 @@ export class Model {
     this.fieldSquareLength = this.height / this.ceilsNum;
     this.fieldStartX = this.width / 2 - this.height / 2;
 
-    this.ceilsNum = 11;
+    this.level = 1;
+    this.ceilsNum = 11 + 3 * Math.floor( (this.level - 1) / 3);
     this.enteredLevel = 1;
     this.charSpeed = 160;
     this.curLvlEnemies = 10;
@@ -64,7 +65,6 @@ export class Model {
     this.curTimer = this.curLvlTimer;
     this.fieldMatrix = undefined;
     this.enemySpeed = 80;
-    this.level = 1;
     this.lives = 3;
 
     this._isMuted = false;

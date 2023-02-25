@@ -225,7 +225,6 @@ export class StartView {
   }
 
   async handleContinueGame() {
-    console.log('handle continue game');
     if (!this.phaser) {
       await model.takeFromBD();
       this.phaser = await import("../phaser.js");

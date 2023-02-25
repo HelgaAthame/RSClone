@@ -356,6 +356,7 @@ class GameScene extends Phaser.Scene {
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
+    //console.log(`enemy Counter = ${model.enemyCounter}, cur Lvl Enemies = ${model.curLvlEnemies}`);
     const isSuperBomb = bomb.texture.key === Bombs.SUPERBOMB;
     const nextX = x + model.fieldSquareLength;
     const prevX = x - model.fieldSquareLength;
@@ -386,7 +387,7 @@ class GameScene extends Phaser.Scene {
       square.object?.startsWith("enemy")
     );
     if (!squareToCheck) {
-      console.log(`handle tile explosion , x = ${x}, y= ${y}`);
+      //console.log(`handle tile explosion , x = ${x}, y= ${y}`);
       throw new Error("Square to check was not found");
     } else {
       if (squareToCheck.object === "stone") return;
@@ -709,6 +710,7 @@ class GameScene extends Phaser.Scene {
     model.activeBombs.forEach((bomb) => {
       window.clearTimeout(bomb.curBomb);
     });
+
     this.bombs.destroy();
     this.scene.restart();
   }
@@ -863,7 +865,7 @@ class GameScene extends Phaser.Scene {
       rotation?: number;
     }
     const cam: Camera = this.cameras.main;
-    console.log("cam :", cam);
+    //console.log("cam :", cam);
     const tilt = setInterval(() => {
       const random =
         (Math.round(Math.random()) * 2 - 1) * (superbomb ? 0.02 : 0.005);
@@ -1013,7 +1015,7 @@ class GameScene extends Phaser.Scene {
       const bombYSquare = Math.round(
         (bombY + model.fieldSquareLength / 2) / model.fieldSquareLength
       );
-      console.log(bombXSquare, bombYSquare);
+      //console.log(bombXSquare, bombYSquare);
       if (!model.berserkActive) {
         this.dropBomb(bombXSquare, bombYSquare);
       }
@@ -1215,6 +1217,18 @@ class GameScene extends Phaser.Scene {
   }
 
   generateGameField() {
+
+
+//recount field size
+  model.ceilsNum = 11 + 3 * Math.floor( (model.level - 1) / 3)
+  model.fieldSquareLength = model.height / model.ceilsNum;
+  model.charStartX = model.fieldStartX + 1.5 * model.fieldSquareLength;
+  model.charStartY = model.height - 1.5 * model.fieldSquareLength;
+  model.textStartX = model.fieldStartX + 0.5 * model.fieldSquareLength;
+  model.textStartY = 0.3 * model.fieldSquareLength;
+//
+
+
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
         const curSquareXCenter =
@@ -1264,7 +1278,7 @@ class GameScene extends Phaser.Scene {
           .setScale((1 / fieldImgSize) * model.fieldSquareLength)
           .refreshBody();
 
-        if (model.fieldMatrix) {
+        if (model.fieldMatrix && model.fieldMatrix[i - 1][j - 1].object) {
           const current = model.fieldMatrix[i - 1][j - 1].object;
           if (current === "wood") {
             this.wood
