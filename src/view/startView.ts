@@ -238,7 +238,6 @@ export class StartView {
       this.gameScene.scene.resume();
     }
 
-    model.escIsPressed = false;
     model.gameOver = false;
   }
 

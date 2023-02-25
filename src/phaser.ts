@@ -979,7 +979,6 @@ class GameScene extends Phaser.Scene {
 
       model.saveToBd();
       model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
-      model.escIsPressed = true;
       model.bombIsPlanting = false;
 
       this.putBombSound.stop();
@@ -987,7 +986,6 @@ class GameScene extends Phaser.Scene {
       this.scene.pause();
 
       setTimeout(() => this.charStepSound.stop(), 0);
-      setTimeout(() => (model.escIsPressed = false), 300);
       view.start.renderUI();
     }
 

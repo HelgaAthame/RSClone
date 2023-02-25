@@ -41,7 +41,6 @@ export class Model {
   berserkActive: boolean;
   maxBombs: number;
   bombIsPlanting: boolean;
-  escIsPressed: boolean;
   highScore: number;
 
   constructor() {
@@ -84,7 +83,6 @@ export class Model {
     this.superBombActive = false;
     this.shieldActive = false;
     this.berserkActive = false;
-    this.escIsPressed = false;
     this.berserkActive = false;
     this.auth = "authorization";
     if (localStorage.getItem("uid")) {
