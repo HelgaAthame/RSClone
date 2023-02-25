@@ -380,8 +380,8 @@ class GameScene extends Phaser.Scene {
     const flatFieldMatrix = this.fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
-        Math.floor(square.x) === Math.floor(x) &&
-        Math.floor(square.y) === Math.floor(y)
+        Math.round(square.x) === Math.round(x) &&
+        Math.round(square.y) === Math.round(y)
     );
     const enemiesAlive = flatFieldMatrix.filter((square) =>
       square.object?.startsWith("enemy")
@@ -468,8 +468,8 @@ class GameScene extends Phaser.Scene {
       .flat()
       .findIndex(
         (square) =>
-          Math.floor(square.x) === Math.floor(x) &&
-          Math.floor(square.y) === Math.floor(y)
+          Math.round(square.x) === Math.round(x) &&
+          Math.round(square.y) === Math.round(y)
       );
     const index_Y = Math.floor(index / model.ceilsNum);
     const index_X = index % model.ceilsNum;
@@ -651,6 +651,7 @@ class GameScene extends Phaser.Scene {
       };
 
       bomb.on("destroy", () => {
+        this.explosionSound.play();
         model.activeBombs = model.activeBombs.filter(
           (bomb) => bomb !== curBomb
         );
@@ -691,7 +692,7 @@ class GameScene extends Phaser.Scene {
     this.drawGameOver();
   }
   restartGame() {
-      model.activeBombs.forEach((bomb) => {
+    model.activeBombs.forEach((bomb) => {
       window.clearTimeout(bomb.curBomb);
     });
     model.resetGame();
@@ -1034,7 +1035,9 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.add.text(
-      model.textStartX + (model.ceilsNum - 2.5) * model.fieldSquareLength - model.level * 8,
+      model.textStartX +
+        (model.ceilsNum - 2.5) * model.fieldSquareLength -
+        model.level * 8,
       model.textStartY - model.level,
       `LEVEL : ${model.level}`,
       gameUITextStyle
@@ -1048,14 +1051,19 @@ class GameScene extends Phaser.Scene {
     );
     this.bonusesText = this.add.text(
       model.textStartX,
-      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength - 10 - model.level,
+      model.textStartY +
+        (model.ceilsNum - 1) * model.fieldSquareLength -
+        10 -
+        model.level,
       "",
       bonusTextStyle
     );
 
     this.timerText = this.add.text(
       model.textStartX + (model.ceilsNum / 2) * model.fieldSquareLength - 110,
-      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength - model.level,
+      model.textStartY +
+        (model.ceilsNum - 1) * model.fieldSquareLength -
+        model.level,
       `TIME : ${model.curLvlTimer}`,
       gameUITextStyle
     );
@@ -1210,8 +1218,8 @@ class GameScene extends Phaser.Scene {
       .setScale(0.9, 0.9)*/
       .setSize(model.fieldSquareLength, model.fieldSquareLength)
       .setDisplaySize(
-         model.fieldSquareLength * 0.7,
-         model.fieldSquareLength * 1.1
+        model.fieldSquareLength * 0.7,
+        model.fieldSquareLength * 1.1
       )
       .refreshBody();
 
@@ -1222,17 +1230,14 @@ class GameScene extends Phaser.Scene {
   }
 
   generateGameField() {
-
-
-//recount field size
-  model.ceilsNum = 11 + 3 * Math.floor( (model.level - 1) / 3)
-  model.fieldSquareLength = model.height / model.ceilsNum;
-  model.charStartX = model.fieldStartX + 1.5 * model.fieldSquareLength;
-  model.charStartY = model.height - 1.5 * model.fieldSquareLength;
-  model.textStartX = model.fieldStartX + 0.5 * model.fieldSquareLength;
-  model.textStartY = 0.3 * model.fieldSquareLength;
-//
-
+    //recount field size
+    model.ceilsNum = 11 + 3 * Math.floor((model.level - 1) / 3);
+    model.fieldSquareLength = model.height / model.ceilsNum;
+    model.charStartX = model.fieldStartX + 1.5 * model.fieldSquareLength;
+    model.charStartY = model.height - 1.5 * model.fieldSquareLength;
+    model.textStartX = model.fieldStartX + 0.5 * model.fieldSquareLength;
+    model.textStartY = 0.3 * model.fieldSquareLength;
+    //
 
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
