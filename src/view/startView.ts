@@ -278,7 +278,7 @@ export class StartView {
           <form id="popup__form">
             <label for="popup__input">Level Num </label>
             <br>
-            <input id="popup__input" type="text" value="1" min="1" max="20" class="form_elem popup__input" autocomplete="off">
+            <input id="popup__input" type="text" value="1" min="1" max="12" class="form_elem popup__input" autocomplete="off">
             <br>
             <button class="popup__button form_elem" type="submit" form="popup__form">OK</button>
           </form>
@@ -297,7 +297,7 @@ export class StartView {
 
       if (input.value.length > 2
         || !input.value.match(/^[1-9]+[0-9]*$/)
-        || Number(input.value) > 30) input.value = input.value.slice( 0, (input.value.length - 1) );
+        || Number(input.value) > 12) input.value = input.value.slice( 0, (input.value.length - 1) );
     })
 
     function submitFunc(e: Event) {

@@ -1025,7 +1025,7 @@ class GameScene extends Phaser.Scene {
   setupGameText() {
     this.livesText = this.add.text(
       model.textStartX + (model.ceilsNum / 2) * model.fieldSquareLength - 120,
-      model.textStartY,
+      model.textStartY - model.level,
       `${
         model.lives <= 5
           ? `LIVES :  ${"❤️".repeat(model.lives)}`
@@ -1034,28 +1034,28 @@ class GameScene extends Phaser.Scene {
       gameUITextStyle
     );
     this.add.text(
-      model.textStartX + (model.ceilsNum - 2.5) * model.fieldSquareLength,
-      model.textStartY,
+      model.textStartX + (model.ceilsNum - 2.5) * model.fieldSquareLength - model.level * 8,
+      model.textStartY - model.level,
       `LEVEL : ${model.level}`,
       gameUITextStyle
     );
 
     this.scoreText = this.add.text(
       model.textStartX,
-      model.textStartY,
+      model.textStartY - model.level,
       `SCORE : ${model.score}`,
       gameUITextStyle
     );
     this.bonusesText = this.add.text(
       model.textStartX,
-      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength - 10,
+      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength - 10 - model.level,
       "",
       bonusTextStyle
     );
 
     this.timerText = this.add.text(
       model.textStartX + (model.ceilsNum / 2) * model.fieldSquareLength - 110,
-      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength,
+      model.textStartY + (model.ceilsNum - 1) * model.fieldSquareLength - model.level,
       `TIME : ${model.curLvlTimer}`,
       gameUITextStyle
     );
