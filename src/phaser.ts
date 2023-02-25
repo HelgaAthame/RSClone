@@ -970,6 +970,7 @@ class GameScene extends Phaser.Scene {
           );
 
           curBomb.destroy();
+          this.explosionSound.stop();
         }
       }
     }
