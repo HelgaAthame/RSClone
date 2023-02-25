@@ -103,7 +103,7 @@ export class Model {
     let allValuesExists = true;
     Object.entries(this).forEach((entrie) => {
       if (entrie[1] === undefined) {
-        console.log(`${entrie[0]} is ${entrie[1]} (saving to DB)`);
+        //console.log(`${entrie[0]} is ${entrie[1]} (saving to DB)`);
         allValuesExists = false;
       }
     });

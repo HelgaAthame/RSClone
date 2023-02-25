@@ -157,7 +157,7 @@ export class SettingsView {
               arrowRight: keys[3].innerHTML as "RIGHT",
               bombSet: keys[4].innerHTML as "SPACE",
               bombRemove: keys[5].innerHTML as "SHIFT",
-              start: keys[7].innerHTML as "ENTER",
+              start: keys[6].innerHTML as "ENTER",
             };
             model.saveToBd();
             document.removeEventListener("keydown", f);
