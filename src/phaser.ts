@@ -1206,8 +1206,13 @@ class GameScene extends Phaser.Scene {
 
     this.char = this.physics.add
       .sprite(charX, charY, "char")
-      .setSize(model.fieldSquareLength * 0.8, model.fieldSquareLength * 0.8)
-      .setScale(0.9, 0.9)
+      /*.setSize(model.fieldSquareLength * 0.8, model.fieldSquareLength * 0.8)
+      .setScale(0.9, 0.9)*/
+      .setSize(model.fieldSquareLength, model.fieldSquareLength)
+      .setDisplaySize(
+         model.fieldSquareLength * 0.7,
+         model.fieldSquareLength * 1.1
+      )
       .refreshBody();
 
     this.char.on("destroy", () => {
@@ -1297,11 +1302,16 @@ class GameScene extends Phaser.Scene {
                 this.fieldMatrix[i - 1][j - 1].y,
                 "enemy"
               )
-              .setSize(
+              /*.setSize(
                 model.fieldSquareLength * 0.9,
                 model.fieldSquareLength * 0.9
               )
-              .setScale(0.9)
+              .setScale(0.9)*/
+              .setSize(model.fieldSquareLength, model.fieldSquareLength)
+              .setDisplaySize(
+                model.fieldSquareLength * 0.9,
+                model.fieldSquareLength * 0.9
+              )
               .setDepth(1)
               .refreshBody();
           }
@@ -1370,8 +1380,13 @@ class GameScene extends Phaser.Scene {
             "enemy"
           )
           .setDepth(1)
-          .setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
-          .setScale(0.9)
+          .setSize(model.fieldSquareLength, model.fieldSquareLength)
+          .setDisplaySize(
+            model.fieldSquareLength * 0.9,
+            model.fieldSquareLength * 0.9
+          )
+          /*.setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
+          .setScale(0.9)*/
           .refreshBody();
       }
     }
