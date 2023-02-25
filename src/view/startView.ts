@@ -97,7 +97,7 @@ export class StartView {
 
   playBgAudio() {
     const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
-    if(bgAudio) bgAudio.play();
+    if (bgAudio) bgAudio.play();
   }
 
   async setContinueButtonState() {
@@ -140,14 +140,17 @@ export class StartView {
         });
       }
 
-      if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l' || e.key === 'Д' || e.key === 'д')) {
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        (e.key === "L" || e.key === "l" || e.key === "Д" || e.key === "д")
+      ) {
         view.start.drawPopup();
-        document.addEventListener('keydown', view.start.popupKeyControl);
+        document.addEventListener("keydown", view.start.popupKeyControl);
       }
 
-      const popup = document.querySelector('.level-popup') as HTMLDivElement;
-      if (!popup || (popup.style.display === 'none')) {
-
+      const popup = document.querySelector(".level-popup") as HTMLDivElement;
+      if (!popup || popup.style.display === "none") {
         switch (e.code) {
           case "ArrowUp":
             clearStyles();
@@ -171,8 +174,9 @@ export class StartView {
             footerlinks[k].classList.add("active");
             break;
           case "Enter":
-
-            const selected = document.querySelector('.active') as HTMLButtonElement;
+            const selected = document.querySelector(
+              ".active"
+            ) as HTMLButtonElement;
             if (selected) {
               switch (selected.dataset.content) {
                 case "authorization":
@@ -212,7 +216,6 @@ export class StartView {
                   selected.click();
                   break;
                 default:
-
                   view.start.pauseBGAudio();
                   selected.click();
                   break;
@@ -254,11 +257,11 @@ export class StartView {
   `;
     setTimeout(async () => {
       if (this.canvas) this.canvas.style.display = "initial";
-      if (!this.phaser) {
+      if (this.phaser) {
+        this.phaser.gameScene.restartScene();
+      } else {
         this.phaser = await import("../phaser.js");
         this.gameScene = this.phaser.gameScene;
-      } else {
-        this.phaser.gameScene.restartGame();
       }
     }, 500);
   }
@@ -269,10 +272,10 @@ export class StartView {
   }
 
   drawPopup() {
-    let popup = document.querySelector('.level-popup') as HTMLDivElement;
+    let popup = document.querySelector(".level-popup") as HTMLDivElement;
     if (!popup) {
-      popup = document.createElement('div');
-      popup.classList.add('level-popup');
+      popup = document.createElement("div");
+      popup.classList.add("level-popup");
       popup.innerHTML = `
         <div class="popup__wrapper">
           <form id="popup__form">
@@ -288,63 +291,62 @@ export class StartView {
 
     document.body.append(popup);
 
-    let form = selectorChecker(document, '#popup__form') as HTMLFormElement;
-    form.addEventListener('submit', submitFunc);
+    let form = selectorChecker(document, "#popup__form") as HTMLFormElement;
+    form.addEventListener("submit", submitFunc);
 
-    let input = selectorChecker(document, '.popup__input') as HTMLFormElement;
+    let input = selectorChecker(document, ".popup__input") as HTMLFormElement;
 
-    input.addEventListener('input', () => {
-
-      if (input.value.length > 2
-        || !input.value.match(/^[1-9]+[0-9]*$/)
-        || Number(input.value) > 12) input.value = input.value.slice( 0, (input.value.length - 1) );
-    })
+    input.addEventListener("input", () => {
+      if (
+        input.value.length > 2 ||
+        !input.value.match(/^[1-9]+[0-9]*$/) ||
+        Number(input.value) > 12
+      )
+        input.value = input.value.slice(0, input.value.length - 1);
+    });
 
     function submitFunc(e: Event) {
       e.preventDefault();
       if (input.value) {
-        form.removeEventListener('submit', submitFunc);
-        popup.style.display = 'none';
+        form.removeEventListener("submit", submitFunc);
+        popup.style.display = "none";
         model.enteredLevel = input.value;
-        document.removeEventListener('keydown', view.start.popupKeyControl);
+        document.removeEventListener("keydown", view.start.popupKeyControl);
       } else {
-
       }
     }
 
-    popup.style.display = 'flex';
+    popup.style.display = "flex";
   }
 
   popupKeyControl(e: KeyboardEvent) {
     let j = 0;
 
-    const formElems: NodeListOf<HTMLInputElement> = document.querySelectorAll('.form_elem');
+    const formElems: NodeListOf<HTMLInputElement> =
+      document.querySelectorAll(".form_elem");
 
     function clearPopupStyles() {
-      formElems.forEach( elem => elem.classList.remove('active') );
+      formElems.forEach((elem) => elem.classList.remove("active"));
     }
 
     switch (e.code) {
       case "ArrowUp":
         clearPopupStyles();
         j = 0;
-        formElems[j].classList.add('active');
+        formElems[j].classList.add("active");
         formElems[j].focus();
         break;
       case "ArrowDown":
         clearPopupStyles();
         j = 1;
-        formElems[j].classList.add('active');
+        formElems[j].classList.add("active");
         formElems[j].focus();
         break;
       case "ArrowLeft":
-
         break;
       case "ArrowRight":
-
         break;
       case "Enter":
-
         break;
     }
   }

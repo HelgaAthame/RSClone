@@ -155,7 +155,7 @@ class GameScene extends Phaser.Scene {
     this.defineGameObjects();
     this.stageMusic.play();
 
-    this.events.on("resume", () => {
+    this.events.once("resume", () => {
       view.start.pauseBGAudio();
       this.stageMusic.resume();
       this.bombCheck();
@@ -1389,7 +1389,10 @@ class GameScene extends Phaser.Scene {
             "enemy"
           )
           .setDepth(1)
-          .setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
+          .setDisplaySize(
+            model.fieldSquareLength * 0.8,
+            model.fieldSquareLength * 0.8
+          )
           .refreshBody();
       }
     }
