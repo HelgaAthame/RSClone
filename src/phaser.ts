@@ -264,8 +264,8 @@ class GameScene extends Phaser.Scene {
 
     const newEnemySquare = flatFieldMatrix.find(
       (square) =>
-        Math.floor(square.x) === Math.floor(closestX) &&
-        Math.floor(square.y) === Math.floor(closestY)
+        Math.round(square.x) === Math.round(closestX) &&
+        Math.round(square.y) === Math.round(closestY)
     );
 
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
@@ -1386,13 +1386,7 @@ class GameScene extends Phaser.Scene {
             "enemy"
           )
           .setDepth(1)
-          .setSize(model.fieldSquareLength, model.fieldSquareLength)
-          .setDisplaySize(
-            model.fieldSquareLength * 0.9,
-            model.fieldSquareLength * 0.9
-          )
-          /*.setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
-          .setScale(0.9)*/
+          .setSize(model.fieldSquareLength * 0.9, model.fieldSquareLength * 0.9)
           .refreshBody();
       }
     }
