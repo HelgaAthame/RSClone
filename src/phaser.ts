@@ -672,9 +672,9 @@ class GameScene extends Phaser.Scene {
       });
 
       if (bombTimer === model.bombSpeed) {
-        model.activeBombs.push(curBomb);
         this.char.anims.play("placeBomb", true);
       }
+      model.activeBombs.push(curBomb);
     }
     model.superBombActive = false;
     this.updateBonusesText();
@@ -885,6 +885,9 @@ class GameScene extends Phaser.Scene {
   bombCheck() {
     if (model.activeBombs.length !== 0) {
       model.activeBombs.forEach((bomb) => {
+        model.activeBombs = model.activeBombs.filter(
+          (curBomb) => curBomb !== bomb
+        );
         this.dropBomb(bomb.bombX, bomb.bombY, bomb.bombTimer, bomb.isSuperBomb);
       });
     }
@@ -964,6 +967,7 @@ class GameScene extends Phaser.Scene {
           const findBombInModel = model.activeBombs.find(
             (bomb) => bomb.bombX === bombXSquare && bomb.bombY === bombYSquare
           ) as ActiveBomb;
+
           clearTimeout(findBombInModel?.curBomb);
           model.activeBombs = model.activeBombs.filter(
             (bomb) => bomb !== findBombInModel
@@ -1017,7 +1021,6 @@ class GameScene extends Phaser.Scene {
       const bombYSquare = Math.round(
         (bombY + model.fieldSquareLength / 2) / model.fieldSquareLength
       );
-      //console.log(bombXSquare, bombYSquare);
       if (!model.berserkActive) {
         this.dropBomb(bombXSquare, bombYSquare);
       }
