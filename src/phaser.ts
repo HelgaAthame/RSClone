@@ -74,9 +74,6 @@ interface IBonusItem extends Phaser.GameObjects.GameObject {
   scaleX: number;
   scaleY: number;
 }
-interface EnhancedEnemy extends Phaser.Physics.Arcade.Sprite {
-  isDeathTriggered: boolean;
-}
 
 interface EnhancedObj extends Phaser.Physics.Arcade.Sprite {
   destroyLock: boolean;
