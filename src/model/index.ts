@@ -176,6 +176,12 @@ export class Model {
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
     this.fieldMatrix = undefined;
+
+    this.fieldSquareLength = this.height / this.ceilsNum;
+    this.charStartX = this.fieldStartX + 1.5 * this.fieldSquareLength;
+    this.charStartY = this.height - 1.5 * this.fieldSquareLength;
+    this.textStartX = this.fieldStartX + 0.5 * this.fieldSquareLength;
+    this.textStartY = 0.3 * this.fieldSquareLength;
   }
 
   nextLvl() {
