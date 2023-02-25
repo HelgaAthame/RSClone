@@ -156,7 +156,7 @@ export class Model {
   }
 
   resetGame() {
-    this.ceilsNum = 11;
+    this.ceilsNum = 11 + 3 * Math.floor( (model.level - 1) / 3);
     this.score = 0;
     this.curLvlScore = 0;
     this.lives = 3;
@@ -195,7 +195,7 @@ export class Model {
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
     if (this.level === 1) {
-      this.ceilsNum = 13;
+      this.ceilsNum = 11 + 3 * Math.floor( (model.level - 1) / 3);
       this.fieldSquareLength = this.height / this.ceilsNum;
     }
   }
