@@ -41,7 +41,6 @@ export class Model {
   berserkActive: boolean;
   maxBombs: number;
   bombIsPlanting: boolean;
-  isGamePaused: boolean;
   escIsPressed: boolean;
   highScore: number;
 
@@ -52,7 +51,7 @@ export class Model {
     this.fieldStartX = this.width / 2 - this.height / 2;
 
     this.level = 1;
-    this.ceilsNum = 11 + 3 * Math.floor( (this.level - 1) / 3);
+    this.ceilsNum = 11 + 3 * Math.floor((this.level - 1) / 3);
     this.enteredLevel = 1;
     this.charSpeed = 160;
     this.curLvlEnemies = 10;
@@ -85,7 +84,6 @@ export class Model {
     this.superBombActive = false;
     this.shieldActive = false;
     this.berserkActive = false;
-    this.isGamePaused = false;
     this.escIsPressed = false;
     this.berserkActive = false;
     this.auth = "authorization";
@@ -156,7 +154,7 @@ export class Model {
   }
 
   resetGame() {
-    this.ceilsNum = 11 + 3 * Math.floor( (model.level - 1) / 3);
+    this.ceilsNum = 11 + 3 * Math.floor((model.level - 1) / 3);
     this.score = 0;
     this.curLvlScore = 0;
     this.lives = 3;
@@ -195,7 +193,7 @@ export class Model {
     this.curTimer = this.curLvlTimer;
     this.activeBombs = [];
     if (this.level === 1) {
-      this.ceilsNum = 11 + 3 * Math.floor( (model.level - 1) / 3);
+      this.ceilsNum = 11 + 3 * Math.floor((model.level - 1) / 3);
       this.fieldSquareLength = this.height / this.ceilsNum;
     }
   }

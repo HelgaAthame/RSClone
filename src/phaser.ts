@@ -151,15 +151,8 @@ class GameScene extends Phaser.Scene {
       .fill([])
       .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
     view.start.pauseBGAudio();
-    model.isGamePaused = false;
     this.defineGameObjects();
     this.stageMusic.play();
-
-    this.events.once("resume", () => {
-      view.start.pauseBGAudio();
-      this.stageMusic.resume();
-      this.bombCheck();
-    });
 
     this.events.once("start", () => {
       this.charDeathSound.stop();
@@ -982,9 +975,10 @@ class GameScene extends Phaser.Scene {
     if (keyESC.isDown) {
       model.fieldMatrix = this.fieldMatrixAdapter(this.fieldMatrix);
 
+      this.events.off("resume");
+
       model.saveToBd();
       model.activeBombs.forEach((bomb) => window.clearTimeout(bomb.curBomb));
-      model.isGamePaused = true;
       model.escIsPressed = true;
       model.bombIsPlanting = false;
 
@@ -1444,6 +1438,14 @@ class GameScene extends Phaser.Scene {
       model.fieldSquareLength / 2;
     bombY = bombY * model.fieldSquareLength - model.fieldSquareLength / 2;
     return [bombX, bombY];
+  }
+
+  resumeEvent() {
+    this.events.once("resume", () => {
+      view.start.pauseBGAudio();
+      this.stageMusic.resume();
+      this.bombCheck();
+    });
   }
 }
 export const gameScene = new GameScene();

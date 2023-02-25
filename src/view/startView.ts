@@ -234,6 +234,7 @@ export class StartView {
       this.gameScene = this.phaser.gameScene;
     } else {
       this.canvas.style.display = "initial";
+      this.gameScene.resumeEvent();
       this.gameScene.scene.resume();
     }
 
@@ -258,7 +259,7 @@ export class StartView {
     setTimeout(async () => {
       if (this.canvas) this.canvas.style.display = "initial";
       if (this.phaser) {
-        this.phaser.gameScene.restartScene();
+        this.phaser.gameScene.restartGame();
       } else {
         this.phaser = await import("../phaser.js");
         this.gameScene = this.phaser.gameScene;
