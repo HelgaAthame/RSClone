@@ -1233,6 +1233,11 @@ class GameScene extends Phaser.Scene {
     model.charStartY = model.height - 1.5 * model.fieldSquareLength;
     model.textStartX = model.fieldStartX + 0.5 * model.fieldSquareLength;
     model.textStartY = 0.3 * model.fieldSquareLength;
+
+    this.fieldMatrix = Array(model.ceilsNum)
+      .fill([])
+      .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
+    view.start.pauseBGAudio();
     //
 
     for (let i = 1; i <= model.ceilsNum; i++) {
@@ -1250,6 +1255,8 @@ class GameScene extends Phaser.Scene {
           (i === model.ceilsNum - 2 && j === 2) ||
           (i === model.ceilsNum - 1 && j === 3);
 
+          //console.log(`this.fieldMatrix =`);
+          //console.log(this.fieldMatrix);
         this.fieldMatrix[i - 1][j - 1] = {
           x: curSquareXCenter,
           y: curSquareYCenter,
