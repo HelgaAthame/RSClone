@@ -129,7 +129,7 @@ export class Model {
         charSpeed: this.charSpeed,
         gameOver: this.gameOver,
         berserkActive: this.berserkActive,
-      }).catch((e) => {
+      }).catch(() => {
         model.saveToBd();
       });
     }
