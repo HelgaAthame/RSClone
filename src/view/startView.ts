@@ -82,9 +82,7 @@ export class StartView {
 
   addBGAudio() {
     const bgAudio = document.querySelector(".bgAudio");
-    //let loaded: boolean;
     if (!bgAudio) {
-      //loaded = false;
       const bgAudio = new Audio(titleScreenAudio);
       bgAudio.classList.add("bgAudio");
       bgAudio.loop = true;
@@ -92,7 +90,6 @@ export class StartView {
       document.body.append(bgAudio);
       bgAudio.play();
     }
-    //if (bgAudio instanceof HTMLAudioElement) bgAudio.play();
   }
 
   playBgAudio() {

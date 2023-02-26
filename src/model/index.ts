@@ -1,9 +1,8 @@
 import FieldSquare from "../utils/fieldSquare.js";
 import ActiveBomb from "../utils/activeBomb.js";
 import Buttons from "../utils/buttons.js";
-//import selectorChecker from "../utils/selectorChecker.js";
 import { db } from "../firebase-config.js";
-import { /*collection,*/ doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export class Model {
   textStartX: number;
@@ -99,7 +98,6 @@ export class Model {
     let allValuesExists = true;
     Object.entries(this).forEach((entrie) => {
       if (entrie[1] === undefined) {
-        //console.log(`${entrie[0]} is ${entrie[1]} (saving to DB)`);
         allValuesExists = false;
       }
     });
@@ -132,7 +130,6 @@ export class Model {
         gameOver: this.gameOver,
         berserkActive: this.berserkActive,
       }).catch((e) => {
-        console.log(`Error when saving to DB: ${e.message}`);
         model.saveToBd();
       });
     }
@@ -199,13 +196,10 @@ export class Model {
   set isMuted(val: Boolean) {
     this._isMuted = val;
 
-    //const inputRange = selectorChecker(document, '.setting__sound-input') as HTMLInputElement;
     const inputRange = document.querySelector(
       ".setting__sound-input"
     ) as HTMLInputElement;
-    //const muteButton = selectorChecker(document, '.setting__sound-mute');
     const muteButton = document.querySelector(".setting__sound-mute");
-    //const bgAudio = selectorChecker(document, '.bgAudio') as HTMLAudioElement;
     const bgAudio = document.querySelector(".bgAudio") as HTMLAudioElement;
     if (muteButton && inputRange && bgAudio) {
       muteButton.innerHTML = muteButton.innerHTML === "🔇" ? "🔈" : "🔇";

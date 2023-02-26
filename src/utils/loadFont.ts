@@ -9,7 +9,6 @@ export default function loadFont(name: string, url: string) {
         if (DF.add !== undefined) {
           DF.add(loaded);
         }
-        //document.fonts.add(loaded);
     }).catch(function (error) {
         return error;
     });

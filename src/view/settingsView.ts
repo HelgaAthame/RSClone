@@ -61,8 +61,6 @@ export class SettingsView {
     `;
     this.configSoundLevel();
     this.configSoundMute();
-    //this.editSettings();
-    //this.saveButtonConfig();
     this.moveMenu();
   }
 

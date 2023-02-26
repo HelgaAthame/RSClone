@@ -176,6 +176,14 @@ class GameScene extends Phaser.Scene {
     this.updateBonusesText();
   }
   update() {
+    //
+    if (this.enemies.children.entries) {
+      if (model.enemyCounter !== this.enemies.children.entries.length) {
+        model.enemyCounter = this.enemies.children.entries.length;
+      }
+    }
+    //
+
     this.bombTimerCheck();
     this.gameTimer();
     this.gameBtnsHandler();
@@ -349,7 +357,6 @@ class GameScene extends Phaser.Scene {
   }
 
   explodeBomb(bomb: Phaser.GameObjects.Image, x: number, y: number) {
-    //console.log(`enemy Counter = ${model.enemyCounter}, cur Lvl Enemies = ${model.curLvlEnemies}`);
     const isSuperBomb = bomb.texture.key === Bombs.SUPERBOMB;
     const nextX = x + model.fieldSquareLength;
     const prevX = x - model.fieldSquareLength;
@@ -380,7 +387,6 @@ class GameScene extends Phaser.Scene {
       square.object?.startsWith("enemy")
     );
     if (!squareToCheck) {
-      //console.log(`handle tile explosion , x = ${x}, y= ${y}`);
       throw new Error("Square to check was not found");
     } else {
       if (squareToCheck.object === "stone") return;
@@ -493,13 +499,10 @@ class GameScene extends Phaser.Scene {
 
   drawExplosion(x: number, y: number) {
     this.explosion = this.physics.add.sprite(x, y, "explosion");
-    // const explosion = this.physics.add.sprite(x, y, "explosion");
-    // const newXplosn = this.explosions.create(x, y, "");
     const explosionAnim = this.explosion.anims.play("bombExplosion", false);
     explosionAnim.once("animationcomplete", () => {
       explosionAnim.destroy();
       this.explosion.destroy();
-      // this.dropRandomBonus(x, y);
     });
 
     [this.superBombs, this.hearts, this.shields, this.bombIncreasers].forEach(
@@ -859,7 +862,6 @@ class GameScene extends Phaser.Scene {
       rotation?: number;
     }
     const cam: Camera = this.cameras.main;
-    //console.log("cam :", cam);
     const tilt = setInterval(() => {
       const random =
         (Math.round(Math.random()) * 2 - 1) * (superbomb ? 0.02 : 0.005);
@@ -1255,8 +1257,6 @@ class GameScene extends Phaser.Scene {
           (i === model.ceilsNum - 2 && j === 2) ||
           (i === model.ceilsNum - 1 && j === 3);
 
-          //console.log(`this.fieldMatrix =`);
-          //console.log(this.fieldMatrix);
         this.fieldMatrix[i - 1][j - 1] = {
           x: curSquareXCenter,
           y: curSquareYCenter,
