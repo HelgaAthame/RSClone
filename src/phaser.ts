@@ -1310,15 +1310,10 @@ class GameScene extends Phaser.Scene {
                 this.fieldMatrix[i - 1][j - 1].y,
                 "enemy"
               )
-              /*.setSize(
-                model.fieldSquareLength * 0.9,
-                model.fieldSquareLength * 0.9
-              )
-              .setScale(0.9)*/
               .setSize(model.fieldSquareLength, model.fieldSquareLength)
               .setDisplaySize(
-                model.fieldSquareLength * 0.9,
-                model.fieldSquareLength * 0.9
+                model.fieldSquareLength * 0.8,
+                model.fieldSquareLength * 0.8
               )
               .setDepth(1)
               .refreshBody();
