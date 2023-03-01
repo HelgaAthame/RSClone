@@ -375,8 +375,8 @@ class GameScene extends Phaser.Scene {
     const flatFieldMatrix = this.fieldMatrix.flat();
     const squareToCheck = flatFieldMatrix.find(
       (square) =>
-        Math.trunc(square.x) === Math.trunc(x) &&
-        Math.trunc(square.y) === Math.trunc(y)
+        Math.round(square.x) === Math.round(x) &&
+        Math.round(square.y) === Math.round(y)
     );
     const enemiesAlive = flatFieldMatrix.filter((square) =>
       square.object?.startsWith("enemy")
