@@ -2,9 +2,7 @@ import { model } from "../model/index.js";
 import { view } from "./index.js";
 import selectorChecker from "../utils/selectorChecker.js";
 import "./settingsView.scss";
-//import keyz from "../utils/keys.js";
 import keysObject from "../utils/keys.js";
-//import { gameScene } from "../phaser.js";
 
 export class SettingsView {
   async renderUI() {
@@ -90,12 +88,12 @@ export class SettingsView {
       if (ourEntry[0].length === 1) return `Key${ourEntry[0]}`;
       return ourEntry[0];
     } else {
-      return '';
+      return "";
     }
   }
 
   moveMenu() {
-    let i = 0; //number of the first element in nav menu to be selected
+    let i = 0;
     const signs: NodeListOf<HTMLDivElement> =
       document.querySelectorAll(".sign");
     const keys: NodeListOf<HTMLDivElement> = document.querySelectorAll(".key");
@@ -116,18 +114,6 @@ export class SettingsView {
       switch (e.code) {
         case "Escape":
           view.start.renderUI();
-          /*if (model.isGamePaused) {
-            const canvas = document.querySelector(
-              "canvas"
-            ) as HTMLCanvasElement;
-            canvas.style.display = "initial";
-
-            const phaser = await import("../phaser.js");
-
-            phaser.gameScene.scene.resume();
-            phaser.gameScene.stageMusic.resume();
-          }*/
-
         case view.settings.findKey(model.buttons.arrowUp):
           clearStyles();
           if (i > 0) i--;

@@ -120,8 +120,8 @@ export class StartView {
   }
 
   navigateMenuListeners() {
-    let i = 0; //number of the first element in nav menu to be selected
-    let k = 2; //number of the first element in footer links to be selected
+    let i = 0;
+    let k = 2;
     const navs: NodeListOf<HTMLDivElement> =
       document.querySelectorAll(".article");
     const footerlinks: NodeListOf<HTMLDivElement> =
@@ -158,7 +158,6 @@ export class StartView {
             clearStyles();
             if (i < navs.length - 1) i++;
             navs[i].classList.add("active");
-            // ctx.pauseBGAudio();
             break;
           case "ArrowLeft":
             clearStyles();
@@ -245,8 +244,6 @@ export class StartView {
     }
 
     model.resetGame();
-
-    //model.saveToBd();
 
     const main = selectorChecker(document, "main");
     main.innerHTML = `

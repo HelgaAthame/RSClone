@@ -28,8 +28,6 @@ import shieldImg from "./assets/shield.png";
 import bombIncreaser from "./assets/plus_bomb.png";
 import mayhem from "./assets/fonts/retro-land-mayhem.ttf";
 
-//import keys from "./utils/keys.js;";
-
 loadFont("Mayhem", mayhem);
 
 model.fieldSquareLength = model.height / model.ceilsNum;
@@ -176,13 +174,11 @@ class GameScene extends Phaser.Scene {
     this.updateBonusesText();
   }
   update() {
-    //
     if (this.enemies.children.entries) {
       if (model.enemyCounter !== this.enemies.children.entries.length) {
         model.enemyCounter = this.enemies.children.entries.length;
       }
     }
-    //
 
     this.bombTimerCheck();
     this.gameTimer();
@@ -272,14 +268,13 @@ class GameScene extends Phaser.Scene {
     const curEnemyID = this.enemies.children.entries.indexOf(enemy);
     if (!newEnemySquare) throw Error("New enemy square was not found");
 
-    /*  */
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
         if (this.fieldMatrix[i - 1][j - 1].object === `enemy_${curEnemyID}`)
           this.fieldMatrix[i - 1][j - 1].object = "grass";
       }
     }
-    /*  */
+
     newEnemySquare.object = `enemy_${curEnemyID}`;
 
     if (
@@ -516,79 +511,7 @@ class GameScene extends Phaser.Scene {
         );
       }
     );
-
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.wood,
-    //   this.destroyOnCollideCallback as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.enemies,
-    //   this.destroyEnemy as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
-    // this.physics.add.overlap(
-    //   this.explosion,
-    //   this.char,
-    //   this.destroyEnemy as ArcadePhysicsCallback,
-    //   undefined,
-    //   this
-    // );
   }
-
-  // destroyEnemy(
-  //   _explosion: Phaser.Physics.Arcade.Sprite,
-  //   enemy: EnhancedEnemy //Phaser.Physics.Arcade.Sprite
-  // ) {
-  //   // enemy.deathTriggered = true
-  //   Object.defineProperty(enemy, "isDeathTriggered", { value: true });
-
-  //   // enemy.disableBody(true, true);
-
-  //   // const squareToCheck = flatFieldMatrix.find(
-  //   //   //   (square) =>
-  //   //   //     Math.floor(square.x) === Math.floor(x) &&
-  //   //   //     Math.floor(square.y) === Math.floor(y)
-  //   //   );
-  //   // const enemyToDestroy = this.enemies.children.entries.find((enemy) => {
-  //   //         const [closestX, closestY] = this.findClosestSquare( enemy as Phaser.Physics.Matter.Sprite
-  //   //         );
-  //   //         return closestX === squareToCheck.x && closestY === squareToCheck.y;
-  //   //       });
-
-  //   enemy.once("destroy", () => {
-  //     const { isDeathTriggered } = enemy;
-  //     if (!isDeathTriggered) {
-  //       model.curLvlScore += 100;
-  //       this.scoreText.setText(`SCORE: ${model.score + model.curLvlScore}`);
-  //       this.enemyDeathSound.play();
-  //       model.enemyCounter--;
-
-  //       enemy.setTint(0xff0000);
-  //       this.add.tween({
-  //         targets: enemy,
-  //         ease: "Sine.easeInOut",
-  //         duration: 200,
-  //         delay: 0,
-  //         alpha: {
-  //           getStart: () => 1,
-  //           getEnd: () => 0,
-  //         },
-  //       });
-  //       if (model.enemyCounter === 0 && !model.gameOver) {
-  //         this.drawLevelComplete();
-  //       }
-  //     }
-  //   });
-
-  //   setTimeout(() => {
-  //     enemy.destroy();
-  //   }, 200);
-  // }
 
   dropBomb(
     bombX: number,
@@ -832,7 +755,6 @@ class GameScene extends Phaser.Scene {
     superBomb.destroy();
     model.superBombActive = true;
     this.updateBonusesText();
-    // this.destroyOnCollideCallback(char, superBomb);
   }
   collectBombIncrease(
     _char: Phaser.Physics.Arcade.Sprite,
@@ -844,7 +766,7 @@ class GameScene extends Phaser.Scene {
   }
   destroyOnCollideCallback(
     _subject: Phaser.Physics.Arcade.Sprite,
-    object: EnhancedObj //Phaser.Physics.Arcade.Sprite
+    object: EnhancedObj
   ) {
     if (!object.destroyLock) {
       object.destroy();
@@ -1134,19 +1056,16 @@ class GameScene extends Phaser.Scene {
   }
 
   setupOverlapsAndColliders() {
-    // char colliders
     this.physics.add.collider(this.char, this.stone);
     this.physics.add.collider(this.char, this.wood);
     this.physics.add.collider(this.char, this.enemies, () => {
       if (!model.gameOver && !model.berserkActive) this.charDie();
     });
 
-    // enemy colliders
     [this.wood, this.stone, this.bombs].forEach((object) => {
       this.physics.add.collider(this.enemies, object);
     });
 
-    // bonuses char overlap
     [
       this.hearts,
       this.shields,
@@ -1189,7 +1108,6 @@ class GameScene extends Phaser.Scene {
       );
     });
 
-    // bonuses enemy destroy overlap
     [this.superBombs, this.hearts, this.shields, this.bombIncreasers].forEach(
       (bonus) => {
         this.physics.add.overlap(
@@ -1212,8 +1130,6 @@ class GameScene extends Phaser.Scene {
 
     this.char = this.physics.add
       .sprite(charX, charY, "char")
-      /*.setSize(model.fieldSquareLength * 0.8, model.fieldSquareLength * 0.8)
-      .setScale(0.9, 0.9)*/
       .setSize(model.fieldSquareLength, model.fieldSquareLength)
       .setDisplaySize(
         model.fieldSquareLength * 0.7,
@@ -1228,7 +1144,6 @@ class GameScene extends Phaser.Scene {
   }
 
   generateGameField() {
-    //recount field size
     model.ceilsNum = 11 + 3 * Math.floor((model.level - 1) / 3);
     model.fieldSquareLength = model.height / model.ceilsNum;
     model.charStartX = model.fieldStartX + 1.5 * model.fieldSquareLength;
@@ -1240,7 +1155,6 @@ class GameScene extends Phaser.Scene {
       .fill([])
       .map(() => Array(model.ceilsNum).fill({ x: 0, y: 0, object: null }));
     view.start.pauseBGAudio();
-    //
 
     for (let i = 1; i <= model.ceilsNum; i++) {
       for (let j = 1; j <= model.ceilsNum; j++) {
