@@ -1,0 +1,257 @@
+@mixin flexCol {
+  display: flex;
+  flex-direction: column;
+  justify-items: space-between;
+}
+
+@mixin flexCenter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flexBetween {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin ancor {
+  color: $text-color;
+  text-decoration: none;
+  &:hover {
+    color: white;
+    cursor: pointer;
+    text-shadow: 0 0 10px white;
+  }
+  &:active {
+    color: $ancor-color;
+    cursor: pointer;
+    text-shadow: 0 0 10px $ancor-color;
+  }
+  &:disabled {
+    color: $disabled-color;
+    cursor: initial;
+  }
+}
+
+$button-color: #222;
+$basic-padding: 1rem;
+$text-color: #ddd;
+$ancor-color: palevioletred;
+$disabled-color: #444;
+$grad: linear-gradient(#e66465, #9198e5);
+
+body {
+  overflow: hidden;
+  background-color: black;
+  font-family: Mayhem;
+  color: #ddd;
+  .level-popup {
+    background-color: rgba(10, 10, 20, 0.75);
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    .popup__wrapper {
+      padding: $basic-padding;
+      font-family: Mayhem;
+      font-size: 2rem;
+      margin: $basic-padding;
+      border-width: 5px;
+      border-color: $text-color;
+      color: $text-color;
+      border-style: solid;
+      background-image: $grad;
+      width: 20rem;
+      height: 20rem;
+      transition: 0.2s;
+      @include flexCenter;
+      #popup__form {
+        @include flexCol;
+        padding: 2rem;
+        .popup__input {align-self: center;
+          text-align: center;
+          width: 4rem;
+          height: 3rem;
+          background-color: $text-color;
+          color: $button-color;
+          font-family: Mayhem;
+          font-size: 1.5rem;
+          padding: $basic-padding;
+          outline: 0;
+          border:0;
+          margin: 0;
+        }
+        .popup__input::-webkit-outer-spin-button,
+        .popup__input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .popup__button {
+          font-size: 1.5rem;
+          background-color: $text-color;
+          padding: $basic-padding;
+          color: $button-color;
+          font-family: Mayhem;
+          outline: 0;
+          border:0;
+          transition: 0.2s;
+
+        }
+        .active {
+          background-color: $button-color;
+          color: $text-color;
+        }
+      }
+    }
+  }
+
+  .main {
+    @include flexCol;
+    height: 95vh;
+
+    .begin {
+      @include flexCenter;
+      margin: 10vw;
+      padding-top: 12vh;
+      padding-right: 7vw;
+      font-size: 2rem;
+      height: 95vh;
+      background-image: url("../assets/bomb.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+
+      .active {
+        color: $ancor-color;
+        text-shadow: 0 0 10px $ancor-color;
+      }
+    }
+
+    .logo {
+      flex-grow: 1;
+      background-image: url("./../assets/bomberman-logo.png");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .nav {
+      @include flexCol;
+      align-items: center;
+      row-gap: 20px;
+
+      div {
+        padding: $basic-padding;
+      }
+
+      button {
+        font: inherit;
+        background-color: transparent;
+        border: none;
+        font-size: 26px;
+        color: $text-color;
+
+        &:disabled {
+          opacity: 0.5;
+        }
+      }
+      .instruction {
+        color: plum;
+        text-shadow: 0 0 10px $ancor-color;
+      }
+      .active {
+        color: $ancor-color;
+        text-shadow: 0 0 10px $ancor-color;
+      }
+      &-item {
+        text-transform: uppercase;
+        font-size: 26px;
+      }
+    }
+    .footer {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+      .github {
+        display: flex;
+        align-items: center;
+        .github__logo {
+          img {
+            width: 3rem;
+          }
+        }
+        div,
+        a {
+          @include ancor;
+          padding: $basic-padding;
+        }
+        .active {
+          color: $ancor-color;
+          text-shadow: 0 0 10px $ancor-color;
+        }
+      }
+      .year {
+        margin: auto;
+      }
+      .rs {
+        padding: $basic-padding;
+        margin-left: auto;
+        img {
+          width: 4rem;
+        }
+      }
+      .active {
+        img {
+          width: 5rem;
+          margin: -0.5rem;
+        }
+      }
+    }
+  }
+}
+
+canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+@font-face {
+  font-family: Mayhem;
+  src: url("./../assets/fonts/retro-land-mayhem.ttf");
+}
+
+@font-face {
+  font-family: Baloo;
+  src: url("./../assets/fonts/BalooPaaji2-Regular.ttf");
+}
+
+@font-face {
+  font-family: Monaco;
+  src: url("./../assets/fonts/monaco.ttf");
+}
+
+@font-face {
+  font-family: Pacifico;
+  src: url("./../assets/fonts/Pacifico.ttf");
+}
+
+@font-face {
+  font-family: Roboto;
+  src: url("./../assets/fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+  font-family: SnakeBold;
+  src: url("./../assets/fonts/snakebold.ttf");
+}
+
+@font-face {
+  font-family: SnakeThin;
+  src: url("./../assets/fonts/snakethin.ttf");
+}

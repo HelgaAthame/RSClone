@@ -1,0 +1,26 @@
+{
+  "name": "RSClone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
+    "netlify": "ntl deploy",
+    "firebase": "firebase serve --only hosting"
+  },
+  "devDependencies": {
+    "firebase": "^9.16.0",
+    "gh-pages": "^5.0.0",
+    "netlify-cli": "^12.10.0",
+    "sass": "^1.58.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4"
+  },
+  "dependencies": {
+    "phaser": "^3.55.2"
+  }
+}

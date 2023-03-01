@@ -1,0 +1,143 @@
+@mixin flexCenter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin ancor {
+  color: $text-color;
+  text-decoration: none;
+  &:hover {
+    color: white;
+    cursor: pointer;
+    text-shadow: 0 0 10px white;
+  }
+  &:active {
+    color: $ancor-color;
+    cursor: pointer;
+    text-shadow: 0 0 10px $ancor-color;
+  }
+  &:disabled {
+    color: $disabled-color;
+    cursor: initial;
+  }
+}
+
+$basic-padding: 1rem;
+$small-padding: 0.25rem 1rem;
+$text-color: #ddd;
+$ancor-color: palevioletred;
+$disabled-color: #444;
+$grad: linear-gradient(#e66465, #9198e5);
+$grad-active: linear-gradient(#c44243, #7076c3);
+$button-color: #222;
+
+@mixin button {
+  font-family: Mayhem;
+  font-size: 2rem;
+  margin: $basic-padding;
+  border-width: 5px;
+  border-color: $button-color;
+  color: $button-color;
+  border-style: solid;
+  background-image: $grad;
+  width: 12rem;
+  height: 5rem;
+  transition: 0.2s;
+}
+
+body {
+  .main {
+    height: 95vh;
+    justify-content: center;
+    .setting__title {
+      font-size: 3rem;
+      text-align: center;
+      padding: $basic-padding;
+    }
+    .setting__wrapper {
+      @include flexCenter;
+      .setting__table {
+        .setting__button {
+          @include flexCenter;
+          width: 22rem;
+          .sign {
+            padding: $small-padding;
+            flex-grow: 1;
+            @include ancor;
+            width: 50%;
+          }
+          .key {
+            margin: $small-padding;
+            flex-grow: 1;
+            width: 50%;
+          }
+          .active {
+            color: $ancor-color;
+            text-shadow: 0 0 10px $ancor-color;
+          }
+          .blink {
+            transition: 0.1s;
+            -webkit-animation: blink 1s linear infinite;
+            animation: blink 1s linear infinite;
+          }
+          @-webkit-keyframes blink {
+            50% { color: rgb(34, 34, 34); }
+            51% { color: rgba(34, 34, 34, 0); }
+            100% { color: rgba(34, 34, 34, 0); }
+          }
+          @keyframes blink {
+            50% { color: rgb(34, 34, 34); }
+            51% { color: rgba(34, 34, 34, 0); }
+            100% { color: rgba(34, 34, 34, 0); }
+          }
+        }
+      }
+      .setting__sound {
+        .setting__sound-wrapper {
+          .setting__sound-input {
+            transform: rotate(-90deg);
+            width: 12rem;
+            margin: 6rem -4rem 0 -4rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: 5px;
+            background-color: $text-color;
+            &:hover {
+              cursor:pointer;
+            }
+            &::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              border-radius: 0;
+              border: 5px solid $button-color;
+              background-image: $grad;
+              width: 1.5rem;
+              height: 3rem;
+            }
+          }
+        }
+      }
+      .setting__sound-mute {
+        margin: 6rem 0 0 0.5rem;
+        font-size: 2rem;
+        &:hover {
+          cursor:pointer;
+        }
+      }
+    }
+    .setting__save {
+      @include flexCenter;
+      .setting__save-button {
+        @include button;
+      }
+      .active {
+        color: $disabled-color;
+        border-color: $disabled-color;
+        background-image: none;
+        background-color: white;
+      }
+    }
+  }
+}
